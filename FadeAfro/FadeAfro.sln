@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeAfro", "FadeAfro\FadeAfro.csproj", "{FADBFC51-EDBF-499B-85C0-76D0A65E6DF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeAfro.Domain", "FadeAfro.Domain\FadeAfro.Domain.csproj", "{D8F173BF-330C-4231-B209-919A642AA6BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeAfro.Infrastructure", "FadeAfro.Infrastructure\FadeAfro.Infrastructure.csproj", "{42CDFDB7-88B9-4D4B-97BC-226D45F67F5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeAfro.Application", "FadeAfro.Application\FadeAfro.Application.csproj", "{20104757-081D-4A80-981C-0B44625FF598}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FADBFC51-EDBF-499B-85C0-76D0A65E6DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FADBFC51-EDBF-499B-85C0-76D0A65E6DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FADBFC51-EDBF-499B-85C0-76D0A65E6DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FADBFC51-EDBF-499B-85C0-76D0A65E6DF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8F173BF-330C-4231-B209-919A642AA6BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8F173BF-330C-4231-B209-919A642AA6BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8F173BF-330C-4231-B209-919A642AA6BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8F173BF-330C-4231-B209-919A642AA6BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42CDFDB7-88B9-4D4B-97BC-226D45F67F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42CDFDB7-88B9-4D4B-97BC-226D45F67F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42CDFDB7-88B9-4D4B-97BC-226D45F67F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42CDFDB7-88B9-4D4B-97BC-226D45F67F5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20104757-081D-4A80-981C-0B44625FF598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20104757-081D-4A80-981C-0B44625FF598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20104757-081D-4A80-981C-0B44625FF598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20104757-081D-4A80-981C-0B44625FF598}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

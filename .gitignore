@@ -53,3 +53,6 @@ TestResults/
 *.trx
 *.coverage
 *.coveragexml
+
+# Dev app settings
+appsettings.Development.json
