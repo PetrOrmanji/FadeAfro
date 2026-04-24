@@ -14,6 +14,11 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
         _context = context;
     }
 
+    public async Task<MasterUnavailability?> GetByIdAsync(Guid id)
+    {
+        return await _context.MasterUnavailabilities.FirstOrDefaultAsync(mu => mu.Id == id);
+    }
+
     public async Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId)
     {
         return await _context.MasterUnavailabilities
