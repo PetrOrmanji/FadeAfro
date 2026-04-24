@@ -14,6 +14,11 @@ public class MasterScheduleRepository : IMasterScheduleRepository
         _context = context;
     }
 
+    public async Task<MasterSchedule?> GetByIdAsync(Guid id)
+    {
+        return await _context.MasterSchedules.FirstOrDefaultAsync(ms => ms.Id == id);
+    }
+
     public async Task<IReadOnlyList<MasterSchedule>> GetByMasterProfileIdAsync(Guid masterProfileId)
     {
         return await _context.MasterSchedules
