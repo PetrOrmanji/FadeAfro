@@ -1,6 +1,7 @@
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FadeAfro.Infrastructure.Persistence.Configurations;
@@ -29,13 +30,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Username)
             .HasMaxLength(100);
 
+        var rolesComparer = new ValueComparer<List<Role>>(
+            (a, b) => a != null && b != null && a.SequenceEqual(b),
+            roles => roles.Aggregate(0, (acc, r) => HashCode.Combine(acc, r.GetHashCode())),
+            roles => roles.ToList());
+
         builder.Property(u => u.Roles)
             .HasConversion(
                 roles => string.Join(',', roles.Select(r => r.ToString())),
                 value => value.Split(',', StringSplitOptions.RemoveEmptyEntries)
                               .Select(Enum.Parse<Role>)
                               .ToList())
-            .IsRequired();
+            .Metadata.SetValueComparer(rolesComparer);
 
         builder.Property(u => u.CreatedAt)
             .IsRequired();
