@@ -30,4 +30,21 @@ public class Service : Entity
         Price = price;
         Duration = duration;
     }
+
+    public void Update(string name, string? description, int price, TimeSpan duration)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new InvalidServiceNameException();
+
+        if (price <= 0)
+            throw new InvalidServicePriceException();
+
+        if (duration <= TimeSpan.Zero)
+            throw new InvalidServiceDurationException();
+
+        Name = name;
+        Description = description;
+        Price = price;
+        Duration = duration;
+    }
 }
