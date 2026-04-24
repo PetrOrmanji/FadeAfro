@@ -18,4 +18,10 @@ public class MasterProfile : Entity
         PhotoUrl = photoUrl;
         Description = description;
     }
+
+    public void Update(string? photoUrl, string? description)
+    {
+        PhotoUrl = photoUrl;
+        Description = description;
+    }
 }
