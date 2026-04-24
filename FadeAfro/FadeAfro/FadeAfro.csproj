@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <ItemGroup>
+      <ProjectReference Include="..\FadeAfro.Application\FadeAfro.Application.csproj" />
       <ProjectReference Include="..\FadeAfro.Infrastructure\FadeAfro.Infrastructure.csproj" />
     </ItemGroup>
 

@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FadeAfro.Application\FadeAfro.Application.csproj" />
       <ProjectReference Include="..\FadeAfro.Domain\FadeAfro.Domain.csproj" />
     </ItemGroup>
 

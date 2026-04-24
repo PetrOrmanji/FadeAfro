@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FadeAfro.Domain\FadeAfro.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
