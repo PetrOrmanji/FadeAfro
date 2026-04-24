@@ -1,4 +1,6 @@
+using FadeAfro.Domain.Repositories;
 using FadeAfro.Infrastructure.Persistence;
+using FadeAfro.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,13 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<DatabaseContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMasterProfileRepository, MasterProfileRepository>();
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IMasterScheduleRepository, MasterScheduleRepository>();
+        services.AddScoped<IMasterUnavailabilityRepository, MasterUnavailabilityRepository>();
+        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
         return services;
     }
