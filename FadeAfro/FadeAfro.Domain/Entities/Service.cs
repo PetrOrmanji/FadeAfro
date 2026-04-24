@@ -11,6 +11,7 @@ public class Service : Entity
     public TimeSpan Duration { get; private set; }
 
     public MasterProfile MasterProfile { get; private set; } = null!;
+    public ICollection<Appointment> Appointments { get; private set; } = [];
 
     public Service(Guid masterProfileId, string name, string? description, int price, TimeSpan duration)
     {

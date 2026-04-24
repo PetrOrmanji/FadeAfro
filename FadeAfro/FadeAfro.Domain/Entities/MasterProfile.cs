@@ -7,6 +7,10 @@ public class MasterProfile : Entity
     public string? Description { get; private set; }
 
     public User Master { get; private set; } = null!;
+    public ICollection<Service> Services { get; private set; } = [];
+    public ICollection<MasterSchedule> Schedules { get; private set; } = [];
+    public ICollection<Appointment> Appointments { get; private set; } = [];
+    public ICollection<MasterUnavailability> Unavailabilities { get; private set; } = [];
 
     public MasterProfile(Guid masterId, string? photoUrl, string? description)
     {

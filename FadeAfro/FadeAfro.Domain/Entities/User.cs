@@ -11,6 +11,8 @@ public class User : Entity
     public string? Username { get; private set; }
     public List<Role> Roles { get; private set; }
 
+    public ICollection<Appointment> Appointments { get; private set; } = [];
+
     public User(long telegramId, string firstName, string? lastName, string? username, List<Role> roles)
     {
         if (telegramId <= 0)

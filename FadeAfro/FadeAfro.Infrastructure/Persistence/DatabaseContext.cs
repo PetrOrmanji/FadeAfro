@@ -15,4 +15,10 @@ public class DatabaseContext : DbContext
     public DbSet<MasterSchedule> MasterSchedules => Set<MasterSchedule>();
     public DbSet<MasterUnavailability> MasterUnavailabilities => Set<MasterUnavailability>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
 }
