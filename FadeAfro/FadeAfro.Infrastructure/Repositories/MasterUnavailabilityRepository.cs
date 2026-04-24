@@ -1,0 +1,39 @@
+using FadeAfro.Domain.Entities;
+using FadeAfro.Domain.Repositories;
+using FadeAfro.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
+namespace FadeAfro.Infrastructure.Repositories;
+
+public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
+{
+    private readonly DatabaseContext _context;
+
+    public MasterUnavailabilityRepository(DatabaseContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId)
+    {
+        return await _context.MasterUnavailabilities
+            .Where(mu => mu.MasterProfileId == masterProfileId)
+            .ToListAsync();
+    }
+
+    public async Task AddAsync(MasterUnavailability unavailability)
+    {
+        await _context.MasterUnavailabilities.AddAsync(unavailability);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var unavailability = await _context.MasterUnavailabilities.FindAsync(id);
+        if (unavailability is not null)
+        {
+            _context.MasterUnavailabilities.Remove(unavailability);
+            await _context.SaveChangesAsync();
+        }
+    }
+}
