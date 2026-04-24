@@ -36,4 +36,28 @@ public class Appointment : Entity
         Status = AppointmentStatus.Pending;
         Comment = comment;
     }
+
+    public void CancelByClient()
+    {
+        if (Status != AppointmentStatus.Pending && Status != AppointmentStatus.Confirmed)
+            throw new InvalidAppointmentStatusException();
+
+        Status = AppointmentStatus.CancelledByClient;
+    }
+
+    public void CancelByMaster()
+    {
+        if (Status != AppointmentStatus.Pending && Status != AppointmentStatus.Confirmed)
+            throw new InvalidAppointmentStatusException();
+
+        Status = AppointmentStatus.CancelledByMaster;
+    }
+
+    public void Complete()
+    {
+        if (Status != AppointmentStatus.Confirmed)
+            throw new InvalidAppointmentStatusException();
+
+        Status = AppointmentStatus.Completed;
+    }
 }
