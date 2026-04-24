@@ -26,7 +26,7 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetByTelegramId), new { telegramId = command.TelegramId }, response);
     }
 
-    [HttpGet("{telegramId}")]
+    [HttpGet("get/{telegramId}")]
     [SwaggerOperation(Summary = "Get user by Telegram ID", Description = "Returns a user with the given Telegram ID.")]
     public async Task<IActionResult> GetByTelegramId(long telegramId)
     {
