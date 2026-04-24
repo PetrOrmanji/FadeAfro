@@ -1,5 +1,5 @@
 using FadeAfro.Domain.Enums;
-using FadeAfro.Domain.Exceptions;
+using FadeAfro.Domain.Exceptions.User;
 
 namespace FadeAfro.Domain.Entities;
 
