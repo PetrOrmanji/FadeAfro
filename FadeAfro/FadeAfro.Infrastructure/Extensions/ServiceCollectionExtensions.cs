@@ -1,4 +1,5 @@
 using System.Text;
+using FadeAfro.Application.Services;
 using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Repositories;
 using FadeAfro.Domain.Services;
@@ -78,6 +79,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMasterScheduleRepository, MasterScheduleRepository>();
         services.AddScoped<IMasterUnavailabilityRepository, MasterUnavailabilityRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddFileStorage(this IServiceCollection services)
+    {
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }

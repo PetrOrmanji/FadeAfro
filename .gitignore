@@ -57,3 +57,7 @@ TestResults/
 
 # Dev app settings
 appsettings.Development.json
+
+# Uploads (keep folder structure, ignore actual files)
+FadeAfro/wwwroot/uploads/**/*
+!FadeAfro/wwwroot/uploads/**/.gitkeep
