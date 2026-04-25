@@ -13,17 +13,6 @@ public class User : Entity
 
     public ICollection<Appointment> Appointments { get; private set; } = [];
 
-    public void AssignMasterRole()
-    {
-        if (Roles.Contains(Role.Master))
-            throw new UserAlreadyMasterException();
-
-        if (Roles.Contains(Role.Owner))
-            Roles = [Role.Owner, Role.Master];
-        else
-            Roles = [Role.Master];
-    }
-
     public User(long telegramId, string firstName, string? lastName, string? username, List<Role> roles)
     {
         if (telegramId <= 0)
@@ -40,5 +29,26 @@ public class User : Entity
         LastName = lastName;
         Username = username;
         Roles = roles;
+    }
+    
+    public void Update(string firstName, string? lastName, string? username)
+    {
+        if (string.IsNullOrWhiteSpace(firstName))
+            throw new InvalidFirstNameException();
+
+        FirstName = firstName;
+        LastName = lastName;
+        Username = username;
+    }
+
+    public void AssignMasterRole()
+    {
+        if (Roles.Contains(Role.Master))
+            throw new UserAlreadyMasterException();
+
+        if (Roles.Contains(Role.Owner))
+            Roles = [Role.Owner, Role.Master];
+        else
+            Roles = [Role.Master];
     }
 }

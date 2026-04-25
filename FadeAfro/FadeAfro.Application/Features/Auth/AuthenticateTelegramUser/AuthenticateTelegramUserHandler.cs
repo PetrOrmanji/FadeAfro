@@ -48,6 +48,11 @@ public class AuthenticateTelegramUserHandler : IRequestHandler<AuthenticateTeleg
 
             await _userRepository.AddAsync(user);
         }
+        else
+        {
+            user.Update(userData.FirstName, userData.LastName, userData.Username);
+            await _userRepository.UpdateAsync(user);
+        }
 
         var token = _jwtTokenService.GenerateToken(user);
 
