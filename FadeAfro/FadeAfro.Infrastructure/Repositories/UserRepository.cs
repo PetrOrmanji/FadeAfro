@@ -24,6 +24,20 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
     }
 
+    public async Task<IReadOnlyList<User>> GetAllAsync(int page, int pageSize)
+    {
+        return await _context.Users
+            .OrderBy(u => u.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountAsync()
+    {
+        return await _context.Users.CountAsync();
+    }
+
     public async Task AddAsync(User user)
     {
         await _context.Users.AddAsync(user);

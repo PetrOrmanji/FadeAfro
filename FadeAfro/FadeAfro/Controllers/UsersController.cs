@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.Users.GetAllUsers;
 using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.RegisterUser;
 using FadeAfro.Domain.Constants;
@@ -36,5 +37,14 @@ public class UsersController : ControllerBase
     {
         var response = await _mediator.Send(new GetUserQuery(telegramId));
         return Ok(response);
+    }
+
+    [HttpGet("all")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Get all users (paged)")]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var result = await _mediator.Send(new GetAllUsersQuery(page, pageSize));
+        return Ok(result);
     }
 }
