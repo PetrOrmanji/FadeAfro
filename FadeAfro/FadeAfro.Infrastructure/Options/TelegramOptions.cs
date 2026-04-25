@@ -6,4 +6,6 @@ public class TelegramOptions
 {
     [Required]
     public string BotToken { get; init; } = string.Empty;
+
+    public bool SkipValidation { get; init; } = false;
 }

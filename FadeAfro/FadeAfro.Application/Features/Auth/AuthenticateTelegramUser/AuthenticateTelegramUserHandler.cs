@@ -56,6 +56,9 @@ public class AuthenticateTelegramUserHandler : IRequestHandler<AuthenticateTeleg
 
     private void ValidateInitData(string initData)
     {
+        if (_telegramSettings.SkipValidation)
+            return;
+
         var pairs = initData
             .Split('&')
             .Select(p => p.Split('=', 2))
