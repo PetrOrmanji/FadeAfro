@@ -1,7 +1,18 @@
+using System.Text.Json.Serialization;
+
 namespace FadeAfro.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddControllersWithOptions(this IServiceCollection services)
+    {
+        services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+        return services;
+    }
+
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();

@@ -9,7 +9,7 @@ builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
 builder.Services.AddTelegram();
 builder.Services.AddCorsPolicy(builder.Configuration, builder.Environment);
-builder.Services.AddControllers();
+builder.Services.AddControllersWithOptions();
 builder.Services.AddAuthorization();
 builder.Services.AddSwagger();
 

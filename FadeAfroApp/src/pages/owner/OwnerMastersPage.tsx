@@ -214,7 +214,7 @@ function MastersTab() {
             key={master.id}
             before={<ColoredAvatar initials={masterInitials(master)} color="#3390EC" />}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
               <span>{[master.firstName, master.lastName].filter(Boolean).join(' ')}</span>
               {master.description && (
                 <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{master.description}</span>
