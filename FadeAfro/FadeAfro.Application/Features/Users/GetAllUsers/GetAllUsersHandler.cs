@@ -16,8 +16,8 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, PagedRespons
 
     public async Task<PagedResponse<GetUserResponse>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
-        var totalCount = await _userRepository.CountAsync();
-        var users = await _userRepository.GetAllAsync(query.Page, query.PageSize);
+        var totalCount = await _userRepository.CountAsync(query.Search);
+        var users = await _userRepository.GetAllAsync(query.Page, query.PageSize, query.Search);
 
         var items = users
             .Select(u => new GetUserResponse(

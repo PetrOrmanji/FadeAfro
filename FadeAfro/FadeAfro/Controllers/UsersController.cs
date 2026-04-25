@@ -42,9 +42,9 @@ public class UsersController : ControllerBase
     [HttpGet("all")]
     [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Get all users (paged)")]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? search = null)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery(page, pageSize));
+        var result = await _mediator.Send(new GetAllUsersQuery(page, pageSize, search));
         return Ok(result);
     }
 }

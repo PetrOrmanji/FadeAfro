@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { List, Cell, Section, Spinner, Placeholder } from '@telegram-apps/telegram-ui'
+import { List, Cell, Section, Spinner, Placeholder, Input } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
 import { getMasters, type MasterProfile } from '@/api/masters'
 
@@ -56,12 +56,23 @@ function userSubtitle(user: UserResponse): string {
 
 const PAGE_SIZE = 20
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState<T>(value)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(timer)
+  }, [value, delay])
+  return debounced
+}
+
 function UsersTab() {
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['users'],
-    queryFn: ({ pageParam }) => getAllUsers(pageParam, PAGE_SIZE),
+    queryKey: ['users', debouncedSearch],
+    queryFn: ({ pageParam }) => getAllUsers(pageParam, PAGE_SIZE, debouncedSearch || undefined),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
@@ -84,39 +95,42 @@ function UsersTab() {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60dvh' }}>
-        <Spinner size="l" />
-      </div>
-    )
-  }
-
-  if (isError) {
-    return <Placeholder header="Ошибка" description="Не удалось загрузить пользователей" />
-  }
-
   const users = data?.pages.flatMap(p => p.items) ?? []
-
-  if (users.length === 0) {
-    return <Placeholder header="Пользователей нет" />
-  }
 
   return (
     <List>
       <Section>
-        {users.map(user => (
-          <Cell
-            key={user.id}
-            before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
-              <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
-              <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
-            </div>
-          </Cell>
-        ))}
+        <Input
+          placeholder="Имя, фамилия или @username"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
       </Section>
+
+      {isLoading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
+          <Spinner size="l" />
+        </div>
+      ) : isError ? (
+        <Placeholder header="Ошибка" description="Не удалось загрузить пользователей" />
+      ) : users.length === 0 ? (
+        <Placeholder header="Ничего не найдено" />
+      ) : (
+        <Section>
+          {users.map(user => (
+            <Cell
+              key={user.id}
+              before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
+                <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
+                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
+              </div>
+            </Cell>
+          ))}
+        </Section>
+      )}
+
       <div ref={sentinelRef} style={{ height: 1 }} />
       {isFetchingNextPage && (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>

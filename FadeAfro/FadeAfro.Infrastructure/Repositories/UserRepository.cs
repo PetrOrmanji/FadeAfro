@@ -24,18 +24,34 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
     }
 
-    public async Task<IReadOnlyList<User>> GetAllAsync(int page, int pageSize)
+    public async Task<IReadOnlyList<User>> GetAllAsync(int page, int pageSize, string? search)
     {
-        return await _context.Users
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(u =>
+                u.FirstName.ToLower().Contains(search.ToLower()) ||
+                (u.LastName != null && u.LastName.ToLower().Contains(search.ToLower())) ||
+                (u.Username != null && u.Username.ToLower().Contains(search.ToLower())));
+
+        return await query
             .OrderBy(u => u.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
     }
 
-    public async Task<int> CountAsync()
+    public async Task<int> CountAsync(string? search)
     {
-        return await _context.Users.CountAsync();
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(u =>
+                u.FirstName.ToLower().Contains(search.ToLower()) ||
+                (u.LastName != null && u.LastName.ToLower().Contains(search.ToLower())) ||
+                (u.Username != null && u.Username.ToLower().Contains(search.ToLower())));
+
+        return await query.CountAsync();
     }
 
     public async Task AddAsync(User user)
