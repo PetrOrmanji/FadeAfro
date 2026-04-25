@@ -8,6 +8,7 @@ builder.Services.AddApplication();
 builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
 builder.Services.AddTelegram();
+builder.Services.AddCorsPolicy(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddSwagger();
@@ -16,6 +17,7 @@ var app = builder.Build();
 
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
