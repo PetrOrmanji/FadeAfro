@@ -156,9 +156,11 @@ function UsersTab() {
             <Cell
               key={user.id}
               before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
-              subtitle={userSubtitle(user)}
             >
-              {[user.firstName, user.lastName].filter(Boolean).join(' ')}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
+                <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
+                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
+              </div>
             </Cell>
           ))}
         </Section>
@@ -211,9 +213,13 @@ function MastersTab() {
           <Cell
             key={master.id}
             before={<ColoredAvatar initials={masterInitials(master)} color="#3390EC" />}
-            subtitle={master.description ?? undefined}
           >
-            {[master.firstName, master.lastName].filter(Boolean).join(' ')}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span>{[master.firstName, master.lastName].filter(Boolean).join(' ')}</span>
+              {master.description && (
+                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{master.description}</span>
+              )}
+            </div>
           </Cell>
         ))}
       </Section>
