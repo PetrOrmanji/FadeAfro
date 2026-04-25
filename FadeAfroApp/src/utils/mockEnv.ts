@@ -32,6 +32,8 @@ export function mockTelegramEnv() {
           themeParams: {},
           expand: () => {},
           ready: () => {},
+          onEvent: () => {},
+          offEvent: () => {},
           MainButton: { show: () => {}, hide: () => {}, setText: () => {}, onClick: () => {} },
           BackButton: { show: () => {}, hide: () => {}, onClick: () => {} },
           HapticFeedback: {
