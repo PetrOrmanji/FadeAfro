@@ -51,11 +51,21 @@ public class AppointmentsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPatch("cancel/{appointmentId:guid}")]
-    [SwaggerOperation(Summary = "Cancel an appointment", Description = "Cancels the appointment. Use cancelledByMaster=true if cancelled by master, false if cancelled by client.")]
-    public async Task<IActionResult> Cancel(Guid appointmentId, [FromQuery] bool cancelledByMaster)
+    [HttpPatch("cancel-by-client/{appointmentId:guid}")]
+    [Authorize(Roles = Roles.Client)]
+    [SwaggerOperation(Summary = "Cancel an appointment by client", Description = "Cancels the appointment on behalf of the client.")]
+    public async Task<IActionResult> CancelByClient(Guid appointmentId)
     {
-        await _mediator.Send(new CancelAppointmentCommand(appointmentId, cancelledByMaster));
+        await _mediator.Send(new CancelAppointmentCommand(appointmentId, CancelledByMaster: false));
+        return NoContent();
+    }
+
+    [HttpPatch("cancel-by-master/{appointmentId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(Summary = "Cancel an appointment by master", Description = "Cancels the appointment on behalf of the master.")]
+    public async Task<IActionResult> CancelByMaster(Guid appointmentId)
+    {
+        await _mediator.Send(new CancelAppointmentCommand(appointmentId, CancelledByMaster: true));
         return NoContent();
     }
 
