@@ -1,5 +1,6 @@
 using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
+using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfile;
 using FadeAfro.Domain.Constants;
@@ -55,5 +56,13 @@ public class MasterProfilesController : ControllerBase
     {
         await _mediator.Send(command with { MasterProfileId = masterProfileId });
         return NoContent();
+    }
+
+    [HttpGet("available-slots/{masterProfileId:guid}")]
+    [SwaggerOperation(Summary = "Get available slots", Description = "Returns available time slots for booking with the given master on the specified date.")]
+    public async Task<IActionResult> GetAvailableSlots(Guid masterProfileId, [FromQuery] Guid serviceId, [FromQuery] DateOnly date)
+    {
+        var response = await _mediator.Send(new GetAvailableSlotsQuery(masterProfileId, serviceId, date));
+        return Ok(response);
     }
 }
