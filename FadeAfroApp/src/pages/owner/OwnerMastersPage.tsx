@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { List, Cell, Section, Spinner, Placeholder } from '@telegram-apps/telegram-ui'
+import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
 import { getMasters, type MasterProfile } from '@/api/masters'
 
@@ -245,16 +245,6 @@ function UsersTab() {
                 }}
               >
                 {f.label}
-                {!isLoading && count > 0 && (
-                  <span style={{
-                    marginLeft: 5,
-                    fontSize: 11,
-                    fontWeight: active ? 700 : 500,
-                    opacity: active ? 0.85 : 0.6,
-                  }}>
-                    {count}
-                  </span>
-                )}
               </button>
             )
           })}
@@ -273,41 +263,51 @@ function UsersTab() {
       ) : users.length === 0 ? (
         <Placeholder header="Ничего не найдено" />
       ) : (
-        <List>
-          <Section>
-            {users.map(user => (
-              <Cell
-                key={user.id}
-                before={
+        <div style={{ margin: '8px 16px 8px' }}>
+          <div style={{
+            borderRadius: 16,
+            overflow: 'hidden',
+            background: 'var(--tgui--bg_color)',
+          }}>
+            {users.map((user, index) => (
+              <div key={user.id}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '11px 16px',
+                }}>
                   <ColoredAvatar
                     initials={userInitials(user)}
                     color={getRoleColor(user.roles)}
                   />
-                }
-              >
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: 4,
-                  width: '100%',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 500 }}>
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: 3,
+                    minWidth: 0,
+                  }}>
+                    <span style={{ fontWeight: 500, fontSize: 16 }}>
                       {[user.firstName, user.lastName].filter(Boolean).join(' ')}
                     </span>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {user.roles.map(role => <RoleBadge key={role} role={role} />)}
-                    </div>
+                    <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
+                      {userSubtitle(user)}
+                    </span>
                   </div>
-                  <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
-                    {userSubtitle(user)}
-                  </span>
                 </div>
-              </Cell>
+                {index < users.length - 1 && (
+                  <div style={{
+                    height: 1,
+                    background: 'var(--tgui--divider)',
+                    marginLeft: 72,
+                  }} />
+                )}
+              </div>
             ))}
-          </Section>
-        </List>
+          </div>
+        </div>
       )}
 
       <div ref={sentinelRef} style={{ height: 1 }} />
@@ -347,36 +347,49 @@ function MastersTab() {
   }
 
   return (
-    <List>
-      <Section>
-        {masters.map(master => (
-          <Cell
-            key={master.id}
-            before={<ColoredAvatar initials={masterInitials(master)} color="#3390EC" />}
-          >
+    <div style={{ margin: '8px 16px' }}>
+      <div style={{
+        borderRadius: 16,
+        overflow: 'hidden',
+        background: 'var(--tgui--bg_color)',
+      }}>
+        {masters.map((master, index) => (
+          <div key={master.id}>
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: 4,
-              width: '100%',
+              alignItems: 'center',
+              gap: 12,
+              padding: '11px 16px',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontWeight: 500 }}>
+              <ColoredAvatar initials={masterInitials(master)} color="#3390EC" />
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                minWidth: 0,
+              }}>
+                <span style={{ fontWeight: 500, fontSize: 16 }}>
                   {[master.firstName, master.lastName].filter(Boolean).join(' ')}
                 </span>
-                <RoleBadge role="Master" />
+                {master.description && (
+                  <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
+                    {master.description}
+                  </span>
+                )}
               </div>
-              {master.description && (
-                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
-                  {master.description}
-                </span>
-              )}
             </div>
-          </Cell>
+            {index < masters.length - 1 && (
+              <div style={{
+                height: 1,
+                background: 'var(--tgui--divider)',
+                marginLeft: 72,
+              }} />
+            )}
+          </div>
         ))}
-      </Section>
-    </List>
+      </div>
+    </div>
   )
 }
 
