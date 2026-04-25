@@ -51,4 +51,15 @@ public class User : Entity
         else
             Roles = [Role.Master];
     }
+
+    public void RevokeMasterRole()
+    {
+        if (!Roles.Contains(Role.Master))
+            throw new UserNotMasterException();
+
+        if (Roles.Contains(Role.Owner))
+            Roles = [Role.Owner];
+        else
+            Roles = [Role.Client];
+    }
 }

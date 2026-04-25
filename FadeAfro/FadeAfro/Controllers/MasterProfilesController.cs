@@ -1,4 +1,5 @@
 using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
 using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
@@ -55,6 +56,15 @@ public class MasterProfilesController : ControllerBase
     public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterProfileCommand command)
     {
         await _mediator.Send(command with { MasterProfileId = masterProfileId });
+        return NoContent();
+    }
+
+    [HttpDelete("dismiss/{userId:guid}")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Dismiss master", Description = "Revokes the Master role and deletes the master profile.")]
+    public async Task<IActionResult> Dismiss(Guid userId)
+    {
+        await _mediator.Send(new DismissMasterCommand(userId));
         return NoContent();
     }
 

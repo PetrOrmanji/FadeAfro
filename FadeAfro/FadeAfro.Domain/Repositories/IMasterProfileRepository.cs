@@ -9,4 +9,5 @@ public interface IMasterProfileRepository
     Task<IReadOnlyList<MasterProfile>> GetAllAsync();
     Task AddAsync(MasterProfile masterProfile);
     Task UpdateAsync(MasterProfile masterProfile);
+    Task DeleteAsync(MasterProfile masterProfile);
 }

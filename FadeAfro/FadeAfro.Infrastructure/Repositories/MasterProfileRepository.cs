@@ -44,4 +44,10 @@ public class MasterProfileRepository : IMasterProfileRepository
         _context.MasterProfiles.Update(masterProfile);
         await _context.SaveChangesAsync();
     }
+
+    public async Task DeleteAsync(MasterProfile masterProfile)
+    {
+        _context.MasterProfiles.Remove(masterProfile);
+        await _context.SaveChangesAsync();
+    }
 }

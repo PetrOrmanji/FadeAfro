@@ -27,3 +27,7 @@ export async function getMasters(): Promise<GetAllMastersResponse> {
 export async function createMasterProfile(request: CreateMasterProfileRequest): Promise<void> {
   await apiClient.post('/api/master-profiles/create', request)
 }
+
+export async function dismissMaster(userId: string): Promise<void> {
+  await apiClient.delete(`/api/master-profiles/dismiss/${userId}`)
+}

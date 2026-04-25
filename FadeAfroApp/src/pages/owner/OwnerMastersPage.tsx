@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
-import { getMasters, createMasterProfile, type MasterProfile } from '@/api/masters'
+import { getMasters, createMasterProfile, dismissMaster, type MasterProfile } from '@/api/masters'
 
 // ─── Аватар ──────────────────────────────────────────────────────────────────
 
@@ -81,8 +81,9 @@ const ROLE_FILTERS: { key: RoleFilter; label: string }[] = [
 // ─── Bottom Sheet ─────────────────────────────────────────────────────────────
 
 function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () => void }) {
-  const [visible, setVisible] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
+  const [visible,        setVisible]        = useState(false)
+  const [error,          setError]          = useState<string | null>(null)
+  const [actionHovered,  setActionHovered]  = useState(false)
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -95,7 +96,9 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
     setTimeout(onClose, 280)
   }
 
-  const mutation = useMutation({
+  const isMaster = user.roles.includes('Master')
+
+  const assignMutation = useMutation({
     mutationFn: () => createMasterProfile({ masterId: user.id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -113,7 +116,21 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
     },
   })
 
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
+  const dismissMutation = useMutation({
+    mutationFn: () => dismissMaster(user.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['masters'] })
+      close()
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error
+      setError(msg ?? 'Что-то пошло не так')
+    },
+  })
+
+  const isPending = assignMutation.isPending || dismissMutation.isPending
+  const fullName  = [user.firstName, user.lastName].filter(Boolean).join(' ')
 
   return (
     <>
@@ -168,29 +185,61 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
         </div>
 
         {/* Действие */}
-        <button
-          onClick={() => { setError(null); mutation.mutate() }}
-          disabled={mutation.isPending}
-          style={{
-            width: '100%',
-            padding: '15px 20px',
-            background: 'transparent',
-            border: 'none',
-            textAlign: 'left',
-            fontSize: 16,
-            color: mutation.isPending ? 'var(--tgui--hint_color)' : 'var(--tgui--text_color)',
-            cursor: mutation.isPending ? 'default' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-          }}
-        >
-          {mutation.isPending
-            ? <Spinner size="s" />
-            : <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
-          }
-          Назначить мастером
-        </button>
+        {isMaster ? (
+          <button
+            onClick={() => { setError(null); dismissMutation.mutate() }}
+            disabled={isPending}
+            onMouseEnter={() => setActionHovered(true)}
+            onMouseLeave={() => setActionHovered(false)}
+            style={{
+              width: '100%',
+              padding: '15px 20px',
+              background: actionHovered && !isPending ? 'var(--tgui--bg_color)' : 'transparent',
+              border: 'none',
+              textAlign: 'left',
+              fontSize: 16,
+              color: isPending ? 'var(--tgui--hint_color)' : '#FF3B30',
+              cursor: isPending ? 'default' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              transition: 'background 0.12s',
+            }}
+          >
+            {dismissMutation.isPending
+              ? <Spinner size="s" />
+              : <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
+            }
+            Снять роль мастера
+          </button>
+        ) : (
+          <button
+            onClick={() => { setError(null); assignMutation.mutate() }}
+            disabled={isPending}
+            onMouseEnter={() => setActionHovered(true)}
+            onMouseLeave={() => setActionHovered(false)}
+            style={{
+              width: '100%',
+              padding: '15px 20px',
+              background: actionHovered && !isPending ? 'var(--tgui--bg_color)' : 'transparent',
+              border: 'none',
+              textAlign: 'left',
+              fontSize: 16,
+              color: isPending ? 'var(--tgui--hint_color)' : 'var(--tgui--text_color)',
+              cursor: isPending ? 'default' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              transition: 'background 0.12s',
+            }}
+          >
+            {assignMutation.isPending
+              ? <Spinner size="s" />
+              : <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
+            }
+            Назначить мастером
+          </button>
+        )}
 
         {/* Ошибка */}
         {error && (
@@ -210,7 +259,7 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
         <div style={{ padding: '4px 16px 8px' }}>
           <button
             onClick={close}
-            disabled={mutation.isPending}
+            disabled={isPending}
             style={{
               width: '100%',
               padding: '14px',
@@ -220,7 +269,7 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
               fontSize: 16,
               fontWeight: 500,
               color: 'var(--tgui--text_color)',
-              cursor: mutation.isPending ? 'default' : 'pointer',
+              cursor: isPending ? 'default' : 'pointer',
             }}
           >
             Отмена
@@ -240,6 +289,7 @@ function UsersTab() {
   const [search,       setSearch]       = useState('')
   const [roleFilter,   setRoleFilter]   = useState<RoleFilter>('all')
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null)
+  const [hoveredId,    setHoveredId]    = useState<string | null>(null)
   const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -399,12 +449,16 @@ function UsersTab() {
               <div key={user.id}>
                 <div
                   onClick={() => setSelectedUser(user)}
+                  onMouseEnter={() => setHoveredId(user.id)}
+                  onMouseLeave={() => setHoveredId(null)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 12,
                     padding: '11px 16px',
                     cursor: 'pointer',
+                    background: hoveredId === user.id ? 'var(--tgui--secondary_bg_color)' : 'transparent',
+                    transition: 'background 0.12s',
                   }}
                 >
                   <ColoredAvatar
