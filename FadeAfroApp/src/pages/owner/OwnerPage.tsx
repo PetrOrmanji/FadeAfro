@@ -366,13 +366,10 @@ function UsersTab() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-
-      {/* ── Sticky шапка ── */}
+    <>
+      {/* ── Шапка ── */}
       <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
+        flexShrink: 0,
         background: 'var(--tgui--secondary_bg_color)',
       }}>
         {/* Поиск */}
@@ -466,7 +463,8 @@ function UsersTab() {
         <div style={{ height: 1, background: 'var(--tgui--divider)' }} />
       </div>
 
-      {/* ── Контент ── */}
+      {/* ── Список (скроллится) ── */}
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
           <Spinner size="l" />
@@ -541,6 +539,7 @@ function UsersTab() {
           <Spinner size="m" />
         </div>
       )}
+      </div>
 
       {/* Bottom Sheet */}
       {selectedUser && (
@@ -549,7 +548,7 @@ function UsersTab() {
           onClose={() => setSelectedUser(null)}
         />
       )}
-    </div>
+    </>
   )
 }
 
@@ -557,7 +556,7 @@ function UsersTab() {
 
 export function OwnerPage() {
   return (
-    <div style={{ height: '100dvh', overflowY: 'auto' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <UsersTab />
     </div>
   )
