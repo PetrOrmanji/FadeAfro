@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { List, Cell, Section, Spinner, Placeholder, Input } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
 import { getMasters, type MasterProfile } from '@/api/masters'
@@ -9,8 +9,8 @@ import { getMasters, type MasterProfile } from '@/api/masters'
 function ColoredAvatar({ initials, color }: { initials: string; color: string }) {
   return (
     <div style={{
-      width: 40,
-      height: 40,
+      width: 44,
+      height: 44,
       borderRadius: '50%',
       background: color,
       display: 'flex',
@@ -18,7 +18,7 @@ function ColoredAvatar({ initials, color }: { initials: string; color: string })
       justifyContent: 'center',
       color: '#fff',
       fontWeight: 600,
-      fontSize: 15,
+      fontSize: 16,
       flexShrink: 0,
     }}>
       {initials}
@@ -26,20 +26,47 @@ function ColoredAvatar({ initials, color }: { initials: string; color: string })
   )
 }
 
-// ─── Роли ───────────────────────────────────────────────────────────────────
+// ─── Бейдж роли ──────────────────────────────────────────────────────────────
+
+const ROLE_CONFIG: Record<string, { label: string; color: string }> = {
+  Owner:  { label: 'Владелец', color: '#F5A623' },
+  Master: { label: 'Мастер',   color: '#3390EC' },
+  Client: { label: 'Клиент',   color: '#8E8E93' },
+}
+
+function RoleBadge({ role }: { role: string }) {
+  const cfg = ROLE_CONFIG[role] ?? { label: role, color: '#8E8E93' }
+  return (
+    <span style={{
+      display: 'inline-block',
+      fontSize: 11,
+      fontWeight: 600,
+      padding: '2px 8px',
+      borderRadius: 10,
+      background: cfg.color + '22',
+      color: cfg.color,
+      lineHeight: 1.5,
+      whiteSpace: 'nowrap',
+    }}>
+      {cfg.label}
+    </span>
+  )
+}
+
+// ─── Вспомогательные функции ─────────────────────────────────────────────────
 
 function getRoleColor(roles: string[]): string {
-  const hasOwner = roles.includes('Owner')
+  const hasOwner  = roles.includes('Owner')
   const hasMaster = roles.includes('Master')
   if (hasOwner && hasMaster) return '#8B5CF6'
-  if (hasOwner) return '#F5A623'
+  if (hasOwner)  return '#F5A623'
   if (hasMaster) return '#3390EC'
   return '#8E8E93'
 }
 
 function userInitials(user: UserResponse): string {
   const first = user.firstName[0] ?? ''
-  const last = user.lastName?.[0] ?? ''
+  const last  = user.lastName?.[0] ?? ''
   return (first + last).toUpperCase()
 }
 
@@ -50,11 +77,13 @@ function userSubtitle(user: UserResponse): string {
   return parts.join(' · ')
 }
 
-// ─── Пагинация ───────────────────────────────────────────────────────────────
+function masterInitials(master: MasterProfile): string {
+  const first = master.firstName[0] ?? ''
+  const last  = master.lastName?.[0] ?? ''
+  return (first + last).toUpperCase()
+}
 
-// ─── Вкладка: Пользователи ───────────────────────────────────────────────────
-
-const PAGE_SIZE = 20
+// ─── Дебаунс ─────────────────────────────────────────────────────────────────
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState<T>(value)
@@ -65,48 +94,131 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced
 }
 
+// ─── Фильтр по роли ──────────────────────────────────────────────────────────
+
+type RoleFilter = 'all' | 'Owner' | 'Master' | 'Client'
+
+const ROLE_FILTERS: { key: RoleFilter; label: string }[] = [
+  { key: 'all',    label: 'Все'       },
+  { key: 'Owner',  label: 'Владельцы' },
+  { key: 'Master', label: 'Мастера'   },
+  { key: 'Client', label: 'Клиенты'   },
+]
+
+// ─── Вкладка: Пользователи ───────────────────────────────────────────────────
+
+const PAGE_SIZE = 20
+
 function UsersTab() {
   const sentinelRef = useRef<HTMLDivElement>(null)
-  const [search, setSearch] = useState('')
+  const [search,     setSearch]     = useState('')
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all')
   const debouncedSearch = useDebounce(search, 300)
 
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['users', debouncedSearch],
-    queryFn: ({ pageParam }) => getAllUsers(pageParam, PAGE_SIZE, debouncedSearch || undefined),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-  })
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['users', debouncedSearch],
+      queryFn:  ({ pageParam }) => getAllUsers(pageParam, PAGE_SIZE, debouncedSearch || undefined),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    })
 
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel) return
-
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage()
       },
       { threshold: 0.1 },
     )
-
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const users = data?.pages.flatMap(p => p.items) ?? []
+  const allUsers = data?.pages.flatMap(p => p.items) ?? []
+  const users    = roleFilter === 'all'
+    ? allUsers
+    : allUsers.filter(u => u.roles.includes(roleFilter))
+
+  const totalCount = data?.pages[0]?.totalCount ?? 0
+
+  const chipCounts: Record<RoleFilter, number> = {
+    all:    totalCount,
+    Owner:  allUsers.filter(u => u.roles.includes('Owner')).length,
+    Master: allUsers.filter(u => u.roles.includes('Master')).length,
+    Client: allUsers.filter(u => u.roles.includes('Client')).length,
+  }
 
   return (
-    <List>
-      <Section>
-        <Input
-          placeholder="Имя, фамилия или @username"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </Section>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
 
+      {/* ── Sticky шапка ── */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        background: 'var(--tgui--secondary_bg_color)',
+      }}>
+        {/* Поиск */}
+        <div style={{ padding: '10px 16px 0' }}>
+          <Input
+            placeholder="🔍  Имя, фамилия или @username"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
+        {/* Чипсы-фильтры со счётчиком */}
+        <div style={{
+          display: 'flex',
+          gap: 8,
+          padding: '8px 16px 10px',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+        }}>
+          {ROLE_FILTERS.map(f => {
+            const active = roleFilter === f.key
+            const count  = chipCounts[f.key]
+            return (
+              <button
+                key={f.key}
+                onClick={() => setRoleFilter(f.key)}
+                style={{
+                  flexShrink: 0,
+                  padding: '5px 13px',
+                  borderRadius: 20,
+                  border: active ? 'none' : '1px solid var(--tgui--divider)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: active ? 600 : 400,
+                  background: active ? 'var(--tgui--button_color)' : 'transparent',
+                  color: active ? '#fff' : 'var(--tgui--hint_color)',
+                  transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+                  lineHeight: 1.4,
+                }}
+              >
+                {f.label}
+                {!isLoading && count > 0 && (
+                  <span style={{
+                    marginLeft: 5,
+                    fontSize: 11,
+                    fontWeight: active ? 700 : 500,
+                    opacity: active ? 0.85 : 0.6,
+                  }}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        <div style={{ height: 1, background: 'var(--tgui--divider)' }} />
+      </div>
+
+      {/* ── Контент ── */}
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
           <Spinner size="l" />
@@ -116,19 +228,41 @@ function UsersTab() {
       ) : users.length === 0 ? (
         <Placeholder header="Ничего не найдено" />
       ) : (
-        <Section>
-          {users.map(user => (
-            <Cell
-              key={user.id}
-              before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
-                <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
-                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
-              </div>
-            </Cell>
-          ))}
-        </Section>
+        <List>
+          <Section>
+            {users.map(user => (
+              <Cell
+                key={user.id}
+                before={
+                  <ColoredAvatar
+                    initials={userInitials(user)}
+                    color={getRoleColor(user.roles)}
+                  />
+                }
+              >
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: 4,
+                  width: '100%',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 500 }}>
+                      {[user.firstName, user.lastName].filter(Boolean).join(' ')}
+                    </span>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {user.roles.map(role => <RoleBadge key={role} role={role} />)}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
+                    {userSubtitle(user)}
+                  </span>
+                </div>
+              </Cell>
+            ))}
+          </Section>
+        </List>
       )}
 
       <div ref={sentinelRef} style={{ height: 1 }} />
@@ -137,22 +271,16 @@ function UsersTab() {
           <Spinner size="m" />
         </div>
       )}
-    </List>
+    </div>
   )
 }
 
 // ─── Вкладка: Мастера ────────────────────────────────────────────────────────
 
-function masterInitials(master: MasterProfile): string {
-  const first = master.firstName[0] ?? ''
-  const last = master.lastName?.[0] ?? ''
-  return (first + last).toUpperCase()
-}
-
 function MastersTab() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['masters'],
-    queryFn: getMasters,
+    queryFn:  getMasters,
   })
 
   if (isLoading) {
@@ -181,10 +309,23 @@ function MastersTab() {
             key={master.id}
             before={<ColoredAvatar initials={masterInitials(master)} color="#3390EC" />}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
-              <span>{[master.firstName, master.lastName].filter(Boolean).join(' ')}</span>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 4,
+              width: '100%',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontWeight: 500 }}>
+                  {[master.firstName, master.lastName].filter(Boolean).join(' ')}
+                </span>
+                <RoleBadge role="Master" />
+              </div>
               {master.description && (
-                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{master.description}</span>
+                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
+                  {master.description}
+                </span>
               )}
             </div>
           </Cell>
@@ -213,8 +354,8 @@ export function OwnerMastersPage() {
         background: 'var(--tgui--secondary_bg_color)',
       }}>
         {([
-          { key: 'users', label: 'Пользователи', icon: '👥' },
-          { key: 'masters', label: 'Мастера', icon: '✂️' },
+          { key: 'users',   label: 'Пользователи', icon: '👥' },
+          { key: 'masters', label: 'Мастера',       icon: '✂️' },
         ] as const).map(tab => (
           <button
             key={tab.key}
