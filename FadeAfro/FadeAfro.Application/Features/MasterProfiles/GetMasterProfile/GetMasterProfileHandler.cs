@@ -23,6 +23,8 @@ public class GetMasterProfileHandler : IRequestHandler<GetMasterProfileQuery, Ge
         return new GetMasterProfileResponse(
             masterProfile.Id,
             masterProfile.MasterId,
+            masterProfile.Master.FirstName,
+            masterProfile.Master.LastName,
             masterProfile.PhotoUrl,
             masterProfile.Description);
     }

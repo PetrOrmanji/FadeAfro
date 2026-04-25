@@ -20,6 +20,8 @@ public class GetAllMastersHandler : IRequestHandler<GetAllMastersQuery, GetAllMa
             .Select(mp => new MasterProfileResponse(
                 mp.Id,
                 mp.MasterId,
+                mp.Master.FirstName,
+                mp.Master.LastName,
                 mp.PhotoUrl,
                 mp.Description))
             .ToList();
