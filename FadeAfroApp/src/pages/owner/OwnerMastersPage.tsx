@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { List, Cell, Section, Spinner, Placeholder, Input } from '@telegram-apps/telegram-ui'
+import { List, Cell, Section, Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
 import { getMasters, type MasterProfile } from '@/api/masters'
 
@@ -163,11 +163,56 @@ function UsersTab() {
       }}>
         {/* Поиск */}
         <div style={{ padding: '10px 16px 0' }}>
-          <Input
-            placeholder="🔍  Имя, фамилия или @username"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'var(--tgui--bg_color)',
+            borderRadius: 12,
+            padding: '9px 14px',
+            border: '1.5px solid var(--tgui--divider)',
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: 0.4 }}>
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2.2" />
+              <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+            <input
+              placeholder="Имя, фамилия или @username"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                fontSize: 16,
+                color: 'var(--tgui--text_color)',
+              }}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                style={{
+                  background: 'var(--tgui--hint_color)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 18,
+                  height: 18,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  padding: 0,
+                  opacity: 0.5,
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 2L8 8M8 2L2 8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Чипсы-фильтры со счётчиком */}
