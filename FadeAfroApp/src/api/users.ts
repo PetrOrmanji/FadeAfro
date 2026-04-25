@@ -22,9 +22,9 @@ export async function getUserByTelegramId(telegramId: number): Promise<UserRespo
   return data
 }
 
-export async function getAllUsers(page: number, pageSize: number): Promise<GetAllUsersResponse> {
+export async function getAllUsers(page: number, pageSize: number, search?: string): Promise<GetAllUsersResponse> {
   const { data } = await apiClient.get<GetAllUsersResponse>('/api/users/all', {
-    params: { page, pageSize },
+    params: { page, pageSize, search: search || undefined },
   })
   return data
 }
