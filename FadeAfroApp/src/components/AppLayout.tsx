@@ -1,10 +1,21 @@
-import { Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Spinner } from '@telegram-apps/telegram-ui'
 import { AuthProvider } from '@/context/AuthContext'
 import { useAuth } from '@/hooks/useAuth'
 
 function AuthGate() {
-  const { isLoading } = useAuth()
+  const { isLoading, role } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    if (isLoading) return
+
+    if (role === 'Owner' && !location.pathname.startsWith('/owner')) {
+      navigate('/owner', { replace: true })
+    }
+  }, [isLoading, role, location.pathname, navigate])
 
   if (isLoading) {
     return (

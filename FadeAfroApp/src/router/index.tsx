@@ -51,7 +51,7 @@ export const router = createBrowserRouter([
 
       // Owner
       {
-        path: 'owner/masters',
+        path: 'owner',
         element: <ProtectedRoute roles={['Owner']}><span /></ProtectedRoute>,
         lazy: () => import('@/pages/owner/OwnerMastersPage').then(m => ({ Component: m.OwnerMastersPage })),
       },
