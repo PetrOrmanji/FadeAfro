@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
 builder.Services.AddPostgres(builder.Configuration);
+builder.Services.AddJwt();
+builder.Services.AddTelegram();
 builder.Services.AddControllers();
 builder.Services.AddSwagger();
 
@@ -13,6 +15,8 @@ var app = builder.Build();
 
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

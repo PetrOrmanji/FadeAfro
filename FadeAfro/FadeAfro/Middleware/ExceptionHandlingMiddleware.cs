@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using FadeAfro.Domain.Exceptions;
 using FadeAfro.Domain.Exceptions.Appointment;
+using FadeAfro.Domain.Exceptions.Auth;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
 using FadeAfro.Domain.Exceptions.MasterUnavailability;
@@ -47,6 +48,9 @@ public class ExceptionHandlingMiddleware
             MasterUnavailabilityNotFoundException or
             AppointmentNotFoundException
                 => (HttpStatusCode.NotFound, exception.Message),
+
+            InvalidInitDataException
+                => (HttpStatusCode.Unauthorized, exception.Message),
 
             UserAlreadyExistsException or
             MasterProfileAlreadyExistsException

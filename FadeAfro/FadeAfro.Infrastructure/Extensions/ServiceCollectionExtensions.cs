@@ -1,14 +1,67 @@
+using System.Text;
+using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Repositories;
+using FadeAfro.Domain.Services;
+using FadeAfro.Infrastructure.Options;
 using FadeAfro.Infrastructure.Persistence;
 using FadeAfro.Infrastructure.Repositories;
+using FadeAfro.Infrastructure.Services;
+using FadeAfro.Infrastructure.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FadeAfro.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddJwt(this IServiceCollection services)
+    {
+        services.AddOptions<JwtOptions>()
+            .BindConfiguration("Jwt")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtOptions>>((jwtBearerOptions, jwtOptions) =>
+            {
+                var jwt = jwtOptions.Value;
+
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwt.Issuer,
+                    ValidAudience = jwt.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey))
+                };
+            });
+
+        return services;
+    }
+
+    public static IServiceCollection AddTelegram(this IServiceCollection services)
+    {
+        services.AddOptions<TelegramOptions>()
+            .BindConfiguration("Telegram")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<ITelegramSettings, TelegramSettings>();
+
+        return services;
+    }
+
     public static IServiceCollection AddPostgres(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Postgres");
