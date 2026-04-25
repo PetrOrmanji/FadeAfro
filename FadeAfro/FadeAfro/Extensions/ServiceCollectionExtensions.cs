@@ -7,7 +7,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options => options.EnableAnnotations());
+        services.AddSwaggerGen(options =>
+        {
+            options.EnableAnnotations();
+            options.InferSecuritySchemes();
+        });
 
         return services;
     }
