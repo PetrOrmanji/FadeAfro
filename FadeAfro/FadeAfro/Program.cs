@@ -9,6 +9,7 @@ builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
 builder.Services.AddTelegram();
 builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 builder.Services.AddSwagger();
 
 var app = builder.Build();

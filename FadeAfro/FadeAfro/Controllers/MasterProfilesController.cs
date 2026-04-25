@@ -2,7 +2,9 @@ using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfile;
+using FadeAfro.Domain.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -11,6 +13,7 @@ namespace FadeAfro.Controllers;
 [ApiController]
 [Route("api/master-profiles")]
 [Tags("Master Profiles")]
+[Authorize]
 public class MasterProfilesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -21,6 +24,7 @@ public class MasterProfilesController : ControllerBase
     }
 
     [HttpPost("create")]
+    [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Create a master profile", Description = "Creates a new master profile for an existing user with the Master role.")]
     public async Task<IActionResult> Create([FromBody] CreateMasterProfileCommand command)
     {
@@ -45,6 +49,7 @@ public class MasterProfilesController : ControllerBase
     }
 
     [HttpPut("update/{masterProfileId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Update master profile", Description = "Updates photo URL and description of the master profile.")]
     public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterProfileCommand command)
     {

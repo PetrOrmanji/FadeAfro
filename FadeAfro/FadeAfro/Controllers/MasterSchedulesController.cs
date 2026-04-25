@@ -1,7 +1,9 @@
 using FadeAfro.Application.Features.MasterSchedules.DeleteSchedule;
 using FadeAfro.Application.Features.MasterSchedules.GetMasterSchedule;
 using FadeAfro.Application.Features.MasterSchedules.SetSchedule;
+using FadeAfro.Domain.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -10,6 +12,7 @@ namespace FadeAfro.Controllers;
 [ApiController]
 [Route("api/master-schedules")]
 [Tags("Master Schedules")]
+[Authorize]
 public class MasterSchedulesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -20,6 +23,7 @@ public class MasterSchedulesController : ControllerBase
     }
 
     [HttpPost("set")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Set a schedule", Description = "Sets a working schedule for a specific day of week for the master profile.")]
     public async Task<IActionResult> Set([FromBody] SetScheduleCommand command)
     {
@@ -36,6 +40,7 @@ public class MasterSchedulesController : ControllerBase
     }
 
     [HttpDelete("delete/{scheduleId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Delete a schedule entry", Description = "Deletes the schedule entry with the given ID.")]
     public async Task<IActionResult> Delete(Guid scheduleId)
     {

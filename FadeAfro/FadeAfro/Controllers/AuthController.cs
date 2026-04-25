@@ -1,5 +1,6 @@
 using FadeAfro.Application.Features.Auth.AuthenticateTelegramUser;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -18,6 +19,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "Authenticate via Telegram", Description = "Validates Telegram Mini App initData and returns a JWT token.")]
     public async Task<IActionResult> Login([FromBody] AuthenticateTelegramUserCommand command)
     {

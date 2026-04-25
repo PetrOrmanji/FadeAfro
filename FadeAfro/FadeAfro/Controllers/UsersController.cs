@@ -1,6 +1,8 @@
 using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.RegisterUser;
+using FadeAfro.Domain.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -19,6 +21,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "Register a new user", Description = "Creates a new user by Telegram ID.")]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
@@ -27,6 +30,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("get/{telegramId}")]
+    [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Get user by Telegram ID", Description = "Returns a user with the given Telegram ID.")]
     public async Task<IActionResult> GetByTelegramId(long telegramId)
     {

@@ -1,7 +1,9 @@
 using FadeAfro.Application.Features.MasterUnavailabilities.AddUnavailability;
 using FadeAfro.Application.Features.MasterUnavailabilities.DeleteUnavailability;
 using FadeAfro.Application.Features.MasterUnavailabilities.GetMasterUnavailabilities;
+using FadeAfro.Domain.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -10,6 +12,7 @@ namespace FadeAfro.Controllers;
 [ApiController]
 [Route("api/master-unavailabilities")]
 [Tags("Master Unavailabilities")]
+[Authorize]
 public class MasterUnavailabilitiesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -20,6 +23,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Add an unavailability", Description = "Marks a date (or time range within a date) as unavailable for the master profile.")]
     public async Task<IActionResult> Add([FromBody] AddUnavailabilityCommand command)
     {
@@ -36,6 +40,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     }
 
     [HttpDelete("delete/{unavailabilityId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Delete an unavailability", Description = "Deletes the unavailability entry with the given ID.")]
     public async Task<IActionResult> Delete(Guid unavailabilityId)
     {

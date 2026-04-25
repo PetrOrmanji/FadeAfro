@@ -2,7 +2,9 @@ using FadeAfro.Application.Features.Services.AddService;
 using FadeAfro.Application.Features.Services.DeleteService;
 using FadeAfro.Application.Features.Services.GetMasterServices;
 using FadeAfro.Application.Features.Services.UpdateService;
+using FadeAfro.Domain.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -11,6 +13,7 @@ namespace FadeAfro.Controllers;
 [ApiController]
 [Route("api/services")]
 [Tags("Services")]
+[Authorize]
 public class ServicesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -21,6 +24,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Add a service", Description = "Adds a new service to the master profile.")]
     public async Task<IActionResult> Add([FromBody] AddServiceCommand command)
     {
@@ -37,6 +41,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPut("update/{serviceId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Update a service", Description = "Updates name, description, price and duration of the service.")]
     public async Task<IActionResult> Update(Guid serviceId, [FromBody] UpdateServiceCommand command)
     {
@@ -45,6 +50,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpDelete("delete/{serviceId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Delete a service", Description = "Deletes the service with the given ID.")]
     public async Task<IActionResult> Delete(Guid serviceId)
     {
