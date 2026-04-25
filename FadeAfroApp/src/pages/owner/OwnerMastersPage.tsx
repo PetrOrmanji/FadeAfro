@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
-import { getMasters, type MasterProfile } from '@/api/masters'
+import { getMasters, createMasterProfile, type MasterProfile } from '@/api/masters'
 
 // ─── Аватар ──────────────────────────────────────────────────────────────────
 
@@ -23,33 +23,6 @@ function ColoredAvatar({ initials, color }: { initials: string; color: string })
     }}>
       {initials}
     </div>
-  )
-}
-
-// ─── Бейдж роли ──────────────────────────────────────────────────────────────
-
-const ROLE_CONFIG: Record<string, { label: string; color: string }> = {
-  Owner:  { label: 'Владелец', color: '#F5A623' },
-  Master: { label: 'Мастер',   color: '#3390EC' },
-  Client: { label: 'Клиент',   color: '#8E8E93' },
-}
-
-function RoleBadge({ role }: { role: string }) {
-  const cfg = ROLE_CONFIG[role] ?? { label: role, color: '#8E8E93' }
-  return (
-    <span style={{
-      display: 'inline-block',
-      fontSize: 11,
-      fontWeight: 600,
-      padding: '2px 8px',
-      borderRadius: 10,
-      background: cfg.color + '22',
-      color: cfg.color,
-      lineHeight: 1.5,
-      whiteSpace: 'nowrap',
-    }}>
-      {cfg.label}
-    </span>
   )
 }
 
@@ -105,14 +78,168 @@ const ROLE_FILTERS: { key: RoleFilter; label: string }[] = [
   { key: 'Client', label: 'Клиенты'   },
 ]
 
+// ─── Bottom Sheet ─────────────────────────────────────────────────────────────
+
+function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () => void }) {
+  const [visible, setVisible] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  function close() {
+    setVisible(false)
+    setTimeout(onClose, 280)
+  }
+
+  const mutation = useMutation({
+    mutationFn: () => createMasterProfile({ masterId: user.id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['masters'] })
+      close()
+    },
+    onError: (err: any) => {
+      const status = err?.response?.status
+      const msg    = err?.response?.data?.error
+      if (status === 409) {
+        setError('Пользователь уже является мастером')
+      } else {
+        setError(msg ?? 'Что-то пошло не так')
+      }
+    },
+  })
+
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
+
+  return (
+    <>
+      {/* Затемнение */}
+      <div
+        onClick={close}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 100,
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 0.28s ease',
+        }}
+      />
+
+      {/* Шторка */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'var(--tgui--secondary_bg_color)',
+        borderRadius: '20px 20px 0 0',
+        zIndex: 101,
+        transform: visible ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 0.28s ease',
+        paddingBottom: 'env(safe-area-inset-bottom, 12px)',
+      }}>
+
+        {/* Ручка */}
+        <div style={{
+          width: 36,
+          height: 4,
+          borderRadius: 2,
+          background: 'var(--tgui--hint_color)',
+          opacity: 0.3,
+          margin: '12px auto 0',
+        }} />
+
+        {/* Заголовок */}
+        <div style={{
+          padding: '14px 20px 12px',
+          borderBottom: '1px solid var(--tgui--divider)',
+        }}>
+          <div style={{ fontWeight: 600, fontSize: 17 }}>{fullName}</div>
+          {user.username && (
+            <div style={{ fontSize: 13, color: 'var(--tgui--hint_color)', marginTop: 2 }}>
+              @{user.username}
+            </div>
+          )}
+        </div>
+
+        {/* Действие */}
+        <button
+          onClick={() => { setError(null); mutation.mutate() }}
+          disabled={mutation.isPending}
+          style={{
+            width: '100%',
+            padding: '15px 20px',
+            background: 'transparent',
+            border: 'none',
+            textAlign: 'left',
+            fontSize: 16,
+            color: mutation.isPending ? 'var(--tgui--hint_color)' : 'var(--tgui--text_color)',
+            cursor: mutation.isPending ? 'default' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+          }}
+        >
+          {mutation.isPending
+            ? <Spinner size="s" />
+            : <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
+          }
+          Назначить мастером
+        </button>
+
+        {/* Ошибка */}
+        {error && (
+          <div style={{
+            margin: '0 16px 8px',
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: 'rgba(255,59,48,0.12)',
+            color: '#FF3B30',
+            fontSize: 13,
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Отмена */}
+        <div style={{ padding: '4px 16px 8px' }}>
+          <button
+            onClick={close}
+            disabled={mutation.isPending}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: 'var(--tgui--bg_color)',
+              border: 'none',
+              borderRadius: 14,
+              fontSize: 16,
+              fontWeight: 500,
+              color: 'var(--tgui--text_color)',
+              cursor: mutation.isPending ? 'default' : 'pointer',
+            }}
+          >
+            Отмена
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // ─── Вкладка: Пользователи ───────────────────────────────────────────────────
 
 const PAGE_SIZE = 20
 
 function UsersTab() {
   const sentinelRef = useRef<HTMLDivElement>(null)
-  const [search,     setSearch]     = useState('')
-  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all')
+  const [search,       setSearch]       = useState('')
+  const [roleFilter,   setRoleFilter]   = useState<RoleFilter>('all')
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null)
   const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -215,7 +342,7 @@ function UsersTab() {
           </div>
         </div>
 
-        {/* Чипсы-фильтры со счётчиком */}
+        {/* Чипсы-фильтры */}
         <div style={{
           display: 'flex',
           gap: 8,
@@ -225,7 +352,6 @@ function UsersTab() {
         }}>
           {ROLE_FILTERS.map(f => {
             const active = roleFilter === f.key
-            const count  = chipCounts[f.key]
             return (
               <button
                 key={f.key}
@@ -263,7 +389,7 @@ function UsersTab() {
       ) : users.length === 0 ? (
         <Placeholder header="Ничего не найдено" />
       ) : (
-        <div style={{ margin: '8px 16px 8px' }}>
+        <div style={{ margin: '8px 16px' }}>
           <div style={{
             borderRadius: 16,
             overflow: 'hidden',
@@ -271,12 +397,16 @@ function UsersTab() {
           }}>
             {users.map((user, index) => (
               <div key={user.id}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '11px 16px',
-                }}>
+                <div
+                  onClick={() => setSelectedUser(user)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '11px 16px',
+                    cursor: 'pointer',
+                  }}
+                >
                   <ColoredAvatar
                     initials={userInitials(user)}
                     color={getRoleColor(user.roles)}
@@ -296,6 +426,10 @@ function UsersTab() {
                       {userSubtitle(user)}
                     </span>
                   </div>
+                  {/* Стрелка */}
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style={{ opacity: 0.25, flexShrink: 0 }}>
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
                 {index < users.length - 1 && (
                   <div style={{
@@ -315,6 +449,14 @@ function UsersTab() {
         <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
           <Spinner size="m" />
         </div>
+      )}
+
+      {/* Bottom Sheet */}
+      {selectedUser && (
+        <UserBottomSheet
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
       )}
     </div>
   )
@@ -366,6 +508,7 @@ function MastersTab() {
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
+                alignItems: 'flex-start',
                 gap: 3,
                 minWidth: 0,
               }}>
