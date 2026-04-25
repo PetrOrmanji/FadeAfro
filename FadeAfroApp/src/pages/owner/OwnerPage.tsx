@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
-import { getMasters, createMasterProfile, dismissMaster, type MasterProfile } from '@/api/masters'
+import { createMasterProfile, dismissMaster } from '@/api/masters'
 
 // ─── Аватар ──────────────────────────────────────────────────────────────────
 
@@ -48,12 +48,6 @@ function userSubtitle(user: UserResponse): string {
   if (user.username) parts.push(`@${user.username}`)
   parts.push(String(user.telegramId))
   return parts.join(' · ')
-}
-
-function masterInitials(master: MasterProfile): string {
-  const first = master.firstName[0] ?? ''
-  const last  = master.lastName?.[0] ?? ''
-  return (first + last).toUpperCase()
 }
 
 // ─── Дебаунс ─────────────────────────────────────────────────────────────────
@@ -559,125 +553,12 @@ function UsersTab() {
   )
 }
 
-// ─── Вкладка: Мастера ────────────────────────────────────────────────────────
-
-function MastersTab() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['masters'],
-    queryFn:  getMasters,
-  })
-
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60dvh' }}>
-        <Spinner size="l" />
-      </div>
-    )
-  }
-
-  if (isError) {
-    return <Placeholder header="Ошибка" description="Не удалось загрузить мастеров" />
-  }
-
-  const masters = data?.masters ?? []
-
-  if (masters.length === 0) {
-    return <Placeholder header="Мастеров пока нет" description="Добавьте первого мастера" />
-  }
-
-  return (
-    <div style={{ margin: '8px 16px' }}>
-      <div style={{
-        borderRadius: 16,
-        overflow: 'hidden',
-        background: 'var(--tgui--bg_color)',
-      }}>
-        {masters.map((master, index) => (
-          <div key={master.id}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '11px 16px',
-            }}>
-              <ColoredAvatar initials={masterInitials(master)} color="#3390EC" />
-              <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: 3,
-                minWidth: 0,
-              }}>
-                <span style={{ fontWeight: 500, fontSize: 16 }}>
-                  {[master.firstName, master.lastName].filter(Boolean).join(' ')}
-                </span>
-                {master.description && (
-                  <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>
-                    {master.description}
-                  </span>
-                )}
-              </div>
-            </div>
-            {index < masters.length - 1 && (
-              <div style={{
-                height: 1,
-                background: 'var(--tgui--divider)',
-                marginLeft: 72,
-              }} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // ─── Страница ─────────────────────────────────────────────────────────────────
 
-type Tab = 'users' | 'masters'
-
-export function OwnerMastersPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('users')
-
+export function OwnerPage() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {activeTab === 'users' ? <UsersTab /> : <MastersTab />}
-      </div>
-
-      <nav style={{
-        display: 'flex',
-        borderTop: '1px solid var(--tgui--divider)',
-        background: 'var(--tgui--secondary_bg_color)',
-      }}>
-        {([
-          { key: 'users',   label: 'Пользователи', icon: '👥' },
-          { key: 'masters', label: 'Мастера',       icon: '✂️' },
-        ] as const).map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 4,
-              padding: '10px 0 14px',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: activeTab === tab.key ? 'var(--tgui--button_color)' : 'var(--tgui--hint_color)',
-              fontSize: 10,
-              fontWeight: activeTab === tab.key ? 600 : 400,
-            }}
-          >
-            <span style={{ fontSize: 22 }}>{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+    <div style={{ height: '100dvh', overflowY: 'auto' }}>
+      <UsersTab />
     </div>
   )
 }
