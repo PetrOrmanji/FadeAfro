@@ -1,10 +1,11 @@
+using FadeAfro.Application.Common;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
 namespace FadeAfro.Application.Features.Appointments.GetMasterAppointments;
 
-public class GetMasterAppointmentsHandler : IRequestHandler<GetMasterAppointmentsQuery, GetMasterAppointmentsResponse>
+public class GetMasterAppointmentsHandler : IRequestHandler<GetMasterAppointmentsQuery, PagedResponse<MasterAppointmentResponse>>
 {
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -15,16 +16,19 @@ public class GetMasterAppointmentsHandler : IRequestHandler<GetMasterAppointment
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<GetMasterAppointmentsResponse> Handle(GetMasterAppointmentsQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResponse<MasterAppointmentResponse>> Handle(GetMasterAppointmentsQuery query, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByIdAsync(query.MasterProfileId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
-        var appointments = await _appointmentRepository.GetByMasterProfileIdAsync(query.MasterProfileId);
+        var (appointments, totalCount) = await _appointmentRepository.GetByMasterProfileIdPagedAsync(
+            query.MasterProfileId,
+            query.Pagination.Page,
+            query.Pagination.PageSize);
 
-        var response = appointments
+        var items = appointments
             .Select(a => new MasterAppointmentResponse(
                 a.Id,
                 a.ClientId,
@@ -35,6 +39,6 @@ public class GetMasterAppointmentsHandler : IRequestHandler<GetMasterAppointment
                 a.Comment))
             .ToList();
 
-        return new GetMasterAppointmentsResponse(response);
+        return new PagedResponse<MasterAppointmentResponse>(items, totalCount, query.Pagination.Page, query.Pagination.PageSize);
     }
 }

@@ -1,10 +1,11 @@
+using FadeAfro.Application.Common;
 using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
 namespace FadeAfro.Application.Features.Appointments.GetClientAppointments;
 
-public class GetClientAppointmentsHandler : IRequestHandler<GetClientAppointmentsQuery, GetClientAppointmentsResponse>
+public class GetClientAppointmentsHandler : IRequestHandler<GetClientAppointmentsQuery, PagedResponse<AppointmentResponse>>
 {
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IUserRepository _userRepository;
@@ -15,16 +16,19 @@ public class GetClientAppointmentsHandler : IRequestHandler<GetClientAppointment
         _userRepository = userRepository;
     }
 
-    public async Task<GetClientAppointmentsResponse> Handle(GetClientAppointmentsQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResponse<AppointmentResponse>> Handle(GetClientAppointmentsQuery query, CancellationToken cancellationToken)
     {
         var client = await _userRepository.GetByIdAsync(query.ClientId);
 
         if (client is null)
             throw new UserNotFoundException();
 
-        var appointments = await _appointmentRepository.GetByClientIdAsync(query.ClientId);
+        var (appointments, totalCount) = await _appointmentRepository.GetByClientIdPagedAsync(
+            query.ClientId,
+            query.Pagination.Page,
+            query.Pagination.PageSize);
 
-        var response = appointments
+        var items = appointments
             .Select(a => new AppointmentResponse(
                 a.Id,
                 a.MasterProfileId,
@@ -35,6 +39,6 @@ public class GetClientAppointmentsHandler : IRequestHandler<GetClientAppointment
                 a.Comment))
             .ToList();
 
-        return new GetClientAppointmentsResponse(response);
+        return new PagedResponse<AppointmentResponse>(items, totalCount, query.Pagination.Page, query.Pagination.PageSize);
     }
 }

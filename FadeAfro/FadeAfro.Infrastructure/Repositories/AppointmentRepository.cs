@@ -19,18 +19,39 @@ public class AppointmentRepository : IAppointmentRepository
         return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetByClientIdAsync(Guid clientId)
-    {
-        return await _context.Appointments
-            .Where(a => a.ClientId == clientId)
-            .ToListAsync();
-    }
-
     public async Task<IReadOnlyList<Appointment>> GetByMasterProfileIdAsync(Guid masterProfileId)
     {
         return await _context.Appointments
             .Where(a => a.MasterProfileId == masterProfileId)
             .ToListAsync();
+    }
+
+    public async Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByClientIdPagedAsync(Guid clientId, int page, int pageSize)
+    {
+        var query = _context.Appointments.Where(a => a.ClientId == clientId);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(a => a.StartTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByMasterProfileIdPagedAsync(Guid masterProfileId, int page, int pageSize)
+    {
+        var query = _context.Appointments.Where(a => a.MasterProfileId == masterProfileId);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(a => a.StartTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task AddAsync(Appointment appointment)

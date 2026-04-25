@@ -1,3 +1,4 @@
+using FadeAfro.Application.Common;
 using FadeAfro.Application.Features.Appointments.CancelAppointment;
 using FadeAfro.Application.Features.Appointments.CompleteAppointment;
 using FadeAfro.Application.Features.Appointments.CreateAppointment;
@@ -35,19 +36,19 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet("get/client/{clientId:guid}")]
     [Authorize(Roles = Roles.ClientOrOwner)]
-    [SwaggerOperation(Summary = "Get appointments by client ID", Description = "Returns all appointments for the given client.")]
-    public async Task<IActionResult> GetByClientId(Guid clientId)
+    [SwaggerOperation(Summary = "Get appointments by client ID", Description = "Returns paginated appointments for the given client.")]
+    public async Task<IActionResult> GetByClientId(Guid clientId, [FromQuery] PaginationParams pagination)
     {
-        var response = await _mediator.Send(new GetClientAppointmentsQuery(clientId));
+        var response = await _mediator.Send(new GetClientAppointmentsQuery(clientId, pagination));
         return Ok(response);
     }
 
     [HttpGet("get/master/{masterProfileId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Get appointments by master profile ID", Description = "Returns all appointments for the given master profile.")]
-    public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
+    [SwaggerOperation(Summary = "Get appointments by master profile ID", Description = "Returns paginated appointments for the given master profile.")]
+    public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId, [FromQuery] PaginationParams pagination)
     {
-        var response = await _mediator.Send(new GetMasterAppointmentsQuery(masterProfileId));
+        var response = await _mediator.Send(new GetMasterAppointmentsQuery(masterProfileId, pagination));
         return Ok(response);
     }
 

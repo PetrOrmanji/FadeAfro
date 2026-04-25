@@ -10,5 +10,3 @@ public record AppointmentResponse(
     DateTime EndTime,
     AppointmentStatus Status,
     string? Comment);
-
-public record GetClientAppointmentsResponse(List<AppointmentResponse> Appointments);
