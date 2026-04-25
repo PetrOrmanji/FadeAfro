@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useRef } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { List, Cell, Section, Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import { getAllUsers, type UserResponse } from '@/api/users'
 import { getMasters, type MasterProfile } from '@/api/masters'
@@ -52,83 +52,37 @@ function userSubtitle(user: UserResponse): string {
 
 // ─── Пагинация ───────────────────────────────────────────────────────────────
 
-interface PaginationProps {
-  page: number
-  totalPages: number
-  onChange: (page: number) => void
-}
-
-function Pagination({ page, totalPages, onChange }: PaginationProps) {
-  if (totalPages <= 1) return null
-
-  const range = 2
-  const start = Math.max(1, page - range)
-  const end = Math.min(totalPages, page + range)
-  const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
-
-  const btnStyle = (active: boolean): React.CSSProperties => ({
-    minWidth: 36,
-    height: 36,
-    borderRadius: 8,
-    border: 'none',
-    cursor: active ? 'default' : 'pointer',
-    fontWeight: active ? 700 : 400,
-    background: active ? 'var(--tgui--button_color)' : 'transparent',
-    color: active ? 'var(--tgui--button_text_color)' : 'var(--tgui--text_color)',
-    opacity: 1,
-  })
-
-  const arrowStyle = (disabled: boolean): React.CSSProperties => ({
-    minWidth: 36,
-    height: 36,
-    borderRadius: 8,
-    border: 'none',
-    cursor: disabled ? 'default' : 'pointer',
-    background: 'transparent',
-    color: disabled ? 'var(--tgui--hint_color)' : 'var(--tgui--text_color)',
-    fontSize: 18,
-  })
-
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, padding: '12px 16px' }}>
-      <button style={arrowStyle(page === 1)} disabled={page === 1} onClick={() => onChange(page - 1)}>
-        ‹
-      </button>
-      {start > 1 && (
-        <>
-          <button style={btnStyle(false)} onClick={() => onChange(1)}>1</button>
-          {start > 2 && <span style={{ color: 'var(--tgui--hint_color)' }}>…</span>}
-        </>
-      )}
-      {pages.map(p => (
-        <button key={p} style={btnStyle(p === page)} disabled={p === page} onClick={() => onChange(p)}>
-          {p}
-        </button>
-      ))}
-      {end < totalPages && (
-        <>
-          {end < totalPages - 1 && <span style={{ color: 'var(--tgui--hint_color)' }}>…</span>}
-          <button style={btnStyle(false)} onClick={() => onChange(totalPages)}>{totalPages}</button>
-        </>
-      )}
-      <button style={arrowStyle(page === totalPages)} disabled={page === totalPages} onClick={() => onChange(page + 1)}>
-        ›
-      </button>
-    </div>
-  )
-}
-
 // ─── Вкладка: Пользователи ───────────────────────────────────────────────────
 
 const PAGE_SIZE = 20
 
 function UsersTab() {
-  const [page, setPage] = useState(1)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['users', page],
-    queryFn: () => getAllUsers(page, PAGE_SIZE),
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['users'],
+    queryFn: ({ pageParam }) => getAllUsers(pageParam, PAGE_SIZE),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   })
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   if (isLoading) {
     return (
@@ -142,35 +96,34 @@ function UsersTab() {
     return <Placeholder header="Ошибка" description="Не удалось загрузить пользователей" />
   }
 
-  const users = data?.items ?? []
+  const users = data?.pages.flatMap(p => p.items) ?? []
 
   if (users.length === 0) {
     return <Placeholder header="Пользователей нет" />
   }
 
   return (
-    <>
-      <List>
-        <Section>
-          {users.map(user => (
-            <Cell
-              key={user.id}
-              before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
-                <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
-                <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
-              </div>
-            </Cell>
-          ))}
-        </Section>
-      </List>
-      <Pagination
-        page={page}
-        totalPages={data?.totalPages ?? 1}
-        onChange={setPage}
-      />
-    </>
+    <List>
+      <Section>
+        {users.map(user => (
+          <Cell
+            key={user.id}
+            before={<ColoredAvatar initials={userInitials(user)} color={getRoleColor(user.roles)} />}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, width: '100%' }}>
+              <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
+              <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{userSubtitle(user)}</span>
+            </div>
+          </Cell>
+        ))}
+      </Section>
+      <div ref={sentinelRef} style={{ height: 1 }} />
+      {isFetchingNextPage && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
+          <Spinner size="m" />
+        </div>
+      )}
+    </List>
   )
 }
 
