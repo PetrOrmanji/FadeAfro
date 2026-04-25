@@ -53,7 +53,8 @@ public class ExceptionHandlingMiddleware
                 => (HttpStatusCode.Unauthorized, exception.Message),
 
             UserAlreadyExistsException or
-            MasterProfileAlreadyExistsException
+            MasterProfileAlreadyExistsException or
+            UserAlreadyMasterException
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or

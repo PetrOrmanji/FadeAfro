@@ -29,6 +29,9 @@ public class CreateMasterProfileHandler : IRequestHandler<CreateMasterProfileCom
         if (existingProfile is not null)
             throw new MasterProfileAlreadyExistsException();
 
+        user.AssignMasterRole();
+        await _userRepository.UpdateAsync(user);
+
         var masterProfile = new MasterProfile(
             command.MasterId,
             command.PhotoUrl,
