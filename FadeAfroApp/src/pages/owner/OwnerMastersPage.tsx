@@ -84,12 +84,26 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
   const [visible,        setVisible]        = useState(false)
   const [error,          setError]          = useState<string | null>(null)
   const [actionHovered,  setActionHovered]  = useState(false)
+  const [confirming,     setConfirming]     = useState(false)
+  const [countdown,      setCountdown]      = useState(3)
   const queryClient = useQueryClient()
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true))
     return () => cancelAnimationFrame(id)
   }, [])
+
+  useEffect(() => {
+    if (!confirming) return
+    setCountdown(3)
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(interval); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [confirming])
 
   function close() {
     setVisible(false)
@@ -186,32 +200,61 @@ function UserBottomSheet({ user, onClose }: { user: UserResponse; onClose: () =>
 
         {/* Действие */}
         {isMaster ? (
-          <button
-            onClick={() => { setError(null); dismissMutation.mutate() }}
-            disabled={isPending}
-            onMouseEnter={() => setActionHovered(true)}
-            onMouseLeave={() => setActionHovered(false)}
-            style={{
-              width: '100%',
-              padding: '15px 20px',
-              background: actionHovered && !isPending ? 'var(--tgui--bg_color)' : 'transparent',
-              border: 'none',
-              textAlign: 'left',
-              fontSize: 16,
-              color: isPending ? 'var(--tgui--hint_color)' : '#FF3B30',
-              cursor: isPending ? 'default' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              transition: 'background 0.12s',
-            }}
-          >
-            {dismissMutation.isPending
-              ? <Spinner size="s" />
-              : <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
-            }
-            Снять роль мастера
-          </button>
+          !confirming ? (
+            <button
+              onClick={() => { setError(null); setConfirming(true) }}
+              disabled={isPending}
+              onMouseEnter={() => setActionHovered(true)}
+              onMouseLeave={() => setActionHovered(false)}
+              style={{
+                width: '100%',
+                padding: '15px 20px',
+                background: actionHovered && !isPending ? 'var(--tgui--bg_color)' : 'transparent',
+                border: 'none',
+                textAlign: 'left',
+                fontSize: 16,
+                color: '#FF3B30',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                transition: 'background 0.12s',
+              }}
+            >
+              <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>✂️</span>
+              Снять роль мастера
+            </button>
+          ) : (
+            <div style={{ padding: '12px 16px' }}>
+              <button
+                onClick={() => { setError(null); dismissMutation.mutate() }}
+                disabled={countdown > 0 || dismissMutation.isPending}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  borderRadius: 14,
+                  border: 'none',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: countdown > 0 || dismissMutation.isPending ? 'default' : 'pointer',
+                  background: countdown > 0 || dismissMutation.isPending ? 'rgba(255,59,48,0.15)' : '#FF3B30',
+                  color: countdown > 0 || dismissMutation.isPending ? '#FF3B30' : '#fff',
+                  transition: 'background 0.3s, color 0.3s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                {dismissMutation.isPending
+                  ? <Spinner size="s" />
+                  : countdown > 0
+                    ? `Вы уверены? (${countdown})`
+                    : 'Подтвердить снятие'
+                }
+              </button>
+            </div>
+          )
         ) : (
           <button
             onClick={() => { setError(null); assignMutation.mutate() }}

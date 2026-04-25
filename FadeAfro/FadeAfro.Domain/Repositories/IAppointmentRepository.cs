@@ -10,4 +10,5 @@ public interface IAppointmentRepository
     Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByMasterProfileIdPagedAsync(Guid masterProfileId, int page, int pageSize);
     Task AddAsync(Appointment appointment);
     Task UpdateAsync(Appointment appointment);
+    Task UpdateRangeAsync(IEnumerable<Appointment> appointments);
 }

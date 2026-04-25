@@ -65,4 +65,10 @@ public class AppointmentRepository : IAppointmentRepository
         _context.Appointments.Update(appointment);
         await _context.SaveChangesAsync();
     }
+
+    public async Task UpdateRangeAsync(IEnumerable<Appointment> appointments)
+    {
+        _context.Appointments.UpdateRange(appointments);
+        await _context.SaveChangesAsync();
+    }
 }
