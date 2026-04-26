@@ -26,6 +26,12 @@ public class MasterScheduleRepository : IMasterScheduleRepository
             .ToListAsync();
     }
 
+    public async Task<MasterSchedule?> GetByMasterProfileIdAndDayAsync(Guid masterProfileId, DayOfWeek dayOfWeek)
+    {
+        return await _context.MasterSchedules
+            .FirstOrDefaultAsync(ms => ms.MasterProfileId == masterProfileId && ms.DayOfWeek == dayOfWeek);
+    }
+
     public async Task AddAsync(MasterSchedule schedule)
     {
         await _context.MasterSchedules.AddAsync(schedule);

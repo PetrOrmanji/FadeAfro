@@ -21,4 +21,13 @@ public class MasterSchedule : Entity
         StartTime = startTime;
         EndTime = endTime;
     }
+
+    public void UpdateTimes(TimeOnly startTime, TimeOnly endTime)
+    {
+        if (endTime <= startTime)
+            throw new InvalidScheduleTimeException();
+
+        StartTime = startTime;
+        EndTime = endTime;
+    }
 }

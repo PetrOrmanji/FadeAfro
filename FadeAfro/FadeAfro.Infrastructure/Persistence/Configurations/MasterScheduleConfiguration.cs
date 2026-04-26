@@ -24,6 +24,9 @@ public class MasterScheduleConfiguration : IEntityTypeConfiguration<MasterSchedu
         builder.Property(ms => ms.CreatedAt)
             .IsRequired();
 
+        builder.HasIndex(ms => new { ms.MasterProfileId, ms.DayOfWeek })
+            .IsUnique();
+
         builder.HasOne(ms => ms.MasterProfile)
             .WithMany(mp => mp.Schedules)
             .HasForeignKey(ms => ms.MasterProfileId)

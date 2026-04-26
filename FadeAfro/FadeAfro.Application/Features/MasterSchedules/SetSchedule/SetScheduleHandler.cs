@@ -23,6 +23,17 @@ public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, SetSchedul
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
+        var existing = await _masterScheduleRepository.GetByMasterProfileIdAndDayAsync(
+            command.MasterProfileId,
+            command.DayOfWeek);
+
+        if (existing is not null)
+        {
+            existing.UpdateTimes(command.StartTime, command.EndTime);
+            await _masterScheduleRepository.UpdateAsync(existing);
+            return new SetScheduleResponse(existing.Id);
+        }
+
         var schedule = new MasterSchedule(
             command.MasterProfileId,
             command.DayOfWeek,
