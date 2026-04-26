@@ -34,7 +34,7 @@ function ProfileTab() {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { data: profile, isLoading, isError } = useQuery({
+  const { data: profile, isLoading, isError, dataUpdatedAt } = useQuery({
     queryKey: ['my-master-profile'],
     queryFn: getMyMasterProfile,
   })
@@ -44,7 +44,6 @@ function ProfileTab() {
   const [description, setDescription] = useState<string>('')
   const [fieldsReady, setFieldsReady] = useState(false)
   const [photoError, setPhotoError] = useState(false)
-  const [photoVersion, setPhotoVersion] = useState(0)
   const [photoLoading, setPhotoLoading] = useState(false)
 
   // Инициализируем поля когда профиль загрузился
@@ -72,7 +71,6 @@ function ProfileTab() {
     onSuccess: () => {
       setPhotoError(false)
       setPhotoLoading(true)
-      setPhotoVersion(v => v + 1)
       queryClient.invalidateQueries({ queryKey: ['my-master-profile'] })
     },
     onError: (error) => showError(error, 'Не удалось загрузить фото'),
@@ -92,7 +90,7 @@ function ProfileTab() {
 
   const displayFirstName = firstName || profile.firstName
   const photoSrc = profile.photoUrl && !photoError
-    ? `${import.meta.env.VITE_API_URL ?? ''}${profile.photoUrl}?v=${photoVersion}`
+    ? `${import.meta.env.VITE_API_URL ?? ''}${profile.photoUrl}?v=${dataUpdatedAt}`
     : null
 
   const nameChanged =
