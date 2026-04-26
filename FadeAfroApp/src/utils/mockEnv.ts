@@ -40,6 +40,10 @@ export function mockTelegramEnv() {
             impactOccurred: () => {},
             notificationOccurred: () => {},
           },
+          showAlert: (message: string, callback?: () => void) => {
+            window.alert(message)
+            callback?.()
+          },
         },
       },
       writable: true,

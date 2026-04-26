@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import axios from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
 import {
@@ -7,6 +8,15 @@ import {
   uploadMasterPhoto,
 } from '@/api/masters'
 import { updateUserName } from '@/api/users'
+
+// ─── Хелпер для ошибок ───────────────────────────────────────────────────────
+
+function showError(error: unknown, fallback: string) {
+  const message = axios.isAxiosError(error)
+    ? (error.response?.data?.error ?? fallback)
+    : fallback
+  window.Telegram.WebApp.showAlert(message)
+}
 
 // ─── Заглушка ────────────────────────────────────────────────────────────────
 
@@ -48,11 +58,13 @@ function ProfileTab() {
   const nameMutation = useMutation({
     mutationFn: () => updateUserName(firstName, lastName || null),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-master-profile'] }),
+    onError: (error) => showError(error, 'Не удалось сохранить имя'),
   })
 
   const updateMutation = useMutation({
     mutationFn: () => updateMasterProfile(profile!.id, description || null),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-master-profile'] }),
+    onError: (error) => showError(error, 'Не удалось сохранить описание'),
   })
 
   const photoMutation = useMutation({
@@ -63,6 +75,7 @@ function ProfileTab() {
       setPhotoVersion(v => v + 1)
       queryClient.invalidateQueries({ queryKey: ['my-master-profile'] })
     },
+    onError: (error) => showError(error, 'Не удалось загрузить фото'),
   })
 
   if (isLoading) {
