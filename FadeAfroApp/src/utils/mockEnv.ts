@@ -44,6 +44,9 @@ export function mockTelegramEnv() {
             window.alert(message)
             callback?.()
           },
+          showConfirm: (message: string, callback: (confirmed: boolean) => void) => {
+            callback(window.confirm(message))
+          },
         },
       },
       writable: true,

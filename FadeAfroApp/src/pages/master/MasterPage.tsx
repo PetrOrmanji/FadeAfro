@@ -9,6 +9,7 @@ import {
 } from '@/api/masters'
 import { updateUserName } from '@/api/users'
 import { getSchedule, setSchedule, deleteSchedule } from '@/api/schedules'
+import { getServices, addService, updateService, deleteService, type ServiceItem } from '@/api/services'
 
 // ─── Хелпер для ошибок ───────────────────────────────────────────────────────
 
@@ -266,6 +267,344 @@ function ScheduleTab() {
       )}
 
     </div>
+  )
+}
+
+// ─── Услуги ───────────────────────────────────────────────────────────────────
+
+function formatDuration(duration: string): string {
+  const [h, m] = duration.split(':').map(Number)
+  if (h === 0) return `${m} мин`
+  if (m === 0) return `${h} ч`
+  return `${h} ч ${m} мин`
+}
+
+function ServicesTab({ onEdit }: { onEdit: (service: ServiceItem | null) => void }) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['my-master-profile'],
+    queryFn: getMyMasterProfile,
+  })
+
+  const masterProfileId = profile?.id ?? ''
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['services', masterProfileId],
+    queryFn: () => getServices(masterProfileId),
+    enabled: !!masterProfileId,
+  })
+
+  if (profileLoading || isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Spinner size="l" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return <Placeholder header="Ошибка" description="Не удалось загрузить услуги" />
+  }
+
+  const services = data?.services ?? []
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+      {/* Список */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 0' }}>
+        {services.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Placeholder
+              header="Нет услуг"
+              description="Добавьте первую услугу"
+            />
+          </div>
+        ) : (
+          <div style={{ borderRadius: 16, background: 'var(--tgui--bg_color)', overflow: 'hidden' }}>
+            {services.map((service, idx) => (
+              <div key={service.id}>
+                {idx > 0 && <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 16px' }} />}
+                <div
+                  onClick={() => onEdit(service)}
+                  onMouseEnter={() => setHoveredId(service.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  style={{
+                    display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12,
+                    cursor: 'pointer',
+                    background: hoveredId === service.id ? 'var(--tgui--secondary_bg_color)' : 'transparent',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  {/* Инфо */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, color: 'var(--tgui--text_color)', fontWeight: 500 }}>
+                      {service.name}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--tgui--hint_color)', marginTop: 2 }}>
+                      {formatDuration(service.duration)}
+                      {service.description && <span> · {service.description}</span>}
+                    </div>
+                  </div>
+
+                  {/* Цена */}
+                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--tgui--text_color)', flexShrink: 0 }}>
+                    {service.price} ₽
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Кнопка добавить */}
+      <div style={{ padding: '12px 16px 20px', flexShrink: 0 }}>
+        <button
+          onClick={() => onEdit(null)}
+          style={{
+            width: '100%',
+            padding: '14px 0',
+            borderRadius: 14,
+            border: 'none',
+            fontSize: 15,
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: 'var(--tgui--button_color)',
+            color: '#fff',
+            boxShadow: '0 2px 8px rgba(51,144,236,0.3)',
+          }}
+        >
+          + Добавить услугу
+        </button>
+      </div>
+
+    </div>
+  )
+}
+
+// ─── Форма услуги ─────────────────────────────────────────────────────────────
+
+const DURATION_OPTIONS = [
+  { value: '00:15:00', label: '15 мин' },
+  { value: '00:30:00', label: '30 мин' },
+  { value: '00:45:00', label: '45 мин' },
+  { value: '01:00:00', label: '1 ч' },
+  { value: '01:30:00', label: '1 ч 30 мин' },
+  { value: '02:00:00', label: '2 ч' },
+]
+
+function ServiceForm({
+  service,
+  masterProfileId,
+  onClose,
+}: {
+  service: ServiceItem | null
+  masterProfileId: string
+  onClose: () => void
+}) {
+  const queryClient = useQueryClient()
+  const isEditing = service !== null
+
+  const [name, setName] = useState(service?.name ?? '')
+  const [description, setDescription] = useState(service?.description ?? '')
+  const [price, setPrice] = useState(service ? String(service.price) : '')
+  const [duration, setDuration] = useState(
+    service ? service.duration.slice(0, 8) : '00:30:00'
+  )
+  const [saving, setSaving] = useState(false)
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: 'var(--tgui--secondary_bg_color)',
+    border: '1px solid var(--tgui--divider)',
+    borderRadius: 10,
+    padding: '11px 14px',
+    fontSize: 15,
+    color: 'var(--tgui--text_color)',
+    fontFamily: 'inherit',
+    outline: 'none',
+    boxSizing: 'border-box',
+  }
+
+  async function handleSave() {
+    if (!name.trim()) {
+      window.Telegram.WebApp.showAlert('Введите название услуги')
+      return
+    }
+    const priceNum = parseInt(price)
+    if (!price || isNaN(priceNum) || priceNum <= 0) {
+      window.Telegram.WebApp.showAlert('Введите корректную цену')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const payload = {
+        name: name.trim(),
+        description: description.trim() || null,
+        price: priceNum,
+        duration,
+      }
+      if (isEditing) {
+        await updateService(service.id, payload)
+      } else {
+        await addService(masterProfileId, payload)
+      }
+      queryClient.invalidateQueries({ queryKey: ['services', masterProfileId] })
+      onClose()
+    } catch (error) {
+      showError(error, 'Не удалось сохранить услугу')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function handleDelete() {
+    window.Telegram.WebApp.showConfirm(
+      `Удалить услугу «${service!.name}»?`,
+      async (confirmed) => {
+        if (!confirmed) return
+        setSaving(true)
+        try {
+          await deleteService(service!.id)
+          queryClient.invalidateQueries({ queryKey: ['services', masterProfileId] })
+          onClose()
+        } catch (error) {
+          showError(error, 'Не удалось удалить услугу')
+        } finally {
+          setSaving(false)
+        }
+      }
+    )
+  }
+
+  return (
+    <>
+      {/* Затемнение */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 100,
+        }}
+      />
+
+      {/* Боттом-шит */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        background: 'var(--tgui--secondary_bg_color)',
+        borderRadius: '20px 20px 0 0',
+        padding: '20px 16px 32px',
+        zIndex: 101,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}>
+
+        {/* Шапка */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+          <span style={{ flex: 1, fontSize: 17, fontWeight: 600, color: 'var(--tgui--text_color)' }}>
+            {isEditing ? 'Редактировать услугу' : 'Новая услуга'}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: 'var(--tgui--hint_color)', padding: 0 }}>
+            ✕
+          </button>
+        </div>
+
+        {/* Название */}
+        <div>
+          <div style={{ fontSize: 12, color: 'var(--tgui--hint_color)', marginBottom: 6, paddingLeft: 4 }}>Название</div>
+          <input
+            placeholder="Например: Стрижка"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        {/* Описание */}
+        <div>
+          <div style={{ fontSize: 12, color: 'var(--tgui--hint_color)', marginBottom: 6, paddingLeft: 4 }}>Описание <span style={{ opacity: 0.6 }}>(необязательно)</span></div>
+          <textarea
+            placeholder="Например: для длинных волос"
+            value={description}
+            rows={1}
+            onChange={e => setDescription(e.target.value)}
+            onInput={e => {
+              const el = e.currentTarget
+              el.style.height = 'auto'
+              el.style.height = `${el.scrollHeight}px`
+            }}
+            style={{
+              ...inputStyle,
+              resize: 'none',
+              overflow: 'hidden',
+              lineHeight: '1.5',
+            }}
+          />
+        </div>
+
+        {/* Цена и длительность */}
+        <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: 'var(--tgui--hint_color)', marginBottom: 6, paddingLeft: 4 }}>Цена, ₽</div>
+            <input
+              placeholder="0"
+              value={price}
+              onChange={e => setPrice(e.target.value.replace(/\D/g, ''))}
+              inputMode="numeric"
+              style={inputStyle}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: 'var(--tgui--hint_color)', marginBottom: 6, paddingLeft: 4 }}>Длительность</div>
+            <select
+              value={duration}
+              onChange={e => setDuration(e.target.value)}
+              style={{ ...inputStyle, cursor: 'pointer', appearance: 'none', textAlign: 'center' }}
+            >
+              {DURATION_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Кнопки */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+          {isEditing && (
+            <button
+              onClick={handleDelete}
+              disabled={saving}
+              style={{
+                flex: 1, padding: '13px 0', borderRadius: 12, border: 'none',
+                background: 'rgba(255,59,48,0.12)', color: '#FF3B30',
+                fontSize: 15, fontWeight: 600, cursor: saving ? 'default' : 'pointer',
+              }}
+            >
+              Удалить
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              flex: 2, padding: '13px 0', borderRadius: 12, border: 'none',
+              background: saving ? 'var(--tgui--hint_color)' : 'var(--tgui--button_color)',
+              color: '#fff', fontSize: 15, fontWeight: 600,
+              cursor: saving ? 'default' : 'pointer',
+              boxShadow: saving ? 'none' : '0 2px 8px rgba(51,144,236,0.3)',
+            }}
+          >
+            {saving ? 'Сохраняем...' : 'Сохранить'}
+          </button>
+        </div>
+
+      </div>
+    </>
   )
 }
 
@@ -551,15 +890,31 @@ const TABS: { key: Tab; label: string; icon: string }[] = [
 export function MasterPage() {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [hoveredTab, setHoveredTab] = useState<Tab | null>(null)
+  const [editingService, setEditingService] = useState<ServiceItem | null | undefined>(undefined)
+  // undefined = форма закрыта, null = новая услуга, ServiceItem = редактирование
+
+  const { data: profile } = useQuery({
+    queryKey: ['my-master-profile'],
+    queryFn: getMyMasterProfile,
+  })
+  const masterProfileId = profile?.id ?? ''
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
         {activeTab === 'profile'      && <ProfileTab />}
         {activeTab === 'schedule'     && <ScheduleTab />}
-        {activeTab === 'services'     && <StubTab label="Услуги" />}
+        {activeTab === 'services'     && <ServicesTab onEdit={s => setEditingService(s)} />}
         {activeTab === 'appointments' && <StubTab label="Записи" />}
       </div>
+
+      {editingService !== undefined && (
+        <ServiceForm
+          service={editingService}
+          masterProfileId={masterProfileId}
+          onClose={() => setEditingService(undefined)}
+        />
+      )}
 
       <nav style={{
         display: 'flex',

@@ -15,6 +15,7 @@ interface TelegramWebApp {
   onEvent: (eventType: string, callback: () => void) => void
   offEvent: (eventType: string, callback: () => void) => void
   showAlert: (message: string, callback?: () => void) => void
+  showConfirm: (message: string, callback: (confirmed: boolean) => void) => void
   MainButton: {
     show: () => void
     hide: () => void
