@@ -29,6 +29,11 @@ export const router = createBrowserRouter([
 
       // Master
       {
+        path: 'master',
+        element: <ProtectedRoute roles={['Master', 'Owner']}><span /></ProtectedRoute>,
+        lazy: () => import('@/pages/master/MasterPage').then(m => ({ Component: m.MasterPage })),
+      },
+      {
         path: 'master-panel/appointments',
         element: <ProtectedRoute roles={['Master', 'Owner']}><span /></ProtectedRoute>,
         lazy: () => import('@/pages/master/MasterAppointmentsPage').then(m => ({ Component: m.MasterAppointmentsPage })),

@@ -15,7 +15,6 @@ export interface GetAllMastersResponse {
 
 export interface CreateMasterProfileRequest {
   masterId: string
-  photoUrl?: string
   description?: string
 }
 
@@ -30,4 +29,21 @@ export async function createMasterProfile(request: CreateMasterProfileRequest): 
 
 export async function dismissMaster(userId: string): Promise<void> {
   await apiClient.delete(`/api/master-profiles/dismiss/${userId}`)
+}
+
+export async function getMyMasterProfile(): Promise<MasterProfile> {
+  const { data } = await apiClient.get<MasterProfile>('/api/master-profiles/my')
+  return data
+}
+
+export async function updateMasterProfile(id: string, description: string | null): Promise<void> {
+  await apiClient.put(`/api/master-profiles/update/${id}`, { description })
+}
+
+export async function uploadMasterPhoto(id: string, file: File): Promise<void> {
+  const formData = new FormData()
+  formData.append('file', file)
+  await apiClient.post(`/api/master-profiles/upload-photo/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
 }
