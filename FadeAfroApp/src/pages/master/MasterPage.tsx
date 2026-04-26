@@ -34,6 +34,8 @@ function ProfileTab() {
   const [description, setDescription] = useState<string>('')
   const [fieldsReady, setFieldsReady] = useState(false)
   const [photoError, setPhotoError] = useState(false)
+  const [photoVersion, setPhotoVersion] = useState(0)
+  const [photoLoading, setPhotoLoading] = useState(false)
 
   // Инициализируем поля когда профиль загрузился
   if (profile && !fieldsReady) {
@@ -57,6 +59,8 @@ function ProfileTab() {
     mutationFn: (file: File) => uploadMasterPhoto(profile!.id, file),
     onSuccess: () => {
       setPhotoError(false)
+      setPhotoLoading(true)
+      setPhotoVersion(v => v + 1)
       queryClient.invalidateQueries({ queryKey: ['my-master-profile'] })
     },
   })
@@ -75,7 +79,7 @@ function ProfileTab() {
 
   const displayFirstName = firstName || profile.firstName
   const photoSrc = profile.photoUrl && !photoError
-    ? `${import.meta.env.VITE_API_URL ?? ''}${profile.photoUrl}`
+    ? `${import.meta.env.VITE_API_URL ?? ''}${profile.photoUrl}?v=${photoVersion}`
     : null
 
   const nameChanged =
@@ -107,7 +111,8 @@ function ProfileTab() {
             <img
               src={photoSrc}
               alt={displayFirstName}
-              onError={() => setPhotoError(true)}
+              onLoad={() => setPhotoLoading(false)}
+              onError={() => { setPhotoError(true); setPhotoLoading(false) }}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
             />
           )}
@@ -116,7 +121,7 @@ function ProfileTab() {
           </span>
 
           {/* Оверлей при загрузке */}
-          {photoMutation.isPending && (
+          {(photoMutation.isPending || photoLoading) && (
             <div style={{
               position: 'absolute',
               inset: 0,

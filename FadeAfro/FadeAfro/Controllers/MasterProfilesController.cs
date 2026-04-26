@@ -6,6 +6,7 @@ using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
+using FadeAfro.Application.Features.MasterProfiles.GetMasterPhoto;
 using System.Security.Claims;
 using FadeAfro.Domain.Constants;
 using MediatR;
@@ -72,6 +73,15 @@ public class MasterProfilesController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("dismiss/{userId:guid}")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Dismiss master", Description = "Revokes the Master role and deletes the master profile.")]
+    public async Task<IActionResult> Dismiss(Guid userId)
+    {
+        await _mediator.Send(new DismissMasterCommand(userId));
+        return NoContent();
+    }
+    
     [HttpPost("upload-photo/{masterProfileId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
     [SwaggerOperation(Summary = "Upload master photo", Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
@@ -88,13 +98,13 @@ public class MasterProfilesController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("dismiss/{userId:guid}")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(Summary = "Dismiss master", Description = "Revokes the Master role and deletes the master profile.")]
-    public async Task<IActionResult> Dismiss(Guid userId)
+    [HttpGet("get-photo/{masterProfileId:guid}")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Get master photo", Description = "Returns the photo of the master profile.")]
+    public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
     {
-        await _mediator.Send(new DismissMasterCommand(userId));
-        return NoContent();
+        var response = await _mediator.Send(new GetMasterPhotoQuery(masterProfileId));
+        return File(response.Stream, response.ContentType);
     }
 
     [HttpGet("available-slots/{masterProfileId:guid}")]

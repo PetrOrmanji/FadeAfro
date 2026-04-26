@@ -1,39 +1,51 @@
 using FadeAfro.Application.Services;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace FadeAfro.Infrastructure.Services;
 
 public class LocalFileStorageService : IFileStorageService
 {
-    private readonly string _uploadsPath;
-    private readonly string _baseUrl;
+    private const string MastersDirectory = "uploads/masters";
+    private const string PhotoUrlBase = "/api/master-profiles/get-photo";
 
-    public LocalFileStorageService(IWebHostEnvironment env)
+    private readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
+
+    public (Stream Stream, string ContentType)? GetMasterPhoto(Guid masterProfileId)
     {
-        _uploadsPath = Path.Combine(env.WebRootPath, "uploads", "masters");
-        _baseUrl = "/uploads/masters";
-    }
+        if (!Directory.Exists(MastersDirectory)) return null;
 
+        var files = Directory.GetFiles(MastersDirectory, $"{masterProfileId}.*");
+        if (files.Length == 0) return null;
+
+        var filePath = files[0];
+        _contentTypeProvider.TryGetContentType(filePath, out var contentType);
+
+        return (new FileStream(filePath, FileMode.Open), contentType!);
+    }
+    
     public async Task<string> SaveMasterPhotoAsync(Guid masterProfileId, Stream stream, string extension)
     {
-        Directory.CreateDirectory(_uploadsPath);
+        if (!Directory.Exists(MastersDirectory))
+            Directory.CreateDirectory(MastersDirectory);
 
-        // Удаляем старый файл с тем же ID (если было другое расширение)
-        foreach (var old in Directory.GetFiles(_uploadsPath, $"{masterProfileId}.*"))
+        foreach (var old in Directory.GetFiles(MastersDirectory, $"{masterProfileId}.*"))
             File.Delete(old);
 
-        var fileName = $"{masterProfileId}{extension}";
-        var fullPath = Path.Combine(_uploadsPath, fileName);
-
-        await using var fileStream = File.Create(fullPath);
+        var filePath = GetPhotoPath(masterProfileId, extension);
+        await using var fileStream = new FileStream(filePath, FileMode.Create);
         await stream.CopyToAsync(fileStream);
 
-        return $"{_baseUrl}/{fileName}";
+        return $"{PhotoUrlBase}/{masterProfileId}";
     }
 
     public void DeleteMasterPhoto(Guid masterProfileId)
     {
-        foreach (var file in Directory.GetFiles(_uploadsPath, $"{masterProfileId}.*"))
+        if (!Directory.Exists(MastersDirectory)) return;
+
+        foreach (var file in Directory.GetFiles(MastersDirectory, $"{masterProfileId}.*"))
             File.Delete(file);
     }
+
+    private static string GetPhotoPath(Guid masterProfileId, string extension) =>
+        Path.Combine(MastersDirectory, $"{masterProfileId}{extension}");
 }

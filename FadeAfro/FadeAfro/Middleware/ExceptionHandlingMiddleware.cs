@@ -43,6 +43,7 @@ public class ExceptionHandlingMiddleware
         {
             UserNotFoundException or
             MasterProfileNotFoundException or
+            MasterProfilePhotoNotFoundException or
             ServiceNotFoundException or
             MasterScheduleNotFoundException or
             MasterUnavailabilityNotFoundException or

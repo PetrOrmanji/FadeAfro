@@ -58,5 +58,5 @@ TestResults/
 # Dev app settings
 appsettings.Development.json
 
-# Static files (generated at runtime)
-FadeAfro/FadeAfro/wwwroot/
+# Uploads (generated at runtime)
+FadeAfro/FadeAfro/uploads/

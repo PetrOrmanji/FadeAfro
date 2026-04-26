@@ -19,7 +19,6 @@ var app = builder.Build();
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
 app.UseCors();
-app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
