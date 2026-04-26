@@ -33,6 +33,7 @@ function ProfileTab() {
   const [lastName, setLastName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [fieldsReady, setFieldsReady] = useState(false)
+  const [photoError, setPhotoError] = useState(false)
 
   // Инициализируем поля когда профиль загрузился
   if (profile && !fieldsReady) {
@@ -54,7 +55,10 @@ function ProfileTab() {
 
   const photoMutation = useMutation({
     mutationFn: (file: File) => uploadMasterPhoto(profile!.id, file),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-master-profile'] }),
+    onSuccess: () => {
+      setPhotoError(false)
+      queryClient.invalidateQueries({ queryKey: ['my-master-profile'] })
+    },
   })
 
   if (isLoading) {
@@ -70,7 +74,7 @@ function ProfileTab() {
   }
 
   const displayFirstName = firstName || profile.firstName
-  const photoSrc = profile.photoUrl
+  const photoSrc = profile.photoUrl && !photoError
     ? `${import.meta.env.VITE_API_URL ?? ''}${profile.photoUrl}`
     : null
 
@@ -89,7 +93,7 @@ function ProfileTab() {
             width: 96,
             height: 96,
             borderRadius: '50%',
-            background: photoSrc ? 'transparent' : '#3390EC',
+            background: '#3390EC',
             overflow: 'hidden',
             cursor: 'pointer',
             display: 'flex',
@@ -99,17 +103,17 @@ function ProfileTab() {
             flexShrink: 0,
           }}
         >
-          {photoSrc ? (
+          {photoSrc && (
             <img
               src={photoSrc}
               alt={displayFirstName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={() => setPhotoError(true)}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
             />
-          ) : (
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 32 }}>
-              {(displayFirstName[0] ?? '') + (lastName?.[0] ?? '')}
-            </span>
           )}
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: 32 }}>
+            {(displayFirstName[0] ?? '') + (lastName?.[0] ?? '')}
+          </span>
 
           {/* Оверлей при загрузке */}
           {photoMutation.isPending && (
