@@ -37,7 +37,7 @@ export async function getMyMasterProfile(): Promise<MasterProfile> {
 }
 
 export async function updateMasterProfile(id: string, description: string | null): Promise<void> {
-  await apiClient.put(`/api/master-profiles/update/${id}`, { description })
+  await apiClient.put(`/api/master-profiles/update-description/${id}`, { description })
 }
 
 export async function uploadMasterPhoto(id: string, file: File): Promise<void> {
