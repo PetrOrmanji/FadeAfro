@@ -62,7 +62,7 @@ function buildInitial(schedules: { id: string; dayOfWeek: string; startTime: str
   return state
 }
 
-function ScheduleTab() {
+function ScheduleBlock() {
   const queryClient = useQueryClient()
   const [days, setDays] = useState<ScheduleState>({})
   const [savingDays, setSavingDays] = useState<Record<number, boolean>>({})
@@ -266,6 +266,38 @@ function ScheduleTab() {
         </div>
       )}
 
+    </div>
+  )
+}
+
+// ─── Вкладка Расписание (расписание + отсутствия) ────────────────────────────
+
+function ScheduleTab() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '16px 0 32px' }}>
+      {/* Блок 1 — Расписание */}
+      <section>
+        <p style={{ margin: '0 16px 12px', fontWeight: 600, fontSize: 16 }}>Расписание</p>
+        <ScheduleBlock />
+      </section>
+
+      {/* Блок 2 — Отсутствия */}
+      <section>
+        <p style={{ margin: '0 16px 12px', fontWeight: 600, fontSize: 16 }}>Отсутствия</p>
+        <div
+          style={{
+            margin: '0 16px',
+            background: 'var(--tgui--bg_color)',
+            borderRadius: 12,
+            padding: '32px 16px',
+            textAlign: 'center',
+            color: 'var(--tgui--hint_color)',
+            fontSize: 14,
+          }}
+        >
+          Календарь появится здесь
+        </div>
+      </section>
     </div>
   )
 }
