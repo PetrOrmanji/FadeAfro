@@ -28,3 +28,7 @@ export async function getAllUsers(page: number, pageSize: number, search?: strin
   })
   return data
 }
+
+export async function updateUserName(firstName: string, lastName: string | null): Promise<void> {
+  await apiClient.put('/api/users/update-name', { firstName, lastName })
+}

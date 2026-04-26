@@ -24,7 +24,7 @@ public class CreateMasterProfileHandlerTests
     public async Task Handle_ValidCommand_CreatesAndReturnsResponse()
     {
         var masterId = Guid.NewGuid();
-        var user = new User(123, "Ivan", "Petrov", "ivanp", [Role.Master]);
+        var user = new User(123, "Ivan", "Petrov", "ivanp", [Role.Client]);
         var command = new CreateMasterProfileCommand(masterId, "https://photo.url", "Bio");
 
         _userRepository.GetByIdAsync(masterId).Returns(user);
@@ -72,7 +72,7 @@ public class CreateMasterProfileHandlerTests
     public async Task Handle_NullPhotoAndDescription_CreatesProfile()
     {
         var masterId = Guid.NewGuid();
-        var user = new User(123, "Ivan", null, null, [Role.Master]);
+        var user = new User(123, "Ivan", null, null, [Role.Client]);
         var command = new CreateMasterProfileCommand(masterId, null, null);
 
         _userRepository.GetByIdAsync(masterId).Returns(user);

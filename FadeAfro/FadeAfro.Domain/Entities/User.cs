@@ -31,14 +31,18 @@ public class User : Entity
         Roles = roles;
     }
     
-    public void Update(string firstName, string? lastName, string? username)
+    public void UpdateUsername(string? username)
+    {
+        Username = username;
+    }
+
+    public void UpdateName(string firstName, string? lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new InvalidFirstNameException();
 
         FirstName = firstName;
         LastName = lastName;
-        Username = username;
     }
 
     public void AssignMasterRole()

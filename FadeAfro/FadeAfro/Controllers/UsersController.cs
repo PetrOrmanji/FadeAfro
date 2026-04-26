@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using FadeAfro.Application.Features.Users.GetAllUsers;
 using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.RegisterUser;
+using FadeAfro.Application.Features.Users.UpdateUserName;
+using UpdateUserNameRequest = FadeAfro.Application.Features.Users.UpdateUserName.UpdateUserNameRequest;
 using FadeAfro.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +40,16 @@ public class UsersController : ControllerBase
     {
         var response = await _mediator.Send(new GetUserQuery(telegramId));
         return Ok(response);
+    }
+
+    [HttpPut("update-name")]
+    [Authorize]
+    [SwaggerOperation(Summary = "Update user's display name", Description = "Updates the first and last name of the currently authenticated user.")]
+    public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _mediator.Send(new UpdateUserNameCommand(userId, request.FirstName, request.LastName));
+        return NoContent();
     }
 
     [HttpGet("all")]

@@ -1,5 +1,6 @@
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Domain.Entities;
+using FadeAfro.Domain.Enums;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using FluentAssertions;
@@ -22,8 +23,10 @@ public class GetMasterProfileHandlerTests
     {
         var masterId = Guid.NewGuid();
         var profileId = Guid.NewGuid();
+        var user = new User(123, "Ivan", "Petrov", "ivanp", [Role.Master]);
         var profile = new MasterProfile(masterId, "https://photo.url", "Bio");
         SetId(profile, profileId);
+        SetMaster(profile, user);
 
         _masterProfileRepository.GetByIdAsync(profileId).Returns(profile);
 
@@ -31,6 +34,8 @@ public class GetMasterProfileHandlerTests
 
         result.Id.Should().Be(profileId);
         result.MasterId.Should().Be(masterId);
+        result.FirstName.Should().Be("Ivan");
+        result.LastName.Should().Be("Petrov");
         result.PhotoUrl.Should().Be("https://photo.url");
         result.Description.Should().Be("Bio");
     }
@@ -50,5 +55,12 @@ public class GetMasterProfileHandlerTests
         typeof(Entity)
             .GetProperty(nameof(Entity.Id))!
             .SetValue(profile, id);
+    }
+
+    private static void SetMaster(MasterProfile profile, User user)
+    {
+        typeof(MasterProfile)
+            .GetProperty(nameof(MasterProfile.Master))!
+            .SetValue(profile, user);
     }
 }

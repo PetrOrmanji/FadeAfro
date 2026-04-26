@@ -50,7 +50,7 @@ public class AuthenticateTelegramUserHandler : IRequestHandler<AuthenticateTeleg
         }
         else
         {
-            user.Update(userData.FirstName, userData.LastName, userData.Username);
+            user.UpdateUsername(userData.Username);
             await _userRepository.UpdateAsync(user);
         }
 
