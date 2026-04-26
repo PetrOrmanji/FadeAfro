@@ -377,19 +377,29 @@ function MonthCalendar({
           const isToday = dateKey === today
           const isPast = dateKey ? dateKey < today : false
 
-          // Фон ячейки при отсутствии
+          // Выходной ли день по расписанию мастера
+          const jsDay = day ? new Date(year, month, day).getDay() : -1
+          const isOffDay = day ? !(jsDay in scheduleByDay) : false
+
+          // Неактивная ячейка — прошлое или выходной
+          const isInactive = isPast || isOffDay
+
+          // Фон ячейки
+          const isWorkingDay = day ? jsDay in scheduleByDay : false
           let cellBg = 'transparent'
+          if (isOffDay) cellBg = 'rgba(52,199,89,0.12)'
+          else if (isWorkingDay) cellBg = 'rgba(0,122,255,0.08)'
           if (mark === 'full') cellBg = 'rgba(255,59,48,0.18)'
           else if (mark === 'partial') cellBg = 'rgba(255,149,0,0.18)'
 
-          // Цвет числа — всегда обычный, только «сегодня» выделяем
+          // Цвет числа
           let color = 'var(--tgui--text_color)'
           if (isToday) color = 'var(--tgui--button_color)'
 
           return (
             <div
               key={idx}
-              onClick={() => dateKey && onDayPress(dateKey)}
+              onClick={() => dateKey && !isInactive && onDayPress(dateKey)}
               style={{
                 position: 'relative',
                 minHeight: 40,
@@ -397,7 +407,7 @@ function MonthCalendar({
                 borderRight: '1px solid var(--tgui--divider)',
                 borderBottom: '1px solid var(--tgui--divider)',
                 background: cellBg,
-                cursor: day ? 'pointer' : 'default',
+                cursor: day && !isInactive ? 'pointer' : 'default',
                 WebkitTapHighlightColor: 'transparent',
                 opacity: isPast ? 0.35 : 1,
                 boxSizing: 'border-box',
@@ -447,15 +457,18 @@ function UnavailabilitiesBlock({
   return (
     <div style={{ background: 'var(--tgui--bg_color)' }}>
       {/* Легенда */}
-      <div style={{ display: 'flex', gap: 16, padding: '12px 16px 0', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#FF3B30', flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Весь день</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#FF9500', flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Часть дня</span>
-        </div>
+      <div style={{ display: 'flex', gap: 12, padding: '12px 16px 0', flexWrap: 'wrap' }}>
+        {[
+          { color: 'rgba(0,122,255,0.35)',   label: 'Рабочий день' },
+          { color: 'rgba(52,199,89,0.5)',    label: 'Выходной' },
+          { color: 'rgba(255,149,0,0.7)',    label: 'Часть дня' },
+          { color: 'rgba(255,59,48,0.7)',    label: 'Весь день' },
+        ].map(({ color, label }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 2, background: color, flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: 'var(--tgui--hint_color)' }}>{label}</span>
+          </div>
+        ))}
       </div>
 
       <MonthCalendar year={thisYear} month={thisMonth} unavailabilities={unavailabilities} scheduleByDay={scheduleByDay} onDayPress={onDayPress} />
@@ -515,19 +528,16 @@ function UnavailabilitySheet({ dateKey, existing, masterProfileId, onClose }: Un
 
   async function handleDelete() {
     if (!existing) return
-    window.Telegram.WebApp.showConfirm('Удалить отсутствие на этот день?', async confirmed => {
-      if (!confirmed) return
-      setDeleting(true)
-      try {
-        await deleteUnavailability(existing.id)
-        queryClient.invalidateQueries({ queryKey: ['unavailabilities', masterProfileId] })
-        onClose()
-      } catch (e) {
-        showError(e, 'Не удалось удалить отсутствие')
-      } finally {
-        setDeleting(false)
-      }
-    })
+    setDeleting(true)
+    try {
+      await deleteUnavailability(existing.id)
+      queryClient.invalidateQueries({ queryKey: ['unavailabilities', masterProfileId] })
+      onClose()
+    } catch (e) {
+      showError(e, 'Не удалось удалить отсутствие')
+    } finally {
+      setDeleting(false)
+    }
   }
 
   const busy = saving || deleting
