@@ -191,17 +191,16 @@ function ScheduleTab() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px' }}>
           {renderToggle(dayOfWeek)}
           <span style={{
-            width: 28,
+            flex: 1,
             fontSize: 15,
-            fontWeight: 500,
+            fontWeight: 400,
             color: hasError ? '#FF3B30' : 'var(--tgui--text_color)',
             transition: 'color 0.15s',
-            flexShrink: 0,
           }}>
             {short}
           </span>
           {day.enabled ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <input
                 type="time" value={day.startTime} disabled={isSaving}
                 onChange={e => updateDay(dayOfWeek, { startTime: e.target.value })}
@@ -229,7 +228,7 @@ function ScheduleTab() {
               />
             </div>
           ) : (
-            <span style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--tgui--hint_color)' }}>выходной</span>
+            <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>выходной</span>
           )}
         </div>
         {!isLast && <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 16px' }} />}
@@ -246,8 +245,8 @@ function ScheduleTab() {
             Рабочие дни
           </div>
           <div style={{ borderRadius: 16, background: 'var(--tgui--bg_color)', overflow: 'hidden' }}>
-            {workingDays.map(({ dayOfWeek, short }, idx) =>
-              renderRow(dayOfWeek, short, idx === workingDays.length - 1)
+            {workingDays.map(({ dayOfWeek, label }, idx) =>
+              renderRow(dayOfWeek, label, idx === workingDays.length - 1)
             )}
           </div>
         </div>
@@ -259,8 +258,8 @@ function ScheduleTab() {
             Выходные
           </div>
           <div style={{ borderRadius: 16, background: 'var(--tgui--bg_color)', overflow: 'hidden' }}>
-            {daysOff.map(({ dayOfWeek, short }, idx) =>
-              renderRow(dayOfWeek, short, idx === daysOff.length - 1)
+            {daysOff.map(({ dayOfWeek, label }, idx) =>
+              renderRow(dayOfWeek, label, idx === daysOff.length - 1)
             )}
           </div>
         </div>
