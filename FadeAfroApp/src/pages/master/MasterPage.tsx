@@ -28,14 +28,14 @@ const DAY_OF_WEEK: Record<string, number> = {
 }
 
 // C# DayOfWeek: 0=Sun, 1=Mon…6=Sat. Отображаем Пн–Вс.
-const DAYS: { dayOfWeek: number; label: string }[] = [
-  { dayOfWeek: 1, label: 'Понедельник' },
-  { dayOfWeek: 2, label: 'Вторник' },
-  { dayOfWeek: 3, label: 'Среда' },
-  { dayOfWeek: 4, label: 'Четверг' },
-  { dayOfWeek: 5, label: 'Пятница' },
-  { dayOfWeek: 6, label: 'Суббота' },
-  { dayOfWeek: 0, label: 'Воскресенье' },
+const DAYS: { dayOfWeek: number; label: string; short: string }[] = [
+  { dayOfWeek: 1, label: 'Понедельник', short: 'Пн' },
+  { dayOfWeek: 2, label: 'Вторник',     short: 'Вт' },
+  { dayOfWeek: 3, label: 'Среда',       short: 'Ср' },
+  { dayOfWeek: 4, label: 'Четверг',     short: 'Чт' },
+  { dayOfWeek: 5, label: 'Пятница',     short: 'Пт' },
+  { dayOfWeek: 6, label: 'Суббота',     short: 'Сб' },
+  { dayOfWeek: 0, label: 'Воскресенье', short: 'Вс' },
 ]
 
 const DEFAULT_START = '09:00'
@@ -146,136 +146,126 @@ function ScheduleTab() {
     return <Placeholder header="Ошибка" description="Не удалось загрузить расписание" />
   }
 
-  return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+  const workingDays = DAYS.filter(d => days[d.dayOfWeek]?.enabled)
+  const daysOff     = DAYS.filter(d => !days[d.dayOfWeek]?.enabled)
 
-        <div style={{
-          borderRadius: 16,
-          background: 'var(--tgui--bg_color)',
-          overflow: 'hidden',
-        }}>
-          {DAYS.map(({ dayOfWeek, label }, idx) => {
-            const day = days[dayOfWeek]
-            if (!day) return null
-            const isSaving = !!savingDays[dayOfWeek]
-            const hasError = !!errorDays[dayOfWeek]
-            return (
-              <div key={dayOfWeek}>
-                {idx > 0 && (
-                  <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 16px' }} />
-                )}
-                <div style={{
-                  padding: '12px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  opacity: day.enabled ? 1 : 0.45,
-                  transition: 'opacity 0.15s',
-                }}>
-                  {/* Тогл */}
-                  <div
-                    onClick={() => handleToggle(dayOfWeek)}
-                    style={{
-                      width: 40,
-                      height: 24,
-                      borderRadius: 12,
-                      background: day.enabled ? 'var(--tgui--button_color)' : 'var(--tgui--hint_color)',
-                      position: 'relative',
-                      cursor: isSaving ? 'default' : 'pointer',
-                      flexShrink: 0,
-                      transition: 'background 0.2s',
-                    }}
-                  >
-                    {isSaving ? (
-                      <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <Spinner size="s" />
-                      </div>
-                    ) : (
-                      <div style={{
-                        position: 'absolute',
-                        top: 3,
-                        left: day.enabled ? 19 : 3,
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        background: '#fff',
-                        transition: 'left 0.2s',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                      }} />
-                    )}
-                  </div>
+  const renderToggle = (dayOfWeek: number) => {
+    const isSaving = !!savingDays[dayOfWeek]
+    const day = days[dayOfWeek]
+    return (
+      <div
+        onClick={() => handleToggle(dayOfWeek)}
+        style={{
+          width: 40, height: 24, borderRadius: 12,
+          background: day?.enabled ? 'var(--tgui--button_color)' : 'var(--tgui--hint_color)',
+          position: 'relative',
+          cursor: isSaving ? 'default' : 'pointer',
+          flexShrink: 0,
+          transition: 'background 0.2s',
+        }}
+      >
+        {isSaving ? (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Spinner size="s" />
+          </div>
+        ) : (
+          <div style={{
+            position: 'absolute', top: 3,
+            left: day?.enabled ? 19 : 3,
+            width: 18, height: 18, borderRadius: '50%',
+            background: '#fff', transition: 'left 0.2s',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+          }} />
+        )}
+      </div>
+    )
+  }
 
-                  {/* Название */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{
-                      fontSize: 15,
-                      color: 'var(--tgui--text_color)',
-                      fontWeight: 400,
-                    }}>
-                      {label}
-                    </span>
-                    {hasError && (
-                      <span style={{ fontSize: 11, color: '#FF3B30' }}>Не сохранено</span>
-                    )}
-                  </div>
-
-                  {/* Время */}
-                  {day.enabled ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <input
-                        type="time"
-                        value={day.startTime}
-                        disabled={isSaving}
-                        onChange={e => updateDay(dayOfWeek, { startTime: e.target.value })}
-                        onBlur={() => handleTimeBlur(dayOfWeek)}
-                        style={{
-                          border: 'none',
-                          background: 'var(--tgui--secondary_bg_color)',
-                          borderRadius: 8,
-                          padding: '4px 8px',
-                          fontSize: 14,
-                          color: 'var(--tgui--text_color)',
-                          fontFamily: 'inherit',
-                          outline: 'none',
-                          cursor: isSaving ? 'default' : 'pointer',
-                          opacity: isSaving ? 0.5 : 1,
-                        }}
-                      />
-                      <span style={{ color: 'var(--tgui--hint_color)', fontSize: 13 }}>—</span>
-                      <input
-                        type="time"
-                        value={day.endTime}
-                        disabled={isSaving}
-                        onChange={e => updateDay(dayOfWeek, { endTime: e.target.value })}
-                        onBlur={() => handleTimeBlur(dayOfWeek)}
-                        style={{
-                          border: 'none',
-                          background: 'var(--tgui--secondary_bg_color)',
-                          borderRadius: 8,
-                          padding: '4px 8px',
-                          fontSize: 14,
-                          color: 'var(--tgui--text_color)',
-                          fontFamily: 'inherit',
-                          outline: 'none',
-                          cursor: isSaving ? 'default' : 'pointer',
-                          opacity: isSaving ? 0.5 : 1,
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>выходной</span>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+  const renderRow = (dayOfWeek: number, short: string, isLast: boolean) => {
+    const day = days[dayOfWeek]
+    if (!day) return null
+    const isSaving = !!savingDays[dayOfWeek]
+    const hasError = !!errorDays[dayOfWeek]
+    return (
+      <div key={dayOfWeek}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px' }}>
+          {renderToggle(dayOfWeek)}
+          <span style={{
+            width: 28,
+            fontSize: 15,
+            fontWeight: 500,
+            color: hasError ? '#FF3B30' : 'var(--tgui--text_color)',
+            transition: 'color 0.15s',
+            flexShrink: 0,
+          }}>
+            {short}
+          </span>
+          {day.enabled ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+              <input
+                type="time" value={day.startTime} disabled={isSaving}
+                onChange={e => updateDay(dayOfWeek, { startTime: e.target.value })}
+                onBlur={() => handleTimeBlur(dayOfWeek)}
+                style={{
+                  border: 'none', background: 'var(--tgui--secondary_bg_color)',
+                  borderRadius: 8, padding: '4px 8px', fontSize: 14,
+                  color: 'var(--tgui--text_color)', fontFamily: 'inherit',
+                  outline: 'none', cursor: isSaving ? 'default' : 'pointer',
+                  opacity: isSaving ? 0.5 : 1,
+                }}
+              />
+              <span style={{ color: 'var(--tgui--hint_color)', fontSize: 13 }}>—</span>
+              <input
+                type="time" value={day.endTime} disabled={isSaving}
+                onChange={e => updateDay(dayOfWeek, { endTime: e.target.value })}
+                onBlur={() => handleTimeBlur(dayOfWeek)}
+                style={{
+                  border: 'none', background: 'var(--tgui--secondary_bg_color)',
+                  borderRadius: 8, padding: '4px 8px', fontSize: 14,
+                  color: 'var(--tgui--text_color)', fontFamily: 'inherit',
+                  outline: 'none', cursor: isSaving ? 'default' : 'pointer',
+                  opacity: isSaving ? 0.5 : 1,
+                }}
+              />
+            </div>
+          ) : (
+            <span style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--tgui--hint_color)' }}>выходной</span>
+          )}
         </div>
+        {!isLast && <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 16px' }} />}
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+      {workingDays.length > 0 && (
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--tgui--hint_color)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6, paddingLeft: 4 }}>
+            Рабочие дни
+          </div>
+          <div style={{ borderRadius: 16, background: 'var(--tgui--bg_color)', overflow: 'hidden' }}>
+            {workingDays.map(({ dayOfWeek, short }, idx) =>
+              renderRow(dayOfWeek, short, idx === workingDays.length - 1)
+            )}
+          </div>
+        </div>
+      )}
+
+      {daysOff.length > 0 && (
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--tgui--hint_color)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6, paddingLeft: 4 }}>
+            Выходные
+          </div>
+          <div style={{ borderRadius: 16, background: 'var(--tgui--bg_color)', overflow: 'hidden' }}>
+            {daysOff.map(({ dayOfWeek, short }, idx) =>
+              renderRow(dayOfWeek, short, idx === daysOff.length - 1)
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
