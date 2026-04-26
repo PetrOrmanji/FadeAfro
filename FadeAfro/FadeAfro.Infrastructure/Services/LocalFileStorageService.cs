@@ -30,4 +30,10 @@ public class LocalFileStorageService : IFileStorageService
 
         return $"{_baseUrl}/{fileName}";
     }
+
+    public void DeleteMasterPhoto(Guid masterProfileId)
+    {
+        foreach (var file in Directory.GetFiles(_uploadsPath, $"{masterProfileId}.*"))
+            File.Delete(file);
+    }
 }

@@ -1,3 +1,4 @@
+using FadeAfro.Application.Services;
 using FadeAfro.Domain.Enums;
 using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
@@ -10,15 +11,18 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
     private readonly IUserRepository _userRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IAppointmentRepository _appointmentRepository;
+    private readonly IFileStorageService _fileStorageService;
 
     public DismissMasterHandler(
         IUserRepository userRepository,
         IMasterProfileRepository masterProfileRepository,
-        IAppointmentRepository appointmentRepository)
+        IAppointmentRepository appointmentRepository,
+        IFileStorageService fileStorageService)
     {
         _userRepository = userRepository;
         _masterProfileRepository = masterProfileRepository;
         _appointmentRepository = appointmentRepository;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task Handle(DismissMasterCommand command, CancellationToken cancellationToken)
@@ -44,6 +48,8 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
 
             if (activeAppointments.Count > 0)
                 await _appointmentRepository.UpdateRangeAsync(activeAppointments);
+
+            _fileStorageService.DeleteMasterPhoto(masterProfile.Id);
 
             await _masterProfileRepository.DeleteAsync(masterProfile);
         }
