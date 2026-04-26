@@ -1,6 +1,9 @@
+using System.Reflection;
 using FadeAfro.Application.Extensions;
 using FadeAfro.Extensions;
 using FadeAfro.Infrastructure.Extensions;
+
+SetCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,3 +28,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void SetCurrentDirectory()
+{
+    var entryAssembly = Assembly.GetEntryAssembly();
+    if (entryAssembly is null)
+    {
+        return;
+    }
+
+    var assemblyDirectory = Path.GetDirectoryName(entryAssembly.Location);
+    if (assemblyDirectory is null)
+    {
+        return;
+    }
+
+    Directory.SetCurrentDirectory(assemblyDirectory);
+}
