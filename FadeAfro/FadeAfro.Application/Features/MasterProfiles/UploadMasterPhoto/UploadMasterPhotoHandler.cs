@@ -40,7 +40,7 @@ public class UploadMasterPhotoHandler : IRequestHandler<UploadMasterPhotoCommand
             command.FileStream,
             command.Extension);
 
-        masterProfile.Update(photoUrl, masterProfile.Description);
+        masterProfile.UpdatePhotoUrl(photoUrl);
         await _masterProfileRepository.UpdateAsync(masterProfile);
     }
 }

@@ -19,9 +19,13 @@ public class MasterProfile : Entity
         Description = description;
     }
 
-    public void Update(string? photoUrl, string? description)
+    public void UpdatePhotoUrl(string? photoUrl)
     {
         PhotoUrl = photoUrl;
+    }
+
+    public void UpdateDescription(string? description)
+    {
         Description = description;
     }
 }

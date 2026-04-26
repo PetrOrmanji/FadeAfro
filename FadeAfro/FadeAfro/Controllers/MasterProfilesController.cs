@@ -3,7 +3,7 @@ using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
 using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
-using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterPhoto;
@@ -64,10 +64,10 @@ public class MasterProfilesController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut("update/{masterProfileId:guid}")]
+    [HttpPut("update-description/{masterProfileId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Update master profile", Description = "Updates photo URL and description of the master profile.")]
-    public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterProfileCommand command)
+    [SwaggerOperation(Summary = "Update master description", Description = "Updates description of the master profile.")]
+    public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterDescriptionCommand command)
     {
         await _mediator.Send(command with { MasterProfileId = masterProfileId });
         return NoContent();
