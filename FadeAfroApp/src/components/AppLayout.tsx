@@ -16,6 +16,10 @@ function AuthGate() {
       navigate('/owner', { replace: true })
     }
 
+    if (role === 'Client' && !location.pathname.startsWith('/client')) {
+      navigate('/client', { replace: true })
+    }
+
     if (role === 'Master' && !location.pathname.startsWith('/master')) {
       navigate('/master', { replace: true })
     }

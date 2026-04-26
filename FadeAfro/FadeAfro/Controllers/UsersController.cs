@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using FadeAfro.Application.Features.Users.GetAllUsers;
+using FadeAfro.Application.Features.Users.GetCurrentUser;
 using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.RegisterUser;
 using FadeAfro.Application.Features.Users.UpdateUserName;
@@ -39,6 +40,16 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetByTelegramId(long telegramId)
     {
         var response = await _mediator.Send(new GetUserQuery(telegramId));
+        return Ok(response);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    [SwaggerOperation(Summary = "Get current user info", Description = "Returns the currently authenticated user's name.")]
+    public async Task<IActionResult> GetMe()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var response = await _mediator.Send(new GetCurrentUserQuery(userId));
         return Ok(response);
     }
 

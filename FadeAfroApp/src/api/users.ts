@@ -17,6 +17,17 @@ export interface GetAllUsersResponse {
   totalPages: number
 }
 
+export interface CurrentUserResponse {
+  id: string
+  firstName: string
+  lastName: string | null
+}
+
+export async function getCurrentUser(): Promise<CurrentUserResponse> {
+  const { data } = await apiClient.get<CurrentUserResponse>('/api/users/me')
+  return data
+}
+
 export async function getUserByTelegramId(telegramId: number): Promise<UserResponse> {
   const { data } = await apiClient.get<UserResponse>(`/api/users/get/${telegramId}`)
   return data

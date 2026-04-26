@@ -27,6 +27,12 @@ export const router = createBrowserRouter([
         lazy: () => import('@/pages/client/MyAppointmentsPage').then(m => ({ Component: m.MyAppointmentsPage })),
       },
 
+      {
+        path: 'client',
+        element: <ProtectedRoute roles={['Client']}><span /></ProtectedRoute>,
+        lazy: () => import('@/pages/client/ClientPage').then(m => ({ Component: m.ClientPage })),
+      },
+
       // Master
       {
         path: 'master',
