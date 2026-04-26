@@ -32,7 +32,11 @@ public class GetClientAppointmentsHandler : IRequestHandler<GetClientAppointment
             .Select(a => new AppointmentResponse(
                 a.Id,
                 a.MasterProfileId,
+                a.MasterProfile.Master.GetFullName(),
+                a.MasterProfile.PhotoUrl,
                 a.ServiceId,
+                a.Service.Name,
+                a.Service.Price,
                 a.StartTime,
                 a.EndTime,
                 a.Status,

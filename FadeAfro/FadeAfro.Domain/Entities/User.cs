@@ -31,6 +31,9 @@ public class User : Entity
         Roles = roles;
     }
     
+    public string GetFullName() =>
+        string.IsNullOrWhiteSpace(LastName) ? FirstName : $"{FirstName} {LastName}";
+
     public void UpdateUsername(string? username)
     {
         Username = username;
