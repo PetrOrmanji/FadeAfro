@@ -23,7 +23,9 @@ public class MasterProfileRepository : IMasterProfileRepository
 
     public async Task<MasterProfile?> GetByMasterIdAsync(Guid masterId)
     {
-        return await _context.MasterProfiles.FirstOrDefaultAsync(mp => mp.MasterId == masterId);
+        return await _context.MasterProfiles
+            .Include(mp => mp.Master)
+            .FirstOrDefaultAsync(mp => mp.MasterId == masterId);
     }
 
     public async Task<IReadOnlyList<MasterProfile>> GetAllAsync()

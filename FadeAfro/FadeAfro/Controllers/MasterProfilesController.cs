@@ -4,6 +4,9 @@ using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
 using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
+using System.Security.Claims;
 using FadeAfro.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -42,6 +45,16 @@ public class MasterProfilesController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("my")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(Summary = "Get my master profile", Description = "Returns the master profile of the currently authenticated master.")]
+    public async Task<IActionResult> GetMy()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var response = await _mediator.Send(new GetMyMasterProfileQuery(userId));
+        return Ok(response);
+    }
+
     [HttpGet("all")]
     [SwaggerOperation(Summary = "Get all master profiles", Description = "Returns a list of all master profiles.")]
     public async Task<IActionResult> GetAll()
@@ -56,6 +69,22 @@ public class MasterProfilesController : ControllerBase
     public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterProfileCommand command)
     {
         await _mediator.Send(command with { MasterProfileId = masterProfileId });
+        return NoContent();
+    }
+
+    [HttpPost("upload-photo/{masterProfileId:guid}")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(Summary = "Upload master photo", Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
+    public async Task<IActionResult> UploadPhoto(Guid masterProfileId, IFormFile file)
+    {
+        var extension = Path.GetExtension(file.FileName);
+
+        await _mediator.Send(new UploadMasterPhotoCommand(
+            masterProfileId,
+            file.OpenReadStream(),
+            extension,
+            file.Length));
+
         return NoContent();
     }
 
