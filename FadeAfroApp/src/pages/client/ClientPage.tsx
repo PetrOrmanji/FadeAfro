@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner } from '@telegram-apps/telegram-ui'
 import { getCurrentUser, updateUserName } from '@/api/users'
@@ -16,14 +16,14 @@ function Avatar({ firstName, lastName }: { firstName: string; lastName?: string 
   return (
     <div
       style={{
-        width: 80,
-        height: 80,
+        width: 48,
+        height: 48,
         borderRadius: '50%',
         background: 'var(--tgui--button_color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 28,
+        fontSize: 18,
         fontWeight: 700,
         color: '#fff',
         flexShrink: 0,
@@ -189,38 +189,23 @@ export function ClientPage() {
     <div style={{ minHeight: '100dvh', background: 'var(--tgui--secondary_bg_color)' }}>
       {/* Header card */}
       <div
+        onClick={() => setEditOpen(true)}
         style={{
           background: 'var(--tgui--bg_color)',
-          padding: '24px 16px 20px',
+          padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
-          gap: 16,
+          gap: 12,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
         }}
       >
         <Avatar firstName={user?.firstName ?? '?'} lastName={user?.lastName} />
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontWeight: 700, fontSize: 18, lineHeight: 1.3 }}>{fullName}</p>
+          <p style={{ margin: 0, fontWeight: 600, fontSize: 16, lineHeight: 1.3 }}>{fullName}</p>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)' }}>Клиент</p>
         </div>
-
-        <button
-          onClick={() => setEditOpen(true)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 8,
-            borderRadius: 8,
-            color: 'var(--tgui--hint_color)',
-            fontSize: 20,
-            lineHeight: 1,
-            flexShrink: 0,
-          }}
-          aria-label="Редактировать имя"
-        >
-          ✏️
-        </button>
       </div>
 
       {/* Appointments placeholder */}
