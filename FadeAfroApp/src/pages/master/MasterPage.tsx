@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
@@ -272,27 +272,41 @@ function ScheduleBlock() {
 
 // ─── Вкладка Расписание (расписание + отсутствия) ────────────────────────────
 
+const sectionCardStyle: React.CSSProperties = {
+  margin: '0 16px',
+  border: '1px solid var(--tgui--divider)',
+  borderRadius: 16,
+  overflow: 'hidden',
+}
+
+const sectionTitleStyle: React.CSSProperties = {
+  margin: 0,
+  padding: '14px 16px',
+  fontWeight: 600,
+  fontSize: 15,
+  borderBottom: '1px solid var(--tgui--divider)',
+  background: 'var(--tgui--bg_color)',
+}
+
 function ScheduleTab() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '16px 0 32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0 32px' }}>
       {/* Блок 1 — Расписание */}
-      <section>
-        <p style={{ margin: '0 16px 12px', fontWeight: 600, fontSize: 16 }}>Расписание</p>
+      <section style={sectionCardStyle}>
+        <p style={sectionTitleStyle}>Расписание</p>
         <ScheduleBlock />
       </section>
 
       {/* Блок 2 — Отсутствия */}
-      <section>
-        <p style={{ margin: '0 16px 12px', fontWeight: 600, fontSize: 16 }}>Отсутствия</p>
+      <section style={sectionCardStyle}>
+        <p style={sectionTitleStyle}>Отсутствия</p>
         <div
           style={{
-            margin: '0 16px',
-            background: 'var(--tgui--bg_color)',
-            borderRadius: 12,
             padding: '32px 16px',
             textAlign: 'center',
             color: 'var(--tgui--hint_color)',
             fontSize: 14,
+            background: 'var(--tgui--bg_color)',
           }}
         >
           Календарь появится здесь
