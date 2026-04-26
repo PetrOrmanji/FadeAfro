@@ -290,11 +290,13 @@ function MonthCalendar({
   year,
   month,
   unavailabilities,
+  scheduleByDay,
   onDayPress,
 }: {
   year: number
   month: number   // 0-based
   unavailabilities: UnavailabilityItem[]
+  scheduleByDay: Record<number, { startTime: string; endTime: string }>  // JS dayOfWeek → times
   onDayPress: (dateKey: string) => void
 }) {
   const today = toDateKey(new Date())
@@ -303,10 +305,20 @@ function MonthCalendar({
   const markedDays = React.useMemo(() => {
     const map: Record<string, 'full' | 'partial'> = {}
     for (const u of unavailabilities) {
-      map[u.date] = u.startTime === null && u.endTime === null ? 'full' : 'partial'
+      if (u.startTime === null && u.endTime === null) {
+        map[u.date] = 'full'
+      } else {
+        // Проверяем, совпадает ли промежуток с рабочим расписанием на этот день
+        const jsDay = new Date(u.date).getDay()
+        const sched = scheduleByDay[jsDay]
+        const coversFullDay = sched
+          && u.startTime?.slice(0, 5) === sched.startTime.slice(0, 5)
+          && u.endTime?.slice(0, 5) === sched.endTime.slice(0, 5)
+        map[u.date] = coversFullDay ? 'full' : 'partial'
+      }
     }
     return map
-  }, [unavailabilities])
+  }, [unavailabilities, scheduleByDay])
 
   // Первый день месяца (0=Sun…6=Sat), переводим в пн-based (0=Mon…6=Sun)
   const firstDay = new Date(year, month, 1)
@@ -321,9 +333,9 @@ function MonthCalendar({
   while (cells.length % 7 !== 0) cells.push(null)
 
   return (
-    <div style={{ padding: '12px 12px 16px' }}>
+    <div>
       {/* Заголовок месяца */}
-      <p style={{ margin: '0 0 10px 4px', fontWeight: 600, fontSize: 14, color: 'var(--tgui--text_color)' }}>
+      <p style={{ margin: 0, padding: '10px 12px 8px', fontWeight: 600, fontSize: 14, color: 'var(--tgui--text_color)' }}>
         {MONTH_NAMES[month]} {year}
       </p>
 
@@ -331,13 +343,24 @@ function MonthCalendar({
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(7, 1fr)',
+        borderTop: '1px solid var(--tgui--divider)',
         borderBottom: '1px solid var(--tgui--divider)',
+        borderLeft: '1px solid var(--tgui--divider)',
       }}>
-        {WEEK_DAYS.map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--tgui--hint_color)', padding: '6px 0' }}>
-            {d}
-          </div>
-        ))}
+        {WEEK_DAYS.map((d) => {
+          return (
+            <div key={d} style={{
+              textAlign: 'center',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--tgui--hint_color)',
+              padding: '5px 0',
+              borderRight: '1px solid var(--tgui--divider)',
+            }}>
+              {d}
+            </div>
+          )
+        })}
       </div>
 
       {/* Сетка дней */}
@@ -347,60 +370,55 @@ function MonthCalendar({
         borderLeft: '1px solid var(--tgui--divider)',
       }}>
         {cells.map((day, idx) => {
-          const isLastInRow = (idx + 1) % 7 === 0
           const dateKey = day
             ? `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
             : null
           const mark = dateKey ? markedDays[dateKey] : undefined
           const isToday = dateKey === today
+          const isPast = dateKey ? dateKey < today : false
 
-          let bg = 'transparent'
+          // Фон ячейки при отсутствии
+          let cellBg = 'transparent'
+          if (mark === 'full') cellBg = 'rgba(255,59,48,0.18)'
+          else if (mark === 'partial') cellBg = 'rgba(255,149,0,0.18)'
+
+          // Цвет числа — всегда обычный, только «сегодня» выделяем
           let color = 'var(--tgui--text_color)'
-          let circleBorder = 'none'
-
-          if (mark === 'full') {
-            bg = '#FF3B30'
-            color = '#fff'
-          } else if (mark === 'partial') {
-            bg = '#FF9500'
-            color = '#fff'
-          } else if (isToday) {
-            circleBorder = '1.5px solid var(--tgui--button_color)'
-            color = 'var(--tgui--button_color)'
-          }
+          if (isToday) color = 'var(--tgui--button_color)'
 
           return (
             <div
               key={idx}
               onClick={() => dateKey && onDayPress(dateKey)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px 0',
+                position: 'relative',
+                minHeight: 40,
+                padding: '4px 5px',
                 borderRight: '1px solid var(--tgui--divider)',
                 borderBottom: '1px solid var(--tgui--divider)',
+                background: cellBg,
                 cursor: day ? 'pointer' : 'default',
                 WebkitTapHighlightColor: 'transparent',
+                opacity: isPast ? 0.35 : 1,
+                boxSizing: 'border-box',
               }}
             >
               {day ? (
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  display: 'flex',
+                <span style={{
+                  display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  width: 24,
+                  height: 24,
                   borderRadius: '50%',
-                  background: bg,
-                  color,
-                  border: circleBorder,
-                  fontSize: 13,
+                  border: isToday ? `1.5px solid ${color}` : 'none',
+                  fontSize: 12,
                   fontWeight: isToday || mark ? 600 : 400,
+                  color,
                   boxSizing: 'border-box',
                 }}>
                   {day}
-                </div>
+                </span>
               ) : null}
             </div>
           )
@@ -412,9 +430,11 @@ function MonthCalendar({
 
 function UnavailabilitiesBlock({
   unavailabilities,
+  scheduleByDay,
   onDayPress,
 }: {
   unavailabilities: UnavailabilityItem[]
+  scheduleByDay: Record<number, { startTime: string; endTime: string }>
   onDayPress: (dateKey: string) => void
 }) {
   const now = new Date()
@@ -438,11 +458,11 @@ function UnavailabilitiesBlock({
         </div>
       </div>
 
-      <MonthCalendar year={thisYear} month={thisMonth} unavailabilities={unavailabilities} onDayPress={onDayPress} />
+      <MonthCalendar year={thisYear} month={thisMonth} unavailabilities={unavailabilities} scheduleByDay={scheduleByDay} onDayPress={onDayPress} />
 
-      <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 12px' }} />
+      <div style={{ height: 8, background: 'var(--tgui--secondary_bg_color)', borderTop: '1px solid var(--tgui--divider)', borderBottom: '1px solid var(--tgui--divider)' }} />
 
-      <MonthCalendar year={nextYear} month={nextMonth} unavailabilities={unavailabilities} onDayPress={onDayPress} />
+      <MonthCalendar year={nextYear} month={nextMonth} unavailabilities={unavailabilities} scheduleByDay={scheduleByDay} onDayPress={onDayPress} />
     </div>
   )
 }
@@ -653,6 +673,21 @@ function ScheduleTab() {
     enabled: !!masterProfileId,
   })
 
+  const { data: scheduleData } = useQuery({
+    queryKey: ['schedule', masterProfileId],
+    queryFn: () => getSchedule(masterProfileId),
+    enabled: !!masterProfileId,
+  })
+
+  // Map JS dayOfWeek (0=Sun…6=Sat) → { startTime, endTime } из расписания
+  const scheduleByDay = React.useMemo(() => {
+    const map: Record<number, { startTime: string; endTime: string }> = {}
+    for (const s of scheduleData?.schedules ?? []) {
+      map[DAY_OF_WEEK[s.dayOfWeek]] = { startTime: s.startTime, endTime: s.endTime }
+    }
+    return map
+  }, [scheduleData])
+
   const existing = selectedDate
     ? unavailabilities.find(u => u.date === selectedDate)
     : undefined
@@ -670,6 +705,7 @@ function ScheduleTab() {
         <p style={sectionTitleStyle}>Отсутствия</p>
         <UnavailabilitiesBlock
           unavailabilities={unavailabilities}
+          scheduleByDay={scheduleByDay}
           onDayPress={setSelectedDate}
         />
       </section>
