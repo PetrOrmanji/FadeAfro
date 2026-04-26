@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner, Placeholder } from '@telegram-apps/telegram-ui'
@@ -8,6 +8,7 @@ import {
   uploadMasterPhoto,
 } from '@/api/masters'
 import { updateUserName } from '@/api/users'
+import { getSchedule, setSchedule, deleteSchedule } from '@/api/schedules'
 
 // ─── Хелпер для ошибок ───────────────────────────────────────────────────────
 
@@ -16,6 +17,267 @@ function showError(error: unknown, fallback: string) {
     ? (error.response?.data?.error ?? fallback)
     : fallback
   window.Telegram.WebApp.showAlert(message)
+}
+
+// ─── Расписание ───────────────────────────────────────────────────────────────
+
+// Маппинг C# DayOfWeek enum name → number
+const DAY_OF_WEEK: Record<string, number> = {
+  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
+  Thursday: 4, Friday: 5, Saturday: 6,
+}
+
+// C# DayOfWeek: 0=Sun, 1=Mon…6=Sat. Отображаем Пн–Вс.
+const DAYS: { dayOfWeek: number; label: string }[] = [
+  { dayOfWeek: 1, label: 'Понедельник' },
+  { dayOfWeek: 2, label: 'Вторник' },
+  { dayOfWeek: 3, label: 'Среда' },
+  { dayOfWeek: 4, label: 'Четверг' },
+  { dayOfWeek: 5, label: 'Пятница' },
+  { dayOfWeek: 6, label: 'Суббота' },
+  { dayOfWeek: 0, label: 'Воскресенье' },
+]
+
+const DEFAULT_START = '09:00'
+const DEFAULT_END   = '18:00'
+
+type DayState = {
+  enabled: boolean
+  startTime: string   // "HH:mm"
+  endTime: string     // "HH:mm"
+  existingId: string | null
+}
+
+type ScheduleState = Record<number, DayState>  // key = dayOfWeek
+
+function buildInitial(schedules: { id: string; dayOfWeek: string; startTime: string; endTime: string }[]): ScheduleState {
+  const state: ScheduleState = {}
+  for (const { dayOfWeek } of DAYS) {
+    const entry = schedules.find(s => DAY_OF_WEEK[s.dayOfWeek] === dayOfWeek)
+    state[dayOfWeek] = entry
+      ? { enabled: true, startTime: entry.startTime.slice(0, 5), endTime: entry.endTime.slice(0, 5), existingId: entry.id }
+      : { enabled: false, startTime: DEFAULT_START, endTime: DEFAULT_END, existingId: null }
+  }
+  return state
+}
+
+function ScheduleTab() {
+  const queryClient = useQueryClient()
+  const [days, setDays] = useState<ScheduleState>({})
+  const [savingDays, setSavingDays] = useState<Record<number, boolean>>({})
+  const [errorDays, setErrorDays] = useState<Record<number, boolean>>({})
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['my-master-profile'],
+    queryFn: getMyMasterProfile,
+  })
+
+  const masterProfileId = profile?.id ?? ''
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['schedule', masterProfileId],
+    queryFn: () => getSchedule(masterProfileId),
+    enabled: !!masterProfileId,
+  })
+
+  useEffect(() => {
+    if (data) setDays(buildInitial(data.schedules))
+  }, [data])
+
+  function updateDay(dayOfWeek: number, patch: Partial<DayState>) {
+    setDays(prev => ({ ...prev, [dayOfWeek]: { ...prev[dayOfWeek], ...patch } }))
+  }
+
+  async function handleTimeBlur(dayOfWeek: number) {
+    const day = days[dayOfWeek]
+    if (!day || !day.enabled || savingDays[dayOfWeek]) return
+
+    setSavingDays(prev => ({ ...prev, [dayOfWeek]: true }))
+    try {
+      const id = await setSchedule(masterProfileId, dayOfWeek, day.startTime, day.endTime)
+      updateDay(dayOfWeek, { existingId: id })
+      setErrorDays(prev => ({ ...prev, [dayOfWeek]: false }))
+      queryClient.invalidateQueries({ queryKey: ['schedule', masterProfileId] })
+    } catch (error) {
+      setErrorDays(prev => ({ ...prev, [dayOfWeek]: true }))
+      showError(error, 'Не удалось сохранить расписание')
+    } finally {
+      setSavingDays(prev => ({ ...prev, [dayOfWeek]: false }))
+    }
+  }
+
+  async function handleToggle(dayOfWeek: number) {
+    const day = days[dayOfWeek]
+    if (!day || savingDays[dayOfWeek]) return
+
+    const enabling = !day.enabled
+    updateDay(dayOfWeek, { enabled: enabling })
+    setSavingDays(prev => ({ ...prev, [dayOfWeek]: true }))
+
+    try {
+      if (enabling) {
+        const id = await setSchedule(masterProfileId, dayOfWeek, day.startTime, day.endTime)
+        updateDay(dayOfWeek, { existingId: id })
+      } else {
+        await deleteSchedule(day.existingId!)
+        updateDay(dayOfWeek, { existingId: null })
+      }
+      setErrorDays(prev => ({ ...prev, [dayOfWeek]: false }))
+      queryClient.invalidateQueries({ queryKey: ['schedule', masterProfileId] })
+    } catch (error) {
+      // Откатываем тогл при ошибке
+      updateDay(dayOfWeek, { enabled: !enabling })
+      setErrorDays(prev => ({ ...prev, [dayOfWeek]: true }))
+      showError(error, 'Не удалось обновить расписание')
+    } finally {
+      setSavingDays(prev => ({ ...prev, [dayOfWeek]: false }))
+    }
+  }
+
+  if (profileLoading || isLoading || Object.keys(days).length === 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Spinner size="l" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return <Placeholder header="Ошибка" description="Не удалось загрузить расписание" />
+  }
+
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+
+        <div style={{
+          borderRadius: 16,
+          background: 'var(--tgui--bg_color)',
+          overflow: 'hidden',
+        }}>
+          {DAYS.map(({ dayOfWeek, label }, idx) => {
+            const day = days[dayOfWeek]
+            if (!day) return null
+            const isSaving = !!savingDays[dayOfWeek]
+            const hasError = !!errorDays[dayOfWeek]
+            return (
+              <div key={dayOfWeek}>
+                {idx > 0 && (
+                  <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 16px' }} />
+                )}
+                <div style={{
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  opacity: day.enabled ? 1 : 0.45,
+                  transition: 'opacity 0.15s',
+                }}>
+                  {/* Тогл */}
+                  <div
+                    onClick={() => handleToggle(dayOfWeek)}
+                    style={{
+                      width: 40,
+                      height: 24,
+                      borderRadius: 12,
+                      background: day.enabled ? 'var(--tgui--button_color)' : 'var(--tgui--hint_color)',
+                      position: 'relative',
+                      cursor: isSaving ? 'default' : 'pointer',
+                      flexShrink: 0,
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    {isSaving ? (
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                        <Spinner size="s" />
+                      </div>
+                    ) : (
+                      <div style={{
+                        position: 'absolute',
+                        top: 3,
+                        left: day.enabled ? 19 : 3,
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        background: '#fff',
+                        transition: 'left 0.2s',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                      }} />
+                    )}
+                  </div>
+
+                  {/* Название */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{
+                      fontSize: 15,
+                      color: 'var(--tgui--text_color)',
+                      fontWeight: 400,
+                    }}>
+                      {label}
+                    </span>
+                    {hasError && (
+                      <span style={{ fontSize: 11, color: '#FF3B30' }}>Не сохранено</span>
+                    )}
+                  </div>
+
+                  {/* Время */}
+                  {day.enabled ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input
+                        type="time"
+                        value={day.startTime}
+                        disabled={isSaving}
+                        onChange={e => updateDay(dayOfWeek, { startTime: e.target.value })}
+                        onBlur={() => handleTimeBlur(dayOfWeek)}
+                        style={{
+                          border: 'none',
+                          background: 'var(--tgui--secondary_bg_color)',
+                          borderRadius: 8,
+                          padding: '4px 8px',
+                          fontSize: 14,
+                          color: 'var(--tgui--text_color)',
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          cursor: isSaving ? 'default' : 'pointer',
+                          opacity: isSaving ? 0.5 : 1,
+                        }}
+                      />
+                      <span style={{ color: 'var(--tgui--hint_color)', fontSize: 13 }}>—</span>
+                      <input
+                        type="time"
+                        value={day.endTime}
+                        disabled={isSaving}
+                        onChange={e => updateDay(dayOfWeek, { endTime: e.target.value })}
+                        onBlur={() => handleTimeBlur(dayOfWeek)}
+                        style={{
+                          border: 'none',
+                          background: 'var(--tgui--secondary_bg_color)',
+                          borderRadius: 8,
+                          padding: '4px 8px',
+                          fontSize: 14,
+                          color: 'var(--tgui--text_color)',
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          cursor: isSaving ? 'default' : 'pointer',
+                          opacity: isSaving ? 0.5 : 1,
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>выходной</span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+    </div>
+  )
 }
 
 // ─── Заглушка ────────────────────────────────────────────────────────────────
@@ -305,7 +567,7 @@ export function MasterPage() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
         {activeTab === 'profile'      && <ProfileTab />}
-        {activeTab === 'schedule'     && <StubTab label="Расписание" />}
+        {activeTab === 'schedule'     && <ScheduleTab />}
         {activeTab === 'services'     && <StubTab label="Услуги" />}
         {activeTab === 'appointments' && <StubTab label="Записи" />}
       </div>
