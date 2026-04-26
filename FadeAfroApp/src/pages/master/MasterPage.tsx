@@ -10,6 +10,7 @@ import {
 import { updateUserName } from '@/api/users'
 import { getSchedule, setSchedule, deleteSchedule } from '@/api/schedules'
 import { getServices, addService, updateService, deleteService, type ServiceItem } from '@/api/services'
+import { type UnavailabilityItem, getUnavailabilities, addUnavailability, deleteUnavailability } from '@/api/unavailabilities'
 
 // ─── Хелпер для ошибок ───────────────────────────────────────────────────────
 
@@ -272,6 +273,355 @@ function ScheduleBlock() {
 
 // ─── Вкладка Расписание (расписание + отсутствия) ────────────────────────────
 
+// ─── Календарь отсутствий ─────────────────────────────────────────────────────
+
+const WEEK_DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+
+const MONTH_NAMES = [
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+]
+
+function toDateKey(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
+function MonthCalendar({
+  year,
+  month,
+  unavailabilities,
+  onDayPress,
+}: {
+  year: number
+  month: number   // 0-based
+  unavailabilities: UnavailabilityItem[]
+  onDayPress: (dateKey: string) => void
+}) {
+  const today = toDateKey(new Date())
+
+  // Собираем словарь date → 'full' | 'partial'
+  const markedDays = React.useMemo(() => {
+    const map: Record<string, 'full' | 'partial'> = {}
+    for (const u of unavailabilities) {
+      map[u.date] = u.startTime === null && u.endTime === null ? 'full' : 'partial'
+    }
+    return map
+  }, [unavailabilities])
+
+  // Первый день месяца (0=Sun…6=Sat), переводим в пн-based (0=Mon…6=Sun)
+  const firstDay = new Date(year, month, 1)
+  const startOffset = (firstDay.getDay() + 6) % 7
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  const cells: (number | null)[] = [
+    ...Array(startOffset).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ]
+  // Добиваем до кратного 7
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  return (
+    <div style={{ padding: '12px 12px 16px' }}>
+      {/* Заголовок месяца */}
+      <p style={{ margin: '0 0 10px 4px', fontWeight: 600, fontSize: 14, color: 'var(--tgui--text_color)' }}>
+        {MONTH_NAMES[month]} {year}
+      </p>
+
+      {/* Дни недели */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        borderBottom: '1px solid var(--tgui--divider)',
+      }}>
+        {WEEK_DAYS.map(d => (
+          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--tgui--hint_color)', padding: '6px 0' }}>
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Сетка дней */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        borderLeft: '1px solid var(--tgui--divider)',
+      }}>
+        {cells.map((day, idx) => {
+          const isLastInRow = (idx + 1) % 7 === 0
+          const dateKey = day
+            ? `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+            : null
+          const mark = dateKey ? markedDays[dateKey] : undefined
+          const isToday = dateKey === today
+
+          let bg = 'transparent'
+          let color = 'var(--tgui--text_color)'
+          let circleBorder = 'none'
+
+          if (mark === 'full') {
+            bg = '#FF3B30'
+            color = '#fff'
+          } else if (mark === 'partial') {
+            bg = '#FF9500'
+            color = '#fff'
+          } else if (isToday) {
+            circleBorder = '1.5px solid var(--tgui--button_color)'
+            color = 'var(--tgui--button_color)'
+          }
+
+          return (
+            <div
+              key={idx}
+              onClick={() => dateKey && onDayPress(dateKey)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px 0',
+                borderRight: '1px solid var(--tgui--divider)',
+                borderBottom: '1px solid var(--tgui--divider)',
+                cursor: day ? 'pointer' : 'default',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {day ? (
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  background: bg,
+                  color,
+                  border: circleBorder,
+                  fontSize: 13,
+                  fontWeight: isToday || mark ? 600 : 400,
+                  boxSizing: 'border-box',
+                }}>
+                  {day}
+                </div>
+              ) : null}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function UnavailabilitiesBlock({
+  unavailabilities,
+  onDayPress,
+}: {
+  unavailabilities: UnavailabilityItem[]
+  onDayPress: (dateKey: string) => void
+}) {
+  const now = new Date()
+  const thisYear = now.getFullYear()
+  const thisMonth = now.getMonth()
+
+  const nextMonth = (thisMonth + 1) % 12
+  const nextYear = thisMonth === 11 ? thisYear + 1 : thisYear
+
+  return (
+    <div style={{ background: 'var(--tgui--bg_color)' }}>
+      {/* Легенда */}
+      <div style={{ display: 'flex', gap: 16, padding: '12px 16px 0', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#FF3B30', flexShrink: 0 }} />
+          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Весь день</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#FF9500', flexShrink: 0 }} />
+          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Часть дня</span>
+        </div>
+      </div>
+
+      <MonthCalendar year={thisYear} month={thisMonth} unavailabilities={unavailabilities} onDayPress={onDayPress} />
+
+      <div style={{ height: 1, background: 'var(--tgui--divider)', margin: '0 12px' }} />
+
+      <MonthCalendar year={nextYear} month={nextMonth} unavailabilities={unavailabilities} onDayPress={onDayPress} />
+    </div>
+  )
+}
+
+// ─── Боттом-шит отсутствия ────────────────────────────────────────────────────
+
+function formatDateLabel(dateKey: string): string {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' })
+}
+
+interface UnavailabilitySheetProps {
+  dateKey: string
+  existing: UnavailabilityItem | undefined
+  masterProfileId: string
+  onClose: () => void
+}
+
+function UnavailabilitySheet({ dateKey, existing, masterProfileId, onClose }: UnavailabilitySheetProps) {
+  const queryClient = useQueryClient()
+  const [allDay, setAllDay] = useState<boolean>(existing ? existing.startTime === null : true)
+  const [startTime, setStartTime] = useState(existing?.startTime?.slice(0, 5) ?? '09:00')
+  const [endTime, setEndTime] = useState(existing?.endTime?.slice(0, 5) ?? '18:00')
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  async function handleSave() {
+    setSaving(true)
+    try {
+      await addUnavailability(
+        masterProfileId,
+        dateKey,
+        allDay ? null : `${startTime}:00`,
+        allDay ? null : `${endTime}:00`,
+      )
+      queryClient.invalidateQueries({ queryKey: ['unavailabilities', masterProfileId] })
+      onClose()
+    } catch (e) {
+      showError(e, 'Не удалось сохранить отсутствие')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!existing) return
+    window.Telegram.WebApp.showConfirm('Удалить отсутствие на этот день?', async confirmed => {
+      if (!confirmed) return
+      setDeleting(true)
+      try {
+        await deleteUnavailability(existing.id)
+        queryClient.invalidateQueries({ queryKey: ['unavailabilities', masterProfileId] })
+        onClose()
+      } catch (e) {
+        showError(e, 'Не удалось удалить отсутствие')
+      } finally {
+        setDeleting(false)
+      }
+    })
+  }
+
+  const busy = saving || deleting
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100 }} />
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 101,
+        background: 'var(--tgui--bg_color)',
+        borderRadius: '16px 16px 0 0',
+        padding: '20px 16px 32px',
+      }}>
+        {/* Handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--tgui--divider)' }} />
+        </div>
+
+        <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: 17 }}>Отсутствие</p>
+        <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--tgui--hint_color)' }}>
+          {formatDateLabel(dateKey)}
+        </p>
+
+        {/* Переключатель весь день / промежуток */}
+        <div style={{
+          display: 'flex', marginBottom: 20,
+          background: 'var(--tgui--secondary_bg_color)',
+          borderRadius: 10, padding: 3,
+        }}>
+          {(['all', 'partial'] as const).map(mode => {
+            const active = mode === 'all' ? allDay : !allDay
+            return (
+              <button
+                key={mode}
+                onClick={() => setAllDay(mode === 'all')}
+                style={{
+                  flex: 1, padding: '7px 0', border: 'none', borderRadius: 8,
+                  background: active ? 'var(--tgui--bg_color)' : 'transparent',
+                  color: active ? 'var(--tgui--text_color)' : 'var(--tgui--hint_color)',
+                  fontWeight: active ? 600 : 400, fontSize: 14,
+                  cursor: 'pointer',
+                  boxShadow: active ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {mode === 'all' ? 'Весь день' : 'Промежуток'}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Поля времени */}
+        {!allDay && (
+          <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+            {[
+              { label: 'С', value: startTime, onChange: setStartTime },
+              { label: 'До', value: endTime, onChange: setEndTime },
+            ].map(({ label, value, onChange }) => (
+              <div key={label} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 13, color: 'var(--tgui--hint_color)' }}>{label}</label>
+                <input
+                  type="time" value={value}
+                  onChange={e => onChange(e.target.value)}
+                  style={{
+                    padding: '10px 12px', borderRadius: 10,
+                    border: '1px solid var(--tgui--divider)',
+                    background: 'var(--tgui--secondary_bg_color)',
+                    color: 'var(--tgui--text_color)',
+                    fontSize: 15, outline: 'none', width: '100%', boxSizing: 'border-box',
+                    fontFamily: 'inherit',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Кнопки */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button
+            onClick={handleSave} disabled={busy}
+            style={{
+              width: '100%', padding: '13px 0', borderRadius: 12, border: 'none',
+              background: busy ? 'var(--tgui--divider)' : 'var(--tgui--button_color)',
+              color: busy ? 'var(--tgui--hint_color)' : '#fff',
+              fontSize: 15, fontWeight: 600,
+              cursor: busy ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {saving ? 'Сохранение...' : 'Сохранить'}
+          </button>
+
+          {existing && (
+            <button
+              onClick={handleDelete} disabled={busy}
+              style={{
+                width: '100%', padding: '13px 0', borderRadius: 12, border: 'none',
+                background: 'transparent',
+                color: busy ? 'var(--tgui--hint_color)' : '#FF3B30',
+                fontSize: 15, fontWeight: 500,
+                cursor: busy ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {deleting ? 'Удаление...' : 'Удалить отсутствие'}
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Секции вкладки Расписание ────────────────────────────────────────────────
+
 const sectionCardStyle: React.CSSProperties = {
   margin: '0 16px',
   border: '1px solid var(--tgui--divider)',
@@ -289,6 +639,24 @@ const sectionTitleStyle: React.CSSProperties = {
 }
 
 function ScheduleTab() {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
+  const { data: profile } = useQuery({
+    queryKey: ['my-master-profile'],
+    queryFn: getMyMasterProfile,
+  })
+  const masterProfileId = profile?.id ?? ''
+
+  const { data: unavailabilities = [] } = useQuery({
+    queryKey: ['unavailabilities', masterProfileId],
+    queryFn: () => getUnavailabilities(masterProfileId),
+    enabled: !!masterProfileId,
+  })
+
+  const existing = selectedDate
+    ? unavailabilities.find(u => u.date === selectedDate)
+    : undefined
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0 32px' }}>
       {/* Блок 1 — Расписание */}
@@ -300,18 +668,20 @@ function ScheduleTab() {
       {/* Блок 2 — Отсутствия */}
       <section style={sectionCardStyle}>
         <p style={sectionTitleStyle}>Отсутствия</p>
-        <div
-          style={{
-            padding: '32px 16px',
-            textAlign: 'center',
-            color: 'var(--tgui--hint_color)',
-            fontSize: 14,
-            background: 'var(--tgui--bg_color)',
-          }}
-        >
-          Календарь появится здесь
-        </div>
+        <UnavailabilitiesBlock
+          unavailabilities={unavailabilities}
+          onDayPress={setSelectedDate}
+        />
       </section>
+
+      {selectedDate && masterProfileId && (
+        <UnavailabilitySheet
+          dateKey={selectedDate}
+          existing={existing}
+          masterProfileId={masterProfileId}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>
   )
 }
