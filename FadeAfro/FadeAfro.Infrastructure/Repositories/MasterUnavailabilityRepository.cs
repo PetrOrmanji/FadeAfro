@@ -19,6 +19,12 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
         return await _context.MasterUnavailabilities.FirstOrDefaultAsync(mu => mu.Id == id);
     }
 
+    public async Task<MasterUnavailability?> GetByMasterProfileIdAndDateAsync(Guid masterProfileId, DateOnly date)
+    {
+        return await _context.MasterUnavailabilities
+            .FirstOrDefaultAsync(mu => mu.MasterProfileId == masterProfileId && mu.Date == date);
+    }
+
     public async Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId)
     {
         return await _context.MasterUnavailabilities
@@ -29,6 +35,12 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
     public async Task AddAsync(MasterUnavailability unavailability)
     {
         await _context.MasterUnavailabilities.AddAsync(unavailability);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(MasterUnavailability unavailability)
+    {
+        _context.MasterUnavailabilities.Update(unavailability);
         await _context.SaveChangesAsync();
     }
 

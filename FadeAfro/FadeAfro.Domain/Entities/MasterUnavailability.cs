@@ -11,6 +11,15 @@ public class MasterUnavailability : Entity
 
     public MasterProfile MasterProfile { get; private set; } = null!;
 
+    public void UpdateTimes(TimeOnly? startTime, TimeOnly? endTime)
+    {
+        if (startTime.HasValue && endTime.HasValue && endTime <= startTime)
+            throw new InvalidUnavailabilityTimeException();
+
+        StartTime = startTime;
+        EndTime = endTime;
+    }
+
     public MasterUnavailability(Guid masterProfileId, DateOnly date, TimeOnly? startTime, TimeOnly? endTime)
     {
         if (startTime.HasValue && endTime.HasValue && endTime <= startTime)

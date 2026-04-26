@@ -23,6 +23,16 @@ public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
+        var existing = await _unavailabilityRepository.GetByMasterProfileIdAndDateAsync(
+            command.MasterProfileId, command.Date);
+
+        if (existing is not null)
+        {
+            existing.UpdateTimes(command.StartTime, command.EndTime);
+            await _unavailabilityRepository.UpdateAsync(existing);
+            return new AddUnavailabilityResponse(existing.Id);
+        }
+
         var unavailability = new MasterUnavailability(
             command.MasterProfileId,
             command.Date,
