@@ -90,8 +90,11 @@ function formatDuration(iso: string): string {
   const parts = iso.split(':')
   const h = parseInt(parts[0] ?? '0', 10)
   const m = parseInt(parts[1] ?? '0', 10)
-  if (h > 0 && m > 0) return `${h} ч ${m} мин`
-  if (h > 0) return `${h} ч`
+
+  const hourLabel = h === 1 ? 'час' : h < 5 ? 'часа' : 'часов'
+
+  if (h > 0 && m > 0) return `${h} ${hourLabel} ${m} мин`
+  if (h > 0) return `${h} ${hourLabel}`
   return `${m} мин`
 }
 
@@ -230,20 +233,24 @@ function Step2Services({ masterId, onSelect }: { masterId: string; onSelect: (se
           className="service-row"
           style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, padding: '14px 16px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-            <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
-            {/* Бейдж цены */}
-            <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 20, background: 'var(--tgui--button_color)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
-              {service.price} ₽
-            </span>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
+            {/* Левый столбик: название + описание */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
+              {service.description && (
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>
+              )}
+            </div>
+            {/* Правый столбик: время + цена */}
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+              <span style={{ padding: '4px 0', borderRadius: 20, background: 'rgba(142,142,147,0.15)', fontSize: 12, color: 'var(--tgui--hint_color)', fontWeight: 500, minWidth: 72, textAlign: 'center' }}>
+                {formatDuration(service.duration)}
+              </span>
+              <span style={{ padding: '4px 12px', borderRadius: 20, background: 'var(--tgui--button_color)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+                {service.price} ₽
+              </span>
+            </div>
           </div>
-          {service.description && (
-            <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>
-          )}
-          {/* Бейдж длительности */}
-          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 20, background: 'rgba(142,142,147,0.15)', fontSize: 12, color: 'var(--tgui--hint_color)', fontWeight: 500 }}>
-            {formatDuration(service.duration)}
-          </span>
         </div>
       ))}
     </div>
