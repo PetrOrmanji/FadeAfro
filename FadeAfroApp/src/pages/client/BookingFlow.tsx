@@ -31,19 +31,18 @@ const INITIAL_STATE: BookingState = {
   time: null,
 }
 
-type Step = 1 | 2 | 3 | 4 | 5
+type Step = 1 | 2 | 3 | 4
 
 const STEP_TITLE: Record<Step, string> = {
   1: 'Выбор мастера',
   2: 'Выбор услуги',
   3: 'Выбор даты и времени',
-  4: 'Выбор даты и времени',
-  5: 'Подтверждение',
+  4: 'Подтверждение',
 }
 
 // ─── Шапка шага ───────────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = 4
 
 function StepHeader({ step, onBack }: { step: Step; onBack: () => void }) {
   const progress = (step / TOTAL_STEPS) * 100
@@ -561,7 +560,7 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
 
   function selectDateTime(date: string, time: string) {
     setBooking(b => ({ ...b, date, time }))
-    setStep(5)
+    setStep(4)
   }
 
   return (
@@ -581,7 +580,7 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
             onSelectDateTime={selectDateTime}
           />
         )}
-        {step === 5 && (
+        {step === 4 && (
           <Step5Confirm
             booking={booking}
             clientId={clientId}
