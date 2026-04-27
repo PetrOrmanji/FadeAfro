@@ -215,15 +215,15 @@ export function ClientPage() {
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--tgui--secondary_bg_color)', paddingBottom: 80 }}>
       {/* Шапка */}
-      <div
-        onClick={() => setEditOpen(true)}
-        style={{ background: 'var(--tgui--bg_color)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', marginBottom: 16 }}
-      >
+      <div style={{ background: 'var(--tgui--bg_color)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <Avatar firstName={user?.firstName ?? '?'} lastName={user?.lastName} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontWeight: 600, fontSize: 16, lineHeight: 1.3 }}>{fullName}</p>
-          <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)' }}>Клиент</p>
-        </div>
+        <p style={{ margin: 0, flex: 1, minWidth: 0, fontWeight: 600, fontSize: 16 }}>{fullName}</p>
+        <button
+          onClick={() => setEditOpen(true)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, color: 'var(--tgui--button_color)', fontSize: 18, lineHeight: 1, flexShrink: 0 }}
+        >
+          ✎
+        </button>
       </div>
 
       {/* Записи */}
