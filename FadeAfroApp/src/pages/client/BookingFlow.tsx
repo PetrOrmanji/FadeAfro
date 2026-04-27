@@ -222,32 +222,30 @@ function Step2Services({ masterId, onSelect }: { masterId: string; onSelect: (se
   if (data.services.length === 0) return <CenterText text="У мастера пока нет услуг" />
 
   return (
-    <div style={{ padding: '12px 0' }}>
-      <div style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, overflow: 'hidden', margin: '0 16px' }}>
-        {data.services.map((service, idx) => (
-          <div
-            key={service.id}
-            onClick={() => onSelect(service)}
-            className="service-row"
-            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderBottom: idx < data.services.length - 1 ? '1px solid var(--tgui--divider)' : 'none', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
-              {service.description && (
-                <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>
-              )}
-              {/* Бейдж длительности */}
-              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 20, background: 'rgba(142,142,147,0.15)', fontSize: 12, color: 'var(--tgui--hint_color)', fontWeight: 500 }}>
-                {formatDuration(service.duration)}
-              </span>
-            </div>
+    <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {data.services.map(service => (
+        <div
+          key={service.id}
+          onClick={() => onSelect(service)}
+          className="service-row"
+          style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, padding: '14px 16px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+            <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
             {/* Бейдж цены */}
             <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 20, background: 'var(--tgui--button_color)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
               {service.price} ₽
             </span>
           </div>
-        ))}
-      </div>
+          {service.description && (
+            <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>
+          )}
+          {/* Бейдж длительности */}
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 20, background: 'rgba(142,142,147,0.15)', fontSize: 12, color: 'var(--tgui--hint_color)', fontWeight: 500 }}>
+            {formatDuration(service.duration)}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
