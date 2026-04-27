@@ -106,12 +106,89 @@ const CS_DAY_TO_JS: Record<string, number> = {
 function MasterAvatar({ name, photoUrl }: { name: string; photoUrl: string | null }) {
   const initials = name.split(' ').map(w => w[0]?.toUpperCase() ?? '').join('').slice(0, 2)
   if (photoUrl) {
-    return <img src={photoUrl} alt={name} style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+    return <img src={photoUrl} alt={name} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
   }
   return (
-    <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--tgui--button_color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+    <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--tgui--button_color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
       {initials}
     </div>
+  )
+}
+
+function MasterDetailSheet({ master, fullName, onClose, onSelect }: {
+  master: MasterProfile
+  fullName: string
+  onClose: () => void
+  onSelect: () => void
+}) {
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 300 }} />
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301, background: 'var(--tgui--bg_color)', borderRadius: '16px 16px 0 0', padding: '20px 16px 40px', maxHeight: '80dvh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--tgui--divider)' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <MasterAvatar name={fullName} photoUrl={master.photoUrl} />
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 17 }}>{fullName}</p>
+        </div>
+        {master.description && (
+          <p style={{ margin: '0 0 24px', fontSize: 14, color: 'var(--tgui--text_color)', lineHeight: 1.6 }}>{master.description}</p>
+        )}
+        <button
+          onClick={onSelect}
+          style={{ width: '100%', padding: '13px 0', borderRadius: 12, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+        >
+          Выбрать мастера
+        </button>
+      </div>
+    </>
+  )
+}
+
+function MasterRow({ master, onSelect }: { master: MasterProfile; onSelect: () => void }) {
+  const [showDetail, setShowDetail] = useState(false)
+  const fullName = [master.firstName, master.lastName].filter(Boolean).join(' ')
+
+  return (
+    <>
+      <div
+        onClick={() => setShowDetail(true)}
+        className="master-row"
+        style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+      >
+        <MasterAvatar name={fullName} photoUrl={master.photoUrl} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{fullName}</p>
+          {master.description && (
+            <>
+              <p style={{ margin: '3px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                {master.description}
+              </p>
+              <span className="master-detail-link" style={{ fontSize: 13, color: 'var(--tgui--button_color)', fontWeight: 500, cursor: 'pointer', transition: 'opacity 0.15s' }}>
+                Подробнее
+              </span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={e => { e.stopPropagation(); onSelect() }}
+          className="master-row-select-btn"
+          style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 10, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s' }}
+        >
+          Выбрать
+        </button>
+      </div>
+
+      {showDetail && (
+        <MasterDetailSheet
+          master={master}
+          fullName={fullName}
+          onClose={() => setShowDetail(false)}
+          onSelect={() => { setShowDetail(false); onSelect() }}
+        />
+      )}
+    </>
   )
 }
 
@@ -125,25 +202,11 @@ function Step1Masters({ onSelect }: { onSelect: (master: MasterProfile) => void 
   return (
     <div style={{ padding: '12px 0' }}>
       <div style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, overflow: 'hidden', margin: '0 16px' }}>
-        {data.masters.map((master, idx) => {
-          const fullName = [master.firstName, master.lastName].filter(Boolean).join(' ')
-          return (
-            <div
-              key={master.id}
-              onClick={() => onSelect(master)}
-              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderBottom: idx < data.masters.length - 1 ? '1px solid var(--tgui--divider)' : 'none', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
-            >
-              <MasterAvatar name={fullName} photoUrl={master.photoUrl} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{fullName}</p>
-                {master.description && (
-                  <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{master.description}</p>
-                )}
-              </div>
-              <span style={{ fontSize: 18, color: 'var(--tgui--hint_color)', flexShrink: 0 }}>›</span>
-            </div>
-          )
-        })}
+        {data.masters.map((master, idx) => (
+          <div key={master.id} style={{ borderBottom: idx < data.masters.length - 1 ? '1px solid var(--tgui--divider)' : 'none' }}>
+            <MasterRow master={master} onSelect={() => onSelect(master)} />
+          </div>
+        ))}
       </div>
     </div>
   )
