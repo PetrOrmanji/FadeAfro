@@ -1,7 +1,26 @@
 /**
  * Мок Telegram окружения для разработки в браузере.
  * В продакшне (внутри Telegram) этот файл не нужен — SDK получает данные напрямую.
+ *
+ * Переключение пользователя: меняй MOCK_USER_ID на нужный id ниже.
+ *
+ * 777777777 — Petr Masterov   (Master)
+ * 100000001 — Oleg Ownerow    (Owner)
+ * 100000002 — Artem Masterov  (Master)
+ * 100000003 — Vasya Clientov  (Client)
  */
+
+const MOCK_USER_ID = 777777777
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOCK_USERS: Record<number, { id: number; first_name: string; last_name: string; username: string }> = {
+  777777777: { id: 777777777, first_name: 'Petr',   last_name: 'Masterov', username: 'petr_masterov'  },
+  100000001: { id: 100000001, first_name: 'Oleg',   last_name: 'Ownerow',  username: 'oleg_ownerow'   },
+  100000002: { id: 100000002, first_name: 'Artem',  last_name: 'Masterov', username: 'artem_masterov' },
+  100000003: { id: 100000003, first_name: 'Vasya',  last_name: 'Clientov', username: 'vasya_clientov' },
+}
+
 export function mockTelegramEnv() {
   if (typeof window === 'undefined') return
 
@@ -9,25 +28,14 @@ export function mockTelegramEnv() {
   const isTelegram = 'Telegram' in window
 
   if (isDev && !isTelegram) {
-    // Минимальный мок initData для разработки
-    const initData = [
-      'user=%7B%22id%22%3A123456789%2C%22first_name%22%3A%22Ivan%22%2C%22last_name%22%3A%22Petrov%22%2C%22username%22%3A%22ivanp%22%7D',
-      'auth_date=9999999999',
-      'hash=mockhash',
-    ].join('&')
+    const user = MOCK_USERS[MOCK_USER_ID]
+    const initData = `user=${encodeURIComponent(JSON.stringify(user))}&auth_date=9999999999&hash=mockhash`
 
     Object.defineProperty(window, 'Telegram', {
       value: {
         WebApp: {
           initData,
-          initDataUnsafe: {
-            user: {
-              id: 123456789,
-              first_name: 'Ivan',
-              last_name: 'Petrov',
-              username: 'ivanp',
-            },
-          },
+          initDataUnsafe: { user },
           colorScheme: 'light',
           themeParams: {},
           expand: () => {},
