@@ -1,6 +1,7 @@
 using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
+using FadeAfro.Application.Features.MasterProfiles.GetAvailableDates;
 using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
@@ -112,6 +113,14 @@ public class MasterProfilesController : ControllerBase
     public async Task<IActionResult> GetAvailableSlots(Guid masterProfileId, [FromQuery] Guid serviceId, [FromQuery] DateOnly date)
     {
         var response = await _mediator.Send(new GetAvailableSlotsQuery(masterProfileId, serviceId, date));
+        return Ok(response);
+    }
+
+    [HttpGet("available-dates/{masterProfileId:guid}")]
+    [SwaggerOperation(Summary = "Get available dates", Description = "Returns dates in the given month that have at least one free slot for the specified service.")]
+    public async Task<IActionResult> GetAvailableDates(Guid masterProfileId, [FromQuery] Guid serviceId, [FromQuery] int year, [FromQuery] int month)
+    {
+        var response = await _mediator.Send(new GetAvailableDatesQuery(masterProfileId, serviceId, year, month));
         return Ok(response);
     }
 }

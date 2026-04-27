@@ -4,7 +4,7 @@ import { Spinner } from '@telegram-apps/telegram-ui'
 import { getMasters, type MasterProfile } from '@/api/masters'
 import { getServices, type ServiceItem } from '@/api/services'
 import { getSchedule } from '@/api/schedules'
-import { getAvailableSlots } from '@/api/slots'
+import { getAvailableSlots, getAvailableDates } from '@/api/slots'
 import { createAppointment } from '@/api/appointments'
 
 // ─── Типы ─────────────────────────────────────────────────────────────────────
@@ -268,11 +268,12 @@ function dateToISO(year: number, month: number, day: number): string {
 
 // ─── Месячный календарь (без навигации) ──────────────────────────────────────
 
-function MonthGrid({ year, month, selectedDate, workingJsDays, onSelect }: {
+function MonthGrid({ year, month, selectedDate, workingJsDays, availableDates, onSelect }: {
   year: number
   month: number
   selectedDate: string | null
   workingJsDays: Set<number>
+  availableDates: Set<string> | null  // null = ещё грузится
   onSelect: (date: string) => void
 }) {
   const today = new Date()
@@ -306,11 +307,14 @@ function MonthGrid({ year, month, selectedDate, workingJsDays, onSelect }: {
           const isPast = cellDate < today
           const isWorking = workingJsDays.has(jsDay)
           const isSelected = selectedDate === isoDate
-          const inactive = isPast || !isWorking
+          // Если availableDates ещё грузится — считаем рабочий день доступным
+          const hasSlots = availableDates === null ? isWorking : availableDates.has(isoDate)
+          const inactive = isPast || !isWorking || !hasSlots
 
           let bg = 'rgba(142,142,147,0.12)'
           if (isSelected) bg = 'var(--tgui--button_color)'
-          else if (!inactive) bg = 'rgba(0,122,255,0.10)'
+          else if (!isPast && isWorking && hasSlots) bg = 'rgba(0,122,255,0.10)'
+          else if (!isPast && isWorking && !hasSlots) bg = 'rgba(142,142,147,0.06)'
 
           return (
             <div
@@ -393,9 +397,24 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
 }) {
   const [pickedDate, setPickedDate] = useState<string | null>(selectedDate)
 
+  const today = new Date()
+  const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+
   const { data: scheduleData, isLoading } = useQuery({
     queryKey: ['schedule', masterId],
     queryFn: () => getSchedule(masterId),
+  })
+
+  const { data: datesThisMonth } = useQuery({
+    queryKey: ['available-dates', masterId, serviceId, today.getFullYear(), today.getMonth() + 1],
+    queryFn: () => getAvailableDates(masterId, serviceId, today.getFullYear(), today.getMonth() + 1),
+    enabled: !!scheduleData,
+  })
+
+  const { data: datesNextMonth } = useQuery({
+    queryKey: ['available-dates', masterId, serviceId, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1],
+    queryFn: () => getAvailableDates(masterId, serviceId, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1),
+    enabled: !!scheduleData,
   })
 
   const workingJsDays = useMemo(() => {
@@ -403,27 +422,31 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
     return new Set(scheduleData.schedules.map(s => CS_DAY_TO_JS[s.dayOfWeek] ?? -1).filter(d => d >= 0))
   }, [scheduleData])
 
-  if (isLoading) return <CenterSpinner />
+  const availableThisMonth = useMemo(() =>
+    datesThisMonth ? new Set(datesThisMonth.dates) : null,
+    [datesThisMonth])
 
-  const today = new Date()
-  const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+  const availableNextMonth = useMemo(() =>
+    datesNextMonth ? new Set(datesNextMonth.dates) : null,
+    [datesNextMonth])
+
+  if (isLoading) return <CenterSpinner />
 
   return (
     <div style={{ paddingTop: 12, position: 'relative' }}>
       {/* Легенда */}
-      <div style={{ display: 'flex', gap: 16, padding: '0 16px 12px', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'rgba(0,122,255,0.10)', border: '1px solid rgba(0,122,255,0.3)' }} />
-          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Доступно</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--tgui--button_color)' }} />
-          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Выбрано</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--tgui--divider)', opacity: 0.3 }} />
-          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Недоступно</span>
-        </div>
+      <div style={{ display: 'flex', gap: 12, padding: '0 16px 12px', flexWrap: 'wrap' }}>
+        {[
+          { bg: 'rgba(0,122,255,0.10)', border: '1px solid rgba(0,122,255,0.3)', label: 'Есть запись' },
+          { bg: 'var(--tgui--button_color)', border: 'none', label: 'Выбрано' },
+          { bg: 'rgba(142,142,147,0.06)', border: 'none', label: 'Нет записи' },
+          { bg: 'rgba(142,142,147,0.12)', border: 'none', label: 'Недоступно' },
+        ].map(({ bg, border, label }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 14, height: 14, borderRadius: 4, background: bg, border: border ?? 'none', flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>{label}</span>
+          </div>
+        ))}
       </div>
 
       {/* Текущий месяц */}
@@ -432,8 +455,14 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         month={today.getMonth()}
         selectedDate={pickedDate}
         workingJsDays={workingJsDays}
+        availableDates={availableThisMonth}
         onSelect={d => { setPickedDate(d) }}
       />
+
+      {/* Подсказка */}
+      <p style={{ margin: '0 16px 12px', fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>
+        Нажмите на доступный день, чтобы увидеть свободное время
+      </p>
 
       {/* Следующий месяц */}
       <MonthGrid
@@ -441,6 +470,7 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         month={nextMonthDate.getMonth()}
         selectedDate={pickedDate}
         workingJsDays={workingJsDays}
+        availableDates={availableNextMonth}
         onSelect={d => { setPickedDate(d) }}
       />
 

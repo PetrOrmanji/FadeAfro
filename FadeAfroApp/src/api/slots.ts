@@ -20,3 +20,20 @@ export async function getAvailableSlots(
   )
   return data
 }
+
+export interface GetAvailableDatesResponse {
+  dates: string[]  // "YYYY-MM-DD"
+}
+
+export async function getAvailableDates(
+  masterProfileId: string,
+  serviceId: string,
+  year: number,
+  month: number,
+): Promise<GetAvailableDatesResponse> {
+  const { data } = await apiClient.get<GetAvailableDatesResponse>(
+    `/api/master-profiles/available-dates/${masterProfileId}`,
+    { params: { serviceId, year, month } },
+  )
+  return data
+}
