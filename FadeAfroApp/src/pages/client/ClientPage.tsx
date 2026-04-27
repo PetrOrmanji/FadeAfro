@@ -18,14 +18,14 @@ function Avatar({ firstName, lastName }: { firstName: string; lastName?: string 
   return (
     <div
       style={{
-        width: 48,
-        height: 48,
+        width: 34,
+        height: 34,
         borderRadius: '50%',
         background: 'var(--tgui--button_color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 18,
+        fontSize: 13,
         fontWeight: 700,
         color: '#fff',
         flexShrink: 0,
@@ -215,7 +215,7 @@ export function ClientPage() {
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--tgui--secondary_bg_color)', paddingBottom: 80 }}>
       {/* Шапка */}
-      <div style={{ background: 'var(--tgui--bg_color)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+      <div style={{ background: 'var(--tgui--bg_color)', padding: '9px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, borderBottom: '1px solid var(--tgui--divider)' }}>
         <Avatar firstName={user?.firstName ?? '?'} lastName={user?.lastName} />
         <p style={{ margin: 0, flex: 1, minWidth: 0, fontWeight: 600, fontSize: 16 }}>{fullName}</p>
         <button

@@ -50,14 +50,14 @@ function StepHeader({ step, onBack }: { step: Step; onBack: () => void }) {
 
   return (
     <div style={{ background: 'var(--tgui--bg_color)', flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 16px', minHeight: 34 }}>
         <button
           onClick={onBack}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--tgui--button_color)', fontSize: 22, lineHeight: 1, display: 'flex', alignItems: 'center', flexShrink: 0 }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tgui--button_color)', fontSize: 22, lineHeight: 1, flexShrink: 0 }}
         >
           ‹
         </button>
-        <span style={{ fontWeight: 700, fontSize: 20 }}>{STEP_TITLE[step]}</span>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>{STEP_TITLE[step]}</span>
       </div>
       {/* Прогресс-бар */}
       <div style={{ height: 3, background: 'var(--tgui--divider)' }}>
