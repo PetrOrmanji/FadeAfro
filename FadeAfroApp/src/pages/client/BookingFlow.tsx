@@ -36,8 +36,8 @@ type Step = 1 | 2 | 3 | 4 | 5
 const STEP_TITLE: Record<Step, string> = {
   1: 'Выбор мастера',
   2: 'Выбор услуги',
-  3: 'Выбор даты',
-  4: 'Выбор времени',
+  3: 'Выбор даты и времени',
+  4: 'Выбор даты и времени',
   5: 'Подтверждение',
 }
 
@@ -267,104 +267,59 @@ function dateToISO(year: number, month: number, day: number): string {
   return `${year}-${toPad(month + 1)}-${toPad(day)}`
 }
 
-function BookingCalendar({ masterId, selectedDate, onSelect, workingJsDays }: {
-  masterId: string
+// ─── Месячный календарь (без навигации) ──────────────────────────────────────
+
+function MonthGrid({ year, month, selectedDate, workingJsDays, onSelect }: {
+  year: number
+  month: number
   selectedDate: string | null
-  onSelect: (date: string) => void
   workingJsDays: Set<number>
+  onSelect: (date: string) => void
 }) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const [viewYear, setViewYear] = useState(today.getFullYear())
-  const [viewMonth, setViewMonth] = useState(today.getMonth())
-
-  const cells = useMemo(() => {
-    const firstDay = new Date(viewYear, viewMonth, 1)
-    // Monday-based: JS Sun=0 → index 6, Mon=1 → index 0
-    const startOffset = (firstDay.getDay() + 6) % 7
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
-    return { startOffset, daysInMonth }
-  }, [viewYear, viewMonth])
-
-  function prevMonth() {
-    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11) }
-    else setViewMonth(m => m - 1)
-  }
-
-  function nextMonth() {
-    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0) }
-    else setViewMonth(m => m + 1)
-  }
-
-  // Disable prev if already at current month
-  const canGoPrev = viewYear > today.getFullYear() || viewMonth > today.getMonth()
-  // Limit to 2 months ahead
-  const maxDate = new Date(today.getFullYear(), today.getMonth() + 2, 0)
-  const canGoNext = new Date(viewYear, viewMonth + 1, 0) < maxDate
-
-  const totalCells = cells.startOffset + cells.daysInMonth
-  const rows = Math.ceil(totalCells / 7)
+  const firstDay = new Date(year, month, 1)
+  const startOffset = (firstDay.getDay() + 6) % 7
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const rows = Math.ceil((startOffset + daysInMonth) / 7)
 
   return (
-    <div style={{ padding: '12px 16px' }}>
-      {/* Навигация по месяцам */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <button
-          onClick={prevMonth}
-          disabled={!canGoPrev}
-          style={{ background: 'none', border: 'none', cursor: canGoPrev ? 'pointer' : 'default', fontSize: 22, color: canGoPrev ? 'var(--tgui--button_color)' : 'var(--tgui--divider)', padding: '4px 8px' }}
-        >‹</button>
-        <span style={{ fontWeight: 600, fontSize: 15 }}>{MONTH_NAMES[viewMonth]} {viewYear}</span>
-        <button
-          onClick={nextMonth}
-          disabled={!canGoNext}
-          style={{ background: 'none', border: 'none', cursor: canGoNext ? 'pointer' : 'default', fontSize: 22, color: canGoNext ? 'var(--tgui--button_color)' : 'var(--tgui--divider)', padding: '4px 8px' }}
-        >›</button>
-      </div>
-
+    <div style={{ padding: '0 16px 16px' }}>
+      <p style={{ margin: '0 0 8px', fontWeight: 600, fontSize: 15 }}>
+        {MONTH_NAMES[month]} {year}
+      </p>
       {/* Дни недели */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 4 }}>
         {WEEK_DAYS_SHORT.map(d => (
           <div key={d} style={{ textAlign: 'center', fontSize: 11, color: 'var(--tgui--hint_color)', padding: '2px 0', fontWeight: 500 }}>{d}</div>
         ))}
       </div>
-
       {/* Ячейки */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', border: '1px solid var(--tgui--divider)', borderRadius: 8, overflow: 'hidden' }}>
         {Array.from({ length: rows * 7 }).map((_, i) => {
-          const dayNum = i - cells.startOffset + 1
-          if (dayNum < 1 || dayNum > cells.daysInMonth) {
-            return <div key={i} />
-          }
+          const dayNum = i - startOffset + 1
+          if (dayNum < 1 || dayNum > daysInMonth) return <div key={i} />
 
-          const cellDate = new Date(viewYear, viewMonth, dayNum)
+          const cellDate = new Date(year, month, dayNum)
           const jsDay = cellDate.getDay()
-          const isoDate = dateToISO(viewYear, viewMonth, dayNum)
+          const isoDate = dateToISO(year, month, dayNum)
           const isPast = cellDate < today
           const isWorking = workingJsDays.has(jsDay)
           const isSelected = selectedDate === isoDate
-
           const inactive = isPast || !isWorking
-          let bg = 'transparent'
+
+          let bg = 'rgba(142,142,147,0.12)'
           if (isSelected) bg = 'var(--tgui--button_color)'
-          else if (!isPast && isWorking) bg = 'rgba(0,122,255,0.10)'
+          else if (!inactive) bg = 'rgba(0,122,255,0.10)'
 
           return (
             <div
               key={i}
               onClick={() => !inactive && onSelect(isoDate)}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                aspectRatio: '1',
-                borderRadius: 8,
-                background: bg,
-                opacity: inactive ? 0.3 : 1,
-                cursor: inactive ? 'default' : 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-              }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0', cursor: inactive ? 'default' : 'pointer', WebkitTapHighlightColor: 'transparent', borderRight: '1px solid var(--tgui--divider)', borderBottom: '1px solid var(--tgui--divider)', background: bg }}
             >
-              <span style={{ fontSize: 14, fontWeight: isSelected ? 700 : 400, color: isSelected ? '#fff' : 'var(--tgui--text_color)' }}>
+              <span style={{ fontSize: 13, fontWeight: isSelected ? 700 : 400, color: isSelected ? '#fff' : 'var(--tgui--text_color)' }}>
                 {dayNum}
               </span>
             </div>
@@ -375,11 +330,56 @@ function BookingCalendar({ masterId, selectedDate, onSelect, workingJsDays }: {
   )
 }
 
-function Step3Date({ masterId, selectedDate, onSelect }: {
+// ─── Слоты времени ────────────────────────────────────────────────────────────
+
+function TimeSlots({ masterId, serviceId, date, onSelect }: {
   masterId: string
-  selectedDate: string | null
-  onSelect: (date: string) => void
+  serviceId: string
+  date: string
+  onSelect: (time: string) => void
 }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['slots', masterId, serviceId, date],
+    queryFn: () => getAvailableSlots(masterId, serviceId, date),
+  })
+
+  const displayDate = new Date(date + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+
+  return (
+    <div style={{ padding: '16px 16px 32px', borderTop: '1px solid var(--tgui--divider)' }}>
+      <p style={{ margin: '0 0 12px', fontWeight: 600, fontSize: 15 }}>Время — {displayDate}</p>
+      {isLoading && <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}><Spinner size="m" /></div>}
+      {isError && <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Не удалось загрузить слоты</p>}
+      {data && data.slots.length === 0 && (
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Нет свободного времени на эту дату</p>
+      )}
+      {data && data.slots.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {data.slots.map(slot => (
+            <div
+              key={slot.start}
+              onClick={() => onSelect(slot.start)}
+              style={{ padding: '10px 4px', borderRadius: 10, textAlign: 'center', background: 'var(--tgui--bg_color)', color: 'var(--tgui--text_color)', fontSize: 14, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', border: '1px solid var(--tgui--divider)' }}
+            >
+              {slot.start.slice(0, 5)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Шаг 3: Дата + время ─────────────────────────────────────────────────────
+
+function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime }: {
+  masterId: string
+  serviceId: string
+  selectedDate: string | null
+  onSelectDateTime: (date: string, time: string) => void
+}) {
+  const [pickedDate, setPickedDate] = useState<string | null>(selectedDate)
+
   const { data: scheduleData, isLoading } = useQuery({
     queryKey: ['schedule', masterId],
     queryFn: () => getSchedule(masterId),
@@ -392,69 +392,54 @@ function Step3Date({ masterId, selectedDate, onSelect }: {
 
   if (isLoading) return <CenterSpinner />
 
-  return (
-    <div>
-      <BookingCalendar
-        masterId={masterId}
-        selectedDate={selectedDate}
-        onSelect={onSelect}
-        workingJsDays={workingJsDays}
-      />
-      {selectedDate && (
-        <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--tgui--hint_color)', marginTop: 4 }}>
-          Выбрано: {new Date(selectedDate + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
-        </p>
-      )}
-    </div>
-  )
-}
-
-// ─── Шаг 4: Выбор времени ─────────────────────────────────────────────────────
-
-function Step4Slots({ masterId, serviceId, date, selectedTime, onSelect }: {
-  masterId: string
-  serviceId: string
-  date: string
-  selectedTime: string | null
-  onSelect: (time: string) => void
-}) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['slots', masterId, serviceId, date],
-    queryFn: () => getAvailableSlots(masterId, serviceId, date),
-  })
-
-  if (isLoading) return <CenterSpinner />
-  if (isError || !data) return <CenterText text="Не удалось загрузить доступное время" error />
-  if (data.slots.length === 0) return <CenterText text="Нет свободного времени на эту дату" />
+  const today = new Date()
+  const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
 
   return (
-    <div style={{ padding: '12px 16px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-        {data.slots.map(slot => {
-          const timeLabel = slot.start.slice(0, 5)  // "HH:mm"
-          const isSelected = selectedTime === slot.start
-          return (
-            <div
-              key={slot.start}
-              onClick={() => onSelect(slot.start)}
-              style={{
-                padding: '12px 8px',
-                borderRadius: 10,
-                textAlign: 'center',
-                background: isSelected ? 'var(--tgui--button_color)' : 'var(--tgui--bg_color)',
-                color: isSelected ? '#fff' : 'var(--tgui--text_color)',
-                fontWeight: isSelected ? 600 : 400,
-                fontSize: 15,
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-                border: isSelected ? 'none' : '1px solid var(--tgui--divider)',
-              }}
-            >
-              {timeLabel}
-            </div>
-          )
-        })}
+    <div style={{ paddingTop: 12 }}>
+      {/* Легенда */}
+      <div style={{ display: 'flex', gap: 16, padding: '0 16px 12px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'rgba(0,122,255,0.10)', border: '1px solid rgba(0,122,255,0.3)' }} />
+          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Доступно</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--tgui--button_color)' }} />
+          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Выбрано</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--tgui--divider)', opacity: 0.3 }} />
+          <span style={{ fontSize: 12, color: 'var(--tgui--hint_color)' }}>Недоступно</span>
+        </div>
       </div>
+
+      {/* Текущий месяц */}
+      <MonthGrid
+        year={today.getFullYear()}
+        month={today.getMonth()}
+        selectedDate={pickedDate}
+        workingJsDays={workingJsDays}
+        onSelect={d => { setPickedDate(d) }}
+      />
+
+      {/* Следующий месяц */}
+      <MonthGrid
+        year={nextMonthDate.getFullYear()}
+        month={nextMonthDate.getMonth()}
+        selectedDate={pickedDate}
+        workingJsDays={workingJsDays}
+        onSelect={d => { setPickedDate(d) }}
+      />
+
+      {/* Слоты времени — появляются после выбора даты */}
+      {pickedDate && (
+        <TimeSlots
+          masterId={masterId}
+          serviceId={serviceId}
+          date={pickedDate}
+          onSelect={time => onSelectDateTime(pickedDate, time)}
+        />
+      )}
     </div>
   )
 }
@@ -559,18 +544,10 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
     setStep(3)
   }
 
-  function selectDate(date: string) {
-    setBooking(b => ({ ...b, date, time: null }))
+  function selectDateTime(date: string, time: string) {
+    setBooking(b => ({ ...b, date, time }))
+    setStep(5)
   }
-
-  function selectTime(time: string) {
-    setBooking(b => ({ ...b, time }))
-  }
-
-  // "Далее" button shows on steps 3 and 4 when something is selected
-  const canProceedStep3 = step === 3 && booking.date !== null
-  const canProceedStep4 = step === 4 && booking.time !== null
-  const showNextBtn = canProceedStep3 || canProceedStep4
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--tgui--secondary_bg_color)', display: 'flex', flexDirection: 'column' }}>
@@ -581,16 +558,12 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
         {step === 2 && booking.masterId && (
           <Step2Services masterId={booking.masterId} onSelect={selectService} />
         )}
-        {step === 3 && booking.masterId && (
-          <Step3Date masterId={booking.masterId} selectedDate={booking.date} onSelect={selectDate} />
-        )}
-        {step === 4 && booking.masterId && booking.serviceId && booking.date && (
-          <Step4Slots
+        {step === 3 && booking.masterId && booking.serviceId && (
+          <Step3DateAndTime
             masterId={booking.masterId}
             serviceId={booking.serviceId}
-            date={booking.date}
-            selectedTime={booking.time}
-            onSelect={selectTime}
+            selectedDate={booking.date}
+            onSelectDateTime={selectDateTime}
           />
         )}
         {step === 5 && (
@@ -601,17 +574,6 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
           />
         )}
       </div>
-
-      {showNextBtn && (
-        <div style={{ padding: '12px 16px', background: 'var(--tgui--bg_color)', borderTop: '1px solid var(--tgui--divider)', flexShrink: 0 }}>
-          <button
-            onClick={() => setStep(s => (s + 1) as Step)}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 12, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
-          >
-            Далее
-          </button>
-        </div>
-      )}
     </div>
   )
 }
