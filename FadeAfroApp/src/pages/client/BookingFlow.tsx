@@ -228,17 +228,23 @@ function Step2Services({ masterId, onSelect }: { masterId: string; onSelect: (se
           <div
             key={service.id}
             onClick={() => onSelect(service)}
+            className="service-row"
             style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderBottom: idx < data.services.length - 1 ? '1px solid var(--tgui--divider)' : 'none', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
-              {service.description && <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>}
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{formatDuration(service.duration)}</p>
+              <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.name}</p>
+              {service.description && (
+                <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--tgui--hint_color)' }}>{service.description}</p>
+              )}
+              {/* Бейдж длительности */}
+              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 20, background: 'rgba(142,142,147,0.15)', fontSize: 12, color: 'var(--tgui--hint_color)', fontWeight: 500 }}>
+                {formatDuration(service.duration)}
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--tgui--text_color)' }}>{service.price} ₽</span>
-              <span style={{ fontSize: 18, color: 'var(--tgui--hint_color)' }}>›</span>
-            </div>
+            {/* Бейдж цены */}
+            <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 20, background: 'var(--tgui--button_color)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+              {service.price} ₽
+            </span>
           </div>
         ))}
       </div>

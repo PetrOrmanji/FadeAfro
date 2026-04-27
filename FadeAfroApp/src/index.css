@@ -116,6 +116,13 @@ code {
 }
 
 /* BookingFlow — hover эффекты */
+.service-row {
+  transition: background 0.15s;
+}
+.service-row:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
 .master-row {
   transition: background 0.15s;
 }
