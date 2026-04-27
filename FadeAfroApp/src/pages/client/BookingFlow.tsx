@@ -43,27 +43,26 @@ const STEP_TITLE: Record<Step, string> = {
 
 // ─── Шапка шага ───────────────────────────────────────────────────────────────
 
+const TOTAL_STEPS = 5
+
 function StepHeader({ step, onBack }: { step: Step; onBack: () => void }) {
+  const progress = (step / TOTAL_STEPS) * 100
+
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      padding: '14px 16px',
-      borderBottom: '1px solid var(--tgui--divider)',
-      background: 'var(--tgui--bg_color)',
-      flexShrink: 0,
-    }}>
-      <button
-        onClick={onBack}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--tgui--button_color)', fontSize: 22, lineHeight: 1, display: 'flex', alignItems: 'center' }}
-      >
-        ‹
-      </button>
-      <span style={{ fontWeight: 600, fontSize: 16 }}>{STEP_TITLE[step]}</span>
-      <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--tgui--hint_color)' }}>
-        {step} / 5
-      </span>
+    <div style={{ background: 'var(--tgui--bg_color)', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px 12px' }}>
+        <button
+          onClick={onBack}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--tgui--button_color)', fontSize: 22, lineHeight: 1, display: 'flex', alignItems: 'center', flexShrink: 0 }}
+        >
+          ‹
+        </button>
+        <span style={{ fontWeight: 700, fontSize: 20 }}>{STEP_TITLE[step]}</span>
+      </div>
+      {/* Прогресс-бар */}
+      <div style={{ height: 3, background: 'var(--tgui--divider)' }}>
+        <div style={{ height: '100%', width: `${progress}%`, background: 'var(--tgui--button_color)', borderRadius: '0 2px 2px 0', transition: 'width 0.3s ease' }} />
+      </div>
     </div>
   )
 }
