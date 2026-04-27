@@ -213,7 +213,7 @@ export function ClientPage() {
   const history  = allAppointments.filter(a => !UPCOMING_STATUSES.includes(a.status))
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--tgui--secondary_bg_color)' }}>
+    <div style={{ minHeight: '100dvh', background: 'var(--tgui--secondary_bg_color)', paddingBottom: 80 }}>
       {/* Шапка */}
       <div
         onClick={() => setEditOpen(true)}
@@ -226,23 +226,13 @@ export function ClientPage() {
         </div>
       </div>
 
-      {/* Кнопка записи */}
-      <div style={{ padding: '0 16px 16px' }}>
-        <button
-          onClick={() => setBookingOpen(true)}
-          style={{ width: '100%', padding: '13px 0', borderRadius: 12, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
-        >
-          Записаться
-        </button>
-      </div>
-
       {/* Записи */}
       {apptLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
           <Spinner size="m" />
         </div>
       ) : (
-        <div style={{ padding: '0 0 32px' }}>
+        <div>
           {upcoming.length > 0 && <AppointmentsSection title="Предстоящие" items={upcoming} />}
           {history.length > 0 && <AppointmentsSection title="История" items={history} />}
           {upcoming.length === 0 && history.length === 0 && (
@@ -252,6 +242,16 @@ export function ClientPage() {
           )}
         </div>
       )}
+
+      {/* Кнопка записи — фиксированная снизу */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px', background: 'var(--tgui--bg_color)', borderTop: '1px solid var(--tgui--divider)' }}>
+        <button
+          onClick={() => setBookingOpen(true)}
+          style={{ width: '100%', padding: '13px 0', borderRadius: 12, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+        >
+          Записаться
+        </button>
+      </div>
 
       {/* Боттом-шит редактирования */}
       {editOpen && user && (
