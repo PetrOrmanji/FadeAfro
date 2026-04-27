@@ -44,3 +44,16 @@ export async function getClientAppointments(
 export async function cancelAppointmentByClient(id: string): Promise<void> {
   await apiClient.patch(`/api/appointments/cancel-by-client/${id}`)
 }
+
+export interface CreateAppointmentPayload {
+  clientId: string
+  masterProfileId: string
+  serviceId: string
+  startTime: string   // ISO 8601
+  comment?: string | null
+}
+
+export async function createAppointment(payload: CreateAppointmentPayload): Promise<string> {
+  const { data } = await apiClient.post<{ id: string }>('/api/appointments/create', payload)
+  return data.id
+}

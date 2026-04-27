@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner } from '@telegram-apps/telegram-ui'
 import { getCurrentUser, updateUserName } from '@/api/users'
 import { getClientAppointments, type AppointmentItem, type AppointmentStatus } from '@/api/appointments'
+import { BookingFlow } from './BookingFlow'
 
 // ─── Avatar ──────────────────────────────────────────────────────────────────
 
@@ -184,6 +185,7 @@ const UPCOMING_STATUSES: AppointmentStatus[] = ['Pending', 'Confirmed']
 
 export function ClientPage() {
   const [editOpen, setEditOpen] = useState(false)
+  const [bookingOpen, setBookingOpen] = useState(false)
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['current-user'],
@@ -224,6 +226,16 @@ export function ClientPage() {
         </div>
       </div>
 
+      {/* Кнопка записи */}
+      <div style={{ padding: '0 16px 16px' }}>
+        <button
+          onClick={() => setBookingOpen(true)}
+          style={{ width: '100%', padding: '13px 0', borderRadius: 12, border: 'none', background: 'var(--tgui--button_color)', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+        >
+          Записаться
+        </button>
+      </div>
+
       {/* Записи */}
       {apptLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
@@ -248,6 +260,11 @@ export function ClientPage() {
           lastName={user.lastName}
           onClose={() => setEditOpen(false)}
         />
+      )}
+
+      {/* Флоу записи */}
+      {bookingOpen && user && (
+        <BookingFlow onClose={() => setBookingOpen(false)} clientId={user.id} />
       )}
     </div>
   )
