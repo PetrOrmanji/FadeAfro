@@ -114,3 +114,17 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* BookingFlow — hover эффекты */
+.master-row {
+  transition: background 0.15s;
+}
+.master-row:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+.master-row-select-btn:hover {
+  opacity: 0.45;
+}
+.master-detail-link:hover {
+  opacity: 0.35;
+}
