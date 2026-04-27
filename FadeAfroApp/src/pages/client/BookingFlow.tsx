@@ -330,13 +330,14 @@ function MonthGrid({ year, month, selectedDate, workingJsDays, onSelect }: {
   )
 }
 
-// ─── Слоты времени ────────────────────────────────────────────────────────────
+// ─── Слоты времени (bottom sheet) ─────────────────────────────────────────────
 
-function TimeSlots({ masterId, serviceId, date, onSelect }: {
+function TimeSlotsSheet({ masterId, serviceId, date, onSelect, onClose }: {
   masterId: string
   serviceId: string
   date: string
   onSelect: (time: string) => void
+  onClose: () => void
 }) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['slots', masterId, serviceId, date],
@@ -346,27 +347,40 @@ function TimeSlots({ masterId, serviceId, date, onSelect }: {
   const displayDate = new Date(date + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
 
   return (
-    <div style={{ padding: '16px 16px 32px', borderTop: '1px solid var(--tgui--divider)' }}>
-      <p style={{ margin: '0 0 12px', fontWeight: 600, fontSize: 15 }}>Время — {displayDate}</p>
-      {isLoading && <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}><Spinner size="m" /></div>}
-      {isError && <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Не удалось загрузить слоты</p>}
-      {data && data.slots.length === 0 && (
-        <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Нет свободного времени на эту дату</p>
-      )}
-      {data && data.slots.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-          {data.slots.map(slot => (
-            <div
-              key={slot.start}
-              onClick={() => onSelect(slot.start)}
-              style={{ padding: '10px 4px', borderRadius: 10, textAlign: 'center', background: 'var(--tgui--bg_color)', color: 'var(--tgui--text_color)', fontSize: 14, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', border: '1px solid var(--tgui--divider)' }}
-            >
-              {slot.start.slice(0, 5)}
-            </div>
-          ))}
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 210 }} />
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 211, background: 'var(--tgui--bg_color)', borderRadius: '16px 16px 0 0', padding: '20px 16px 40px', maxHeight: '60dvh', overflowY: 'auto' }}>
+        {/* Заголовок */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>Время — {displayDate}</p>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--tgui--hint_color)', padding: 4, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '50%', background: 'var(--tgui--secondary_bg_color)' as any }}
+          >
+            ✕
+          </button>
         </div>
-      )}
-    </div>
+
+        {isLoading && <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}><Spinner size="m" /></div>}
+        {isError && <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Не удалось загрузить слоты</p>}
+        {data && data.slots.length === 0 && (
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Нет свободного времени на эту дату</p>
+        )}
+        {data && data.slots.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            {data.slots.map(slot => (
+              <div
+                key={slot.start}
+                onClick={() => onSelect(slot.start)}
+                style={{ padding: '12px 4px', borderRadius: 10, textAlign: 'center', background: 'var(--tgui--secondary_bg_color)', color: 'var(--tgui--text_color)', fontSize: 14, fontWeight: 500, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', border: '1px solid var(--tgui--divider)' }}
+              >
+                {slot.start.slice(0, 5)}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 
@@ -396,7 +410,7 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
   const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
 
   return (
-    <div style={{ paddingTop: 12 }}>
+    <div style={{ paddingTop: 12, position: 'relative' }}>
       {/* Легенда */}
       <div style={{ display: 'flex', gap: 16, padding: '0 16px 12px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -431,13 +445,14 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         onSelect={d => { setPickedDate(d) }}
       />
 
-      {/* Слоты времени — появляются после выбора даты */}
+      {/* Слоты времени — поверх календаря */}
       {pickedDate && (
-        <TimeSlots
+        <TimeSlotsSheet
           masterId={masterId}
           serviceId={serviceId}
           date={pickedDate}
           onSelect={time => onSelectDateTime(pickedDate, time)}
+          onClose={() => setPickedDate(null)}
         />
       )}
     </div>
