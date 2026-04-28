@@ -465,11 +465,11 @@ function Step5Confirm({ booking, clientId, onSuccess }: {
   const queryClient = useQueryClient()
 
   const startTime = booking.date && booking.time
-    ? `${booking.date}T${booking.time}`
+    ? `${booking.date}T${booking.time}Z`
     : null
 
   const displayDate = booking.date
-    ? new Date(booking.date + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(booking.date + 'T00:00:00').toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
     : ''
   const displayTime = booking.time ? booking.time.slice(0, 5) : ''
 

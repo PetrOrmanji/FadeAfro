@@ -40,13 +40,14 @@ public class CreateAppointmentHandler : IRequestHandler<CreateAppointmentCommand
         if (service is null)
             throw new ServiceNotFoundException();
 
-        var endTime = command.StartTime.Add(service.Duration);
+        var startTime = DateTime.SpecifyKind(command.StartTime, DateTimeKind.Utc);
+        var endTime = startTime.Add(service.Duration);
 
         var appointment = new Appointment(
             command.ClientId,
             command.MasterProfileId,
             command.ServiceId,
-            command.StartTime,
+            startTime,
             endTime,
             command.Comment);
 
