@@ -25,6 +25,9 @@ public class AppointmentServiceConfiguration : IEntityTypeConfiguration<Appointm
         builder.Property(s => s.CreatedAt)
             .IsRequired();
 
+        builder.HasIndex(s => new { s.AppointmentId, s.ServiceId })
+            .IsUnique();
+
         builder.HasOne(s => s.Service)
             .WithMany(s => s.AppointmentServices)
             .HasForeignKey(s => s.ServiceId)
