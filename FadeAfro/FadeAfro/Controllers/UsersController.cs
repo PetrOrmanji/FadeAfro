@@ -26,29 +26,41 @@ public class UsersController : ControllerBase
     [HttpGet("me")]
     [Authorize]
     [SwaggerOperation(Summary = "Get current user info", Description = "Returns the currently authenticated user's name.")]
-    public async Task<IActionResult> GetMe()
+    public async Task<IActionResult> GetMe() 
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var response = await _mediator.Send(new GetCurrentUserQuery(userId));
+        var userId = GetUserId();
+        var getUserQuery = new GetUserQuery(userId);
+        
+        var response = await _mediator.Send(getUserQuery);
         return Ok(response);
     }
-
-    [HttpPut("update-name")]
-    [Authorize]
-    [SwaggerOperation(Summary = "Update user's display name", Description = "Updates the first and last name of the currently authenticated user.")]
-    public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
-    {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        await _mediator.Send(new UpdateUserNameCommand(userId, request.FirstName, request.LastName));
-        return NoContent();
-    }
-
+    
     [HttpGet("all")]
     [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Get all users (paged)")]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? search = null)
+    public async Task<IActionResult> GetAll([FromQuery] GetAllUsersRequest request)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery(page, pageSize, search));
+        var getAllUsersQuery = new GetAllUsersQuery(
+            request.Page,
+            request.PageSize,
+            request.Search);
+        
+        var result = await _mediator.Send(getAllUsersQuery);
         return Ok(result);
     }
+
+    [HttpPut("update-full-name")]
+    [Authorize]
+    [SwaggerOperation(Summary = "Update user's full name", Description = "Updates the first and last name of the currently authenticated user.")]
+    public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
+    {
+        var userId = GetUserId();
+        var updateUserFullNameCommand = new UpdateUserFullNameCommand(userId, request.FirstName, request.LastName);
+        
+        await _mediator.Send(updateUserFullNameCommand);
+        return NoContent();
+    }
+    
+    private Guid GetUserId() =>
+        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }

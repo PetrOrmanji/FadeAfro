@@ -39,7 +39,7 @@ public class User : Entity
         Username = username;
     }
 
-    public void UpdateName(string firstName, string? lastName)
+    public void UpdateFullName(string firstName, string? lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new InvalidFirstNameException();
