@@ -11,6 +11,7 @@ import { createAppointment } from '@/api/appointments'
 export interface BookingState {
   masterId: string | null
   masterName: string | null
+  masterPhotoUrl: string | null
   serviceId: string | null
   serviceName: string | null
   servicePrice: number | null
@@ -22,6 +23,7 @@ export interface BookingState {
 const INITIAL_STATE: BookingState = {
   masterId: null,
   masterName: null,
+  masterPhotoUrl: null,
   serviceId: null,
   serviceName: null,
   servicePrice: null,
@@ -97,13 +99,14 @@ function formatDuration(iso: string): string {
 
 // ─── Шаг 1: Список мастеров ───────────────────────────────────────────────────
 
-function MasterAvatar({ name, photoUrl }: { name: string; photoUrl: string | null }) {
+function MasterAvatar({ name, photoUrl, size = 64 }: { name: string; photoUrl: string | null; size?: number }) {
   const initials = name.split(' ').map(w => w[0]?.toUpperCase() ?? '').join('').slice(0, 2)
+  const fontSize = Math.round(size * 0.34)
   if (photoUrl) {
-    return <img src={photoUrl} alt={name} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+    return <img src={photoUrl} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
   }
   return (
-    <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--tgui--button_color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+    <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--tgui--button_color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
       {initials}
     </div>
   )
@@ -486,9 +489,7 @@ function Step5Confirm({ booking, clientId, onSuccess }: {
     },
   })
 
-  const rows: { label: string; value: string }[] = [
-    { label: 'Мастер', value: booking.masterName ?? '' },
-    { label: 'Услуга', value: booking.serviceName ?? '' },
+  const detailRows: { label: string; value: string }[] = [
     { label: 'Стоимость', value: `${booking.servicePrice} ₽` },
     { label: 'Длительность', value: booking.serviceDuration ? formatDuration(booking.serviceDuration) : '' },
     { label: 'Дата', value: displayDate },
@@ -496,12 +497,22 @@ function Step5Confirm({ booking, clientId, onSuccess }: {
   ]
 
   return (
-    <div style={{ padding: '12px 0 32px' }}>
+    <div style={{ padding: '0 0 32px' }}>
+      {/* Hero-блок мастера */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 16px 24px', gap: 14 }}>
+        <MasterAvatar name={booking.masterName ?? ''} photoUrl={booking.masterPhotoUrl} size={88} />
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 20, color: 'var(--tgui--text_color)' }}>{booking.masterName}</p>
+          <p style={{ margin: '5px 0 0', fontSize: 15, color: 'var(--tgui--hint_color)' }}>{booking.serviceName}</p>
+        </div>
+      </div>
+
+      {/* Детали */}
       <div style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, overflow: 'hidden', margin: '0 16px 24px' }}>
-        {rows.map((row, idx) => (
+        {detailRows.map((row, idx) => (
           <div
             key={row.label}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: idx < rows.length - 1 ? '1px solid var(--tgui--divider)' : 'none' }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: idx < detailRows.length - 1 ? '1px solid var(--tgui--divider)' : 'none' }}
           >
             <span style={{ fontSize: 14, color: 'var(--tgui--hint_color)' }}>{row.label}</span>
             <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--tgui--text_color)' }}>{row.value}</span>
@@ -543,7 +554,7 @@ export function BookingFlow({ onClose, clientId }: BookingFlowProps) {
 
   function selectMaster(master: MasterProfile) {
     const fullName = [master.firstName, master.lastName].filter(Boolean).join(' ')
-    setBooking(b => ({ ...b, masterId: master.id, masterName: fullName, serviceId: null, serviceName: null, servicePrice: null, serviceDuration: null, date: null, time: null }))
+    setBooking(b => ({ ...b, masterId: master.id, masterName: fullName, masterPhotoUrl: master.photoUrl ?? null, serviceId: null, serviceName: null, servicePrice: null, serviceDuration: null, date: null, time: null }))
     setStep(2)
   }
 
