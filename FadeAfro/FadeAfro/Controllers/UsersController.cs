@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using FadeAfro.Application.Features.Users.GetAllUsers;
 using FadeAfro.Application.Features.Users.GetCurrentUser;
-using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.UpdateUserName;
 using UpdateUserNameRequest = FadeAfro.Application.Features.Users.UpdateUserName.UpdateUserNameRequest;
 using FadeAfro.Domain.Constants;
@@ -22,15 +21,6 @@ public class UsersController : ControllerBase
     public UsersController(IMediator mediator)
     {
         _mediator = mediator;
-    }
-
-    [HttpGet("get/{telegramId}")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(Summary = "Get user by Telegram ID", Description = "Returns a user with the given Telegram ID.")]
-    public async Task<IActionResult> GetByTelegramId(long telegramId)
-    {
-        var response = await _mediator.Send(new GetUserQuery(telegramId));
-        return Ok(response);
     }
 
     [HttpGet("me")]
