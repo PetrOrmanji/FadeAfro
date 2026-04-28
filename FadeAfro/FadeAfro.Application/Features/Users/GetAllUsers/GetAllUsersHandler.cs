@@ -1,11 +1,10 @@
 using FadeAfro.Application.Common;
-using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
 namespace FadeAfro.Application.Features.Users.GetAllUsers;
 
-public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, PagedResponse<GetUserResponse>>
+public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, PagedResponse<GetAllUsersResponse>>
 {
     private readonly IUserRepository _userRepository;
 
@@ -14,13 +13,13 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, PagedRespons
         _userRepository = userRepository;
     }
 
-    public async Task<PagedResponse<GetUserResponse>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResponse<GetAllUsersResponse>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
         var totalCount = await _userRepository.CountAsync(query.Search);
         var users = await _userRepository.GetAllAsync(query.Page, query.PageSize, query.Search);
 
         var items = users
-            .Select(u => new GetUserResponse(
+            .Select(u => new GetAllUsersResponse(
                 u.Id,
                 u.TelegramId,
                 u.FirstName,
@@ -29,6 +28,6 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, PagedRespons
                 u.Roles))
             .ToList();
 
-        return new PagedResponse<GetUserResponse>(items, totalCount, query.Page, query.PageSize);
+        return new PagedResponse<GetAllUsersResponse>(items, totalCount, query.Page, query.PageSize);
     }
 }
