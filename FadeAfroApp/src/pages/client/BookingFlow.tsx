@@ -3,8 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Spinner } from '@telegram-apps/telegram-ui'
 import { getMasters, type MasterProfile } from '@/api/masters'
 import { getServices, type ServiceItem } from '@/api/services'
-import { getSchedule } from '@/api/schedules'
-import { getAvailableSlots, getAvailableDates } from '@/api/slots'
+import { getMasterAvailability } from '@/api/slots'
 import { createAppointment } from '@/api/appointments'
 
 // ─── Типы ─────────────────────────────────────────────────────────────────────
@@ -94,12 +93,6 @@ function formatDuration(iso: string): string {
   if (h > 0 && m > 0) return `${h} ${hourLabel} ${m} мин`
   if (h > 0) return `${h} ${hourLabel}`
   return `${m} мин`
-}
-
-// C# DayOfWeek → JS getDay()
-const CS_DAY_TO_JS: Record<string, number> = {
-  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
-  Thursday: 4, Friday: 5, Saturday: 6,
 }
 
 // ─── Шаг 1: Список мастеров ───────────────────────────────────────────────────
@@ -268,11 +261,10 @@ function dateToISO(year: number, month: number, day: number): string {
 
 // ─── Месячный календарь (без навигации) ──────────────────────────────────────
 
-function MonthGrid({ year, month, selectedDate, workingJsDays, availableDates, onSelect }: {
+function MonthGrid({ year, month, selectedDate, availableDates, onSelect }: {
   year: number
   month: number
   selectedDate: string | null
-  workingJsDays: Set<number>
   availableDates: Set<string> | null  // null = ещё грузится
   onSelect: (date: string) => void
 }) {
@@ -302,19 +294,16 @@ function MonthGrid({ year, month, selectedDate, workingJsDays, availableDates, o
           if (dayNum < 1 || dayNum > daysInMonth) return <div key={i} />
 
           const cellDate = new Date(year, month, dayNum)
-          const jsDay = cellDate.getDay()
           const isoDate = dateToISO(year, month, dayNum)
           const isPast = cellDate < today
-          const isWorking = workingJsDays.has(jsDay)
           const isSelected = selectedDate === isoDate
-          // Если availableDates ещё грузится — считаем рабочий день доступным
-          const hasSlots = availableDates === null ? isWorking : availableDates.has(isoDate)
-          const inactive = isPast || !isWorking || !hasSlots
+          // null = loading — не подсвечиваем ничего пока
+          const hasSlots = availableDates !== null && availableDates.has(isoDate)
+          const inactive = isPast || !hasSlots
 
           let bg = 'rgba(142,142,147,0.12)'
           if (isSelected) bg = 'var(--tgui--button_color)'
-          else if (!isPast && isWorking && hasSlots) bg = 'rgba(0,122,255,0.10)'
-          else if (!isPast && isWorking && !hasSlots) bg = 'rgba(142,142,147,0.06)'
+          else if (!isPast && hasSlots) bg = 'rgba(0,122,255,0.10)'
 
           return (
             <div
@@ -335,53 +324,38 @@ function MonthGrid({ year, month, selectedDate, workingJsDays, availableDates, o
 
 // ─── Слоты времени (bottom sheet) ─────────────────────────────────────────────
 
-function TimeSlotsSheet({ masterId, serviceId, date, onSelect, onClose }: {
-  masterId: string
-  serviceId: string
+function TimeSlotsSheet({ date, slots, onSelect, onClose }: {
   date: string
+  slots: string[]
   onSelect: (time: string) => void
   onClose: () => void
 }) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['slots', masterId, serviceId, date],
-    queryFn: () => getAvailableSlots(masterId, serviceId, date),
-  })
-
   const displayDate = new Date(date + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
 
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 210 }} />
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 211, background: 'var(--tgui--bg_color)', borderRadius: '16px 16px 0 0', padding: '20px 16px 40px', maxHeight: '60dvh', overflowY: 'auto' }}>
-        {/* Заголовок */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>Время — {displayDate}</p>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--tgui--hint_color)', padding: 4, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '50%', background: 'var(--tgui--secondary_bg_color)' as any }}
+            style={{ background: 'var(--tgui--secondary_bg_color)', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--tgui--hint_color)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             ✕
           </button>
         </div>
-
-        {isLoading && <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}><Spinner size="m" /></div>}
-        {isError && <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Не удалось загрузить слоты</p>}
-        {data && data.slots.length === 0 && (
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--tgui--hint_color)', textAlign: 'center' }}>Нет свободного времени на эту дату</p>
-        )}
-        {data && data.slots.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-            {data.slots.map(slot => (
-              <div
-                key={slot.start}
-                onClick={() => onSelect(slot.start)}
-                style={{ padding: '12px 4px', borderRadius: 10, textAlign: 'center', background: 'var(--tgui--secondary_bg_color)', color: 'var(--tgui--text_color)', fontSize: 14, fontWeight: 500, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', border: '1px solid var(--tgui--divider)' }}
-              >
-                {slot.start.slice(0, 5)}
-              </div>
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {slots.map(slot => (
+            <div
+              key={slot}
+              onClick={() => onSelect(slot)}
+              style={{ padding: '12px 4px', borderRadius: 10, textAlign: 'center', background: 'var(--tgui--secondary_bg_color)', color: 'var(--tgui--text_color)', fontSize: 14, fontWeight: 500, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', border: '1px solid var(--tgui--divider)' }}
+            >
+              {slot.slice(0, 5)}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   )
@@ -400,37 +374,31 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
   const today = new Date()
   const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
 
-  const { data: scheduleData, isLoading } = useQuery({
-    queryKey: ['schedule', masterId],
-    queryFn: () => getSchedule(masterId),
+  const { data: availabilityData, isLoading } = useQuery({
+    queryKey: ['availability', masterId, serviceId],
+    queryFn: () => getMasterAvailability(masterId, serviceId),
   })
 
-  const { data: datesThisMonth } = useQuery({
-    queryKey: ['available-dates', masterId, serviceId, today.getFullYear(), today.getMonth() + 1],
-    queryFn: () => getAvailableDates(masterId, serviceId, today.getFullYear(), today.getMonth() + 1),
-    enabled: !!scheduleData,
-  })
+  // Множество дат с доступными слотами
+  const availableDates = useMemo(() => {
+    if (!availabilityData) return null
+    return new Set(availabilityData.days.map(d => d.date))
+  }, [availabilityData])
 
-  const { data: datesNextMonth } = useQuery({
-    queryKey: ['available-dates', masterId, serviceId, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1],
-    queryFn: () => getAvailableDates(masterId, serviceId, nextMonthDate.getFullYear(), nextMonthDate.getMonth() + 1),
-    enabled: !!scheduleData,
-  })
-
-  const workingJsDays = useMemo(() => {
-    if (!scheduleData) return new Set<number>()
-    return new Set(scheduleData.schedules.map(s => CS_DAY_TO_JS[s.dayOfWeek] ?? -1).filter(d => d >= 0))
-  }, [scheduleData])
-
-  const availableThisMonth = useMemo(() =>
-    datesThisMonth ? new Set(datesThisMonth.dates) : null,
-    [datesThisMonth])
-
-  const availableNextMonth = useMemo(() =>
-    datesNextMonth ? new Set(datesNextMonth.dates) : null,
-    [datesNextMonth])
+  // Карта дата → слоты
+  const slotsByDate = useMemo(() => {
+    const map = new Map<string, string[]>()
+    if (availabilityData) {
+      for (const d of availabilityData.days) {
+        map.set(d.date, d.slots)
+      }
+    }
+    return map
+  }, [availabilityData])
 
   if (isLoading) return <CenterSpinner />
+
+  const pickedSlots = pickedDate ? (slotsByDate.get(pickedDate) ?? []) : []
 
   return (
     <div style={{ paddingTop: 12, position: 'relative' }}>
@@ -439,7 +407,6 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         {[
           { bg: 'rgba(0,122,255,0.10)', border: '1px solid rgba(0,122,255,0.3)', label: 'Есть запись' },
           { bg: 'var(--tgui--button_color)', border: 'none', label: 'Выбрано' },
-          { bg: 'rgba(142,142,147,0.06)', border: 'none', label: 'Нет записи' },
           { bg: 'rgba(142,142,147,0.12)', border: 'none', label: 'Недоступно' },
         ].map(({ bg, border, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -454,9 +421,8 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         year={today.getFullYear()}
         month={today.getMonth()}
         selectedDate={pickedDate}
-        workingJsDays={workingJsDays}
-        availableDates={availableThisMonth}
-        onSelect={d => { setPickedDate(d) }}
+        availableDates={availableDates}
+        onSelect={d => setPickedDate(d)}
       />
 
       {/* Подсказка */}
@@ -469,17 +435,15 @@ function Step3DateAndTime({ masterId, serviceId, selectedDate, onSelectDateTime 
         year={nextMonthDate.getFullYear()}
         month={nextMonthDate.getMonth()}
         selectedDate={pickedDate}
-        workingJsDays={workingJsDays}
-        availableDates={availableNextMonth}
-        onSelect={d => { setPickedDate(d) }}
+        availableDates={availableDates}
+        onSelect={d => setPickedDate(d)}
       />
 
       {/* Слоты времени — поверх календаря */}
       {pickedDate && (
         <TimeSlotsSheet
-          masterId={masterId}
-          serviceId={serviceId}
           date={pickedDate}
+          slots={pickedSlots}
           onSelect={time => onSelectDateTime(pickedDate, time)}
           onClose={() => setPickedDate(null)}
         />

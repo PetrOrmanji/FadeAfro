@@ -1,8 +1,7 @@
 using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
-using FadeAfro.Application.Features.MasterProfiles.GetAvailableDates;
-using FadeAfro.Application.Features.MasterProfiles.GetAvailableSlots;
+using FadeAfro.Application.Features.MasterProfiles.GetMasterAvailability;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
@@ -108,19 +107,11 @@ public class MasterProfilesController : ControllerBase
         return File(response.Stream, response.ContentType);
     }
 
-    [HttpGet("available-slots/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get available slots", Description = "Returns available time slots for booking with the given master on the specified date.")]
-    public async Task<IActionResult> GetAvailableSlots(Guid masterProfileId, [FromQuery] Guid serviceId, [FromQuery] DateOnly date)
+    [HttpGet("availability/{masterProfileId:guid}")]
+    [SwaggerOperation(Summary = "Get master availability", Description = "Returns all available dates and time slots for the next 2 months.")]
+    public async Task<IActionResult> GetAvailability(Guid masterProfileId, [FromQuery] Guid serviceId)
     {
-        var response = await _mediator.Send(new GetAvailableSlotsQuery(masterProfileId, serviceId, date));
-        return Ok(response);
-    }
-
-    [HttpGet("available-dates/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get available dates", Description = "Returns dates in the given month that have at least one free slot for the specified service.")]
-    public async Task<IActionResult> GetAvailableDates(Guid masterProfileId, [FromQuery] Guid serviceId, [FromQuery] int year, [FromQuery] int month)
-    {
-        var response = await _mediator.Send(new GetAvailableDatesQuery(masterProfileId, serviceId, year, month));
+        var response = await _mediator.Send(new GetMasterAvailabilityQuery(masterProfileId, serviceId));
         return Ok(response);
     }
 }

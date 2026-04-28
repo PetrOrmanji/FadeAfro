@@ -1,39 +1,21 @@
 import { apiClient } from './client'
 
-export interface TimeSlot {
-  start: string  // "HH:mm:ss"
-  end: string    // "HH:mm:ss"
+export interface DayAvailability {
+  date: string    // "YYYY-MM-DD"
+  slots: string[] // ["09:00:00", "09:30:00", ...]
 }
 
-export interface GetAvailableSlotsResponse {
-  slots: TimeSlot[]
+export interface GetMasterAvailabilityResponse {
+  days: DayAvailability[]
 }
 
-export async function getAvailableSlots(
+export async function getMasterAvailability(
   masterProfileId: string,
   serviceId: string,
-  date: string,  // "YYYY-MM-DD"
-): Promise<GetAvailableSlotsResponse> {
-  const { data } = await apiClient.get<GetAvailableSlotsResponse>(
-    `/api/master-profiles/available-slots/${masterProfileId}`,
-    { params: { serviceId, date } },
-  )
-  return data
-}
-
-export interface GetAvailableDatesResponse {
-  dates: string[]  // "YYYY-MM-DD"
-}
-
-export async function getAvailableDates(
-  masterProfileId: string,
-  serviceId: string,
-  year: number,
-  month: number,
-): Promise<GetAvailableDatesResponse> {
-  const { data } = await apiClient.get<GetAvailableDatesResponse>(
-    `/api/master-profiles/available-dates/${masterProfileId}`,
-    { params: { serviceId, year, month } },
+): Promise<GetMasterAvailabilityResponse> {
+  const { data } = await apiClient.get<GetMasterAvailabilityResponse>(
+    `/api/master-profiles/availability/${masterProfileId}`,
+    { params: { serviceId } },
   )
   return data
 }
