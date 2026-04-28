@@ -28,6 +28,9 @@ public class Appointment : Entity
         if (startTime <= DateTime.UtcNow)
             throw new InvalidAppointmentTimeException();
 
+        if (endTime <= startTime)
+            throw new InvalidAppointmentEndTimeException();
+
         ClientId = clientId;
         MasterProfileId = masterProfileId;
         StartTime = startTime;
@@ -38,6 +41,9 @@ public class Appointment : Entity
 
     public void AddService(Guid serviceId, string serviceName, int price, TimeSpan duration)
     {
+        if (_services.Any(s => s.ServiceId == serviceId))
+            throw new DuplicateAppointmentServiceException();
+
         var appointmentService = new AppointmentService(Id, serviceId, serviceName, price, duration);
         _services.Add(appointmentService);
     }
