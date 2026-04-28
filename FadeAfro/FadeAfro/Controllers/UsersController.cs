@@ -1,9 +1,8 @@
-using System.Security.Claims;
 using FadeAfro.Application.Features.Users.GetAllUsers;
 using FadeAfro.Application.Features.Users.GetCurrentUser;
 using FadeAfro.Application.Features.Users.UpdateUserName;
-using UpdateUserNameRequest = FadeAfro.Application.Features.Users.UpdateUserName.UpdateUserNameRequest;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +27,7 @@ public class UsersController : ControllerBase
     [SwaggerOperation(Summary = "Get current user info", Description = "Returns the currently authenticated user's name.")]
     public async Task<IActionResult> GetMe() 
     {
-        var userId = GetUserId();
-        var getUserQuery = new GetUserQuery(userId);
+        var getUserQuery = new GetUserQuery(User.GetUserId());
         
         var response = await _mediator.Send(getUserQuery);
         return Ok(response);
@@ -54,13 +52,12 @@ public class UsersController : ControllerBase
     [SwaggerOperation(Summary = "Update user's full name", Description = "Updates the first and last name of the currently authenticated user.")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
     {
-        var userId = GetUserId();
-        var updateUserFullNameCommand = new UpdateUserFullNameCommand(userId, request.FirstName, request.LastName);
+        var updateUserFullNameCommand = new UpdateUserFullNameCommand(
+            User.GetUserId(), 
+            request.FirstName, 
+            request.LastName);
         
         await _mediator.Send(updateUserFullNameCommand);
         return NoContent();
     }
-    
-    private Guid GetUserId() =>
-        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }

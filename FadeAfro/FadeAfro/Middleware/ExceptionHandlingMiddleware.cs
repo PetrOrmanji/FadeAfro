@@ -55,7 +55,8 @@ public class ExceptionHandlingMiddleware
 
             UserAlreadyExistsException or
             MasterProfileAlreadyExistsException or
-            UserAlreadyMasterException
+            UserAlreadyMasterException or
+            ServiceFromAnotherMasterException
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or
