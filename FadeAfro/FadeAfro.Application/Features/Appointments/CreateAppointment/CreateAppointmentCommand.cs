@@ -5,6 +5,6 @@ namespace FadeAfro.Application.Features.Appointments.CreateAppointment;
 public record CreateAppointmentCommand(
     Guid ClientId,
     Guid MasterProfileId,
-    Guid ServiceId,
+    List<Guid> ServiceIds,
     DateTime StartTime,
     string? Comment) : IRequest<CreateAppointmentResponse>;

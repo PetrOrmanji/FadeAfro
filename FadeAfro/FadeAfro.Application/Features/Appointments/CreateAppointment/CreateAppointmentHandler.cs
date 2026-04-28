@@ -1,4 +1,5 @@
 using FadeAfro.Domain.Entities;
+using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.Service;
 using FadeAfro.Domain.Exceptions.User;
@@ -28,6 +29,9 @@ public class CreateAppointmentHandler : IRequestHandler<CreateAppointmentCommand
 
     public async Task<CreateAppointmentResponse> Handle(CreateAppointmentCommand command, CancellationToken cancellationToken)
     {
+        if (command.ServiceIds is null || command.ServiceIds.Count == 0)
+            throw new AppointmentMustHaveAtLeastOneServiceException();
+
         var client = await _userRepository.GetByIdAsync(command.ClientId);
         if (client is null)
             throw new UserNotFoundException();
@@ -36,20 +40,28 @@ public class CreateAppointmentHandler : IRequestHandler<CreateAppointmentCommand
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
-        var service = await _serviceRepository.GetByIdAsync(command.ServiceId);
-        if (service is null)
-            throw new ServiceNotFoundException();
+        var services = new List<Service>();
+        foreach (var serviceId in command.ServiceIds)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service is null)
+                throw new ServiceNotFoundException();
+            services.Add(service);
+        }
 
         var startTime = DateTime.SpecifyKind(command.StartTime, DateTimeKind.Utc);
-        var endTime = startTime.Add(service.Duration);
+        var totalDuration = services.Aggregate(TimeSpan.Zero, (sum, s) => sum + s.Duration);
+        var endTime = startTime.Add(totalDuration);
 
         var appointment = new Appointment(
             command.ClientId,
             command.MasterProfileId,
-            command.ServiceId,
             startTime,
             endTime,
             command.Comment);
+
+        foreach (var service in services)
+            appointment.AddService(service.Id, service.Name, service.Price, service.Duration);
 
         await _appointmentRepository.AddAsync(appointment);
 

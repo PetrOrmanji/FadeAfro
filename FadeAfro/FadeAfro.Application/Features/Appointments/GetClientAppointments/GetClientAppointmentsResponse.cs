@@ -1,15 +1,14 @@
+using FadeAfro.Application.Common.Appointments;
 using FadeAfro.Domain.Enums;
 
 namespace FadeAfro.Application.Features.Appointments.GetClientAppointments;
 
-public record AppointmentResponse(
+public record GetClientAppointmentsResponse(
     Guid Id,
     Guid MasterProfileId,
     string MasterName,
     string? MasterPhotoUrl,
-    Guid ServiceId,
-    string ServiceName,
-    decimal ServicePrice,
+    IReadOnlyList<AppointmentServiceDto> Services,
     DateTime StartTime,
     DateTime EndTime,
     AppointmentStatus Status,
