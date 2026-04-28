@@ -38,9 +38,11 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .HasForeignKey(a => a.MasterProfileId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(a => a.Service)
-            .WithMany(s => s.Appointments)
-            .HasForeignKey(a => a.ServiceId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(a => a.Services)
+            .WithOne(s => s.Appointment)
+            .HasForeignKey(s => s.AppointmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(a => a.Services).HasField("_services");
     }
 }

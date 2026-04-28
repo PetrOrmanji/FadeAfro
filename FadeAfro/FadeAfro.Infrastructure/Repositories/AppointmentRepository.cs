@@ -30,7 +30,7 @@ public class AppointmentRepository : IAppointmentRepository
     {
         var query = _context.Appointments
             .Include(a => a.MasterProfile).ThenInclude(mp => mp.Master)
-            .Include(a => a.Service)
+            .Include(a => a.Services)
             .Where(a => a.ClientId == clientId);
 
         var totalCount = await query.CountAsync();
@@ -45,7 +45,9 @@ public class AppointmentRepository : IAppointmentRepository
 
     public async Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByMasterProfileIdPagedAsync(Guid masterProfileId, int page, int pageSize)
     {
-        var query = _context.Appointments.Where(a => a.MasterProfileId == masterProfileId);
+        var query = _context.Appointments
+            .Include(a => a.Services)
+            .Where(a => a.MasterProfileId == masterProfileId);
 
         var totalCount = await query.CountAsync();
         var items = await query

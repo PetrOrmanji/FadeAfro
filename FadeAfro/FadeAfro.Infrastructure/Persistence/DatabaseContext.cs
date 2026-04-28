@@ -15,6 +15,7 @@ public class DatabaseContext : DbContext
     public DbSet<MasterSchedule> MasterSchedules => Set<MasterSchedule>();
     public DbSet<MasterUnavailability> MasterUnavailabilities => Set<MasterUnavailability>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<AppointmentService> AppointmentServices => Set<AppointmentService>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
