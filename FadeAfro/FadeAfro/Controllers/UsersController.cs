@@ -2,7 +2,6 @@ using System.Security.Claims;
 using FadeAfro.Application.Features.Users.GetAllUsers;
 using FadeAfro.Application.Features.Users.GetCurrentUser;
 using FadeAfro.Application.Features.Users.GetUser;
-using FadeAfro.Application.Features.Users.RegisterUser;
 using FadeAfro.Application.Features.Users.UpdateUserName;
 using UpdateUserNameRequest = FadeAfro.Application.Features.Users.UpdateUserName.UpdateUserNameRequest;
 using FadeAfro.Domain.Constants;
@@ -23,15 +22,6 @@ public class UsersController : ControllerBase
     public UsersController(IMediator mediator)
     {
         _mediator = mediator;
-    }
-
-    [HttpPost("register")]
-    [AllowAnonymous]
-    [SwaggerOperation(Summary = "Register a new user", Description = "Creates a new user by Telegram ID.")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
-    {
-        var response = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetByTelegramId), new { telegramId = command.TelegramId }, response);
     }
 
     [HttpGet("get/{telegramId}")]
