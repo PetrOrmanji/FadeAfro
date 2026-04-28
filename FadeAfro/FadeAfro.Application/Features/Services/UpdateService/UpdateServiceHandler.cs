@@ -20,7 +20,7 @@ public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand, Unit>
 
     public async Task<Unit> Handle(UpdateServiceCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.UserId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile == null)
             throw new MasterProfileNotFoundException();
         

@@ -20,7 +20,7 @@ public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand, Unit>
 
     public async Task<Unit> Handle(DeleteServiceCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.UserId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
         

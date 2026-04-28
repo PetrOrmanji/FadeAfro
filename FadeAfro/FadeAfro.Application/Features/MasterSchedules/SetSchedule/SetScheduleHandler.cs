@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterSchedules.SetSchedule;
 
-public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, SetScheduleResponse>
+public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, Unit>
 {
     private readonly IMasterScheduleRepository _masterScheduleRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -16,32 +16,32 @@ public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, SetSchedul
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<SetScheduleResponse> Handle(SetScheduleCommand command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetScheduleCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
         var existing = await _masterScheduleRepository.GetByMasterProfileIdAndDayAsync(
-            command.MasterProfileId,
+            masterProfile.Id,
             command.DayOfWeek);
 
         if (existing is not null)
         {
             existing.UpdateTimes(command.StartTime, command.EndTime);
             await _masterScheduleRepository.UpdateAsync(existing);
-            return new SetScheduleResponse(existing.Id);
+            return Unit.Value;
         }
 
         var schedule = new MasterSchedule(
-            command.MasterProfileId,
+            masterProfile.Id,
             command.DayOfWeek,
             command.StartTime,
             command.EndTime);
 
         await _masterScheduleRepository.AddAsync(schedule);
 
-        return new SetScheduleResponse(schedule.Id);
+        return Unit.Value;
     }
 }

@@ -3,7 +3,7 @@ using MediatR;
 namespace FadeAfro.Application.Features.Services.AddService;
 
 public record AddServiceCommand(
-    Guid UserId,
+    Guid MasterId,
     string Name,
     string? Description,
     int Price,

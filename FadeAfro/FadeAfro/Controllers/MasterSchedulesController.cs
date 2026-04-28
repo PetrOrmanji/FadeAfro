@@ -2,6 +2,7 @@ using FadeAfro.Application.Features.MasterSchedules.DeleteSchedule;
 using FadeAfro.Application.Features.MasterSchedules.GetMasterSchedule;
 using FadeAfro.Application.Features.MasterSchedules.SetSchedule;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,30 +22,43 @@ public class MasterSchedulesController : ControllerBase
     {
         _mediator = mediator;
     }
-
-    [HttpPost("set")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Set a schedule", Description = "Sets a working schedule for a specific day of week for the master profile.")]
-    public async Task<IActionResult> Set([FromBody] SetScheduleCommand command)
-    {
-        var response = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetByMasterProfileId), new { masterProfileId = command.MasterProfileId }, response);
-    }
-
+    
     [HttpGet("get/{masterProfileId:guid}")]
     [SwaggerOperation(Summary = "Get schedule by master profile ID", Description = "Returns all schedule entries for the given master profile.")]
     public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
     {
-        var response = await _mediator.Send(new GetMasterScheduleQuery(masterProfileId));
+        var getMasterScheduleQuery = new GetMasterScheduleQuery(masterProfileId);
+        
+        var response = await _mediator.Send(getMasterScheduleQuery);
         return Ok(response);
+    }
+
+    [HttpPost("set")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(Summary = "Set master's schedule", Description = "Sets a working schedule for a specific day of week for the master profile.")]
+    public async Task<IActionResult> Set([FromBody] SetScheduleRequest request)
+    {
+        var setScheduleCommand = new SetScheduleCommand(
+            User.GetUserId(),
+            request.DayOfWeek,
+            request.StartTime,
+            request.EndTime);
+        
+        await _mediator.Send(setScheduleCommand);
+        return Ok();
     }
 
     [HttpDelete("delete/{scheduleId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Delete a schedule entry", Description = "Deletes the schedule entry with the given ID.")]
+    [SwaggerOperation(Summary = "Delete master's schedule entry", Description = "Deletes master's schedule entry with the given ID.")]
     public async Task<IActionResult> Delete(Guid scheduleId)
     {
-        await _mediator.Send(new DeleteScheduleCommand(scheduleId));
+        var deleteScheduleCommand = new DeleteScheduleCommand(
+            User.GetUserId(),
+            scheduleId);
+        
+        await _mediator.Send(deleteScheduleCommand);
+        
         return NoContent();
     }
 }

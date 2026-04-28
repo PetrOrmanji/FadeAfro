@@ -23,7 +23,7 @@ public class AddServiceHandler : IRequestHandler<AddServiceCommand, Unit>
 
     public async Task<Unit> Handle(AddServiceCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.UserId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
