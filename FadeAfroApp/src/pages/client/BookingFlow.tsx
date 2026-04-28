@@ -489,11 +489,9 @@ function Step5Confirm({ booking, clientId, onSuccess }: {
     },
   })
 
-  const detailRows: { label: string; value: string }[] = [
+  const serviceRows: { label: string; value: string }[] = [
     { label: 'Стоимость', value: `${booking.servicePrice} ₽` },
     { label: 'Длительность', value: booking.serviceDuration ? formatDuration(booking.serviceDuration) : '' },
-    { label: 'Дата', value: displayDate },
-    { label: 'Время', value: displayTime },
   ]
 
   return (
@@ -507,17 +505,26 @@ function Step5Confirm({ booking, clientId, onSuccess }: {
         </div>
       </div>
 
-      {/* Детали */}
-      <div style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, overflow: 'hidden', margin: '0 16px 24px' }}>
-        {detailRows.map((row, idx) => (
+      {/* Стоимость и длительность */}
+      <div style={{ background: 'var(--tgui--bg_color)', borderRadius: 12, overflow: 'hidden', margin: '0 16px 12px' }}>
+        {serviceRows.map((row, idx) => (
           <div
             key={row.label}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: idx < detailRows.length - 1 ? '1px solid var(--tgui--divider)' : 'none' }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 16px', borderBottom: idx < serviceRows.length - 1 ? '1px solid var(--tgui--divider)' : 'none' }}
           >
             <span style={{ fontSize: 14, color: 'var(--tgui--hint_color)' }}>{row.label}</span>
             <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--tgui--text_color)' }}>{row.value}</span>
           </div>
         ))}
+      </div>
+
+      {/* Акцентный блок даты и времени */}
+      <div style={{ margin: '0 16px 24px', borderRadius: 12, background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.18)', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <p style={{ margin: 0, fontSize: 12, color: 'var(--tgui--button_color)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Дата и время</p>
+          <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'var(--tgui--text_color)' }}>{displayDate}</p>
+        </div>
+        <p style={{ margin: 0, fontSize: 28, fontWeight: 700, color: 'var(--tgui--button_color)' }}>{displayTime}</p>
       </div>
 
       <div style={{ padding: '0 16px' }}>
