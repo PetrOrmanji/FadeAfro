@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.MasterUnavailabilities.Common;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using MediatR;
@@ -22,16 +23,20 @@ public class GetMasterUnavailabilitiesHandler : IRequestHandler<GetMasterUnavail
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
-        var unavailabilities = await _unavailabilityRepository.GetByMasterProfileIdAsync(query.MasterProfileId);
+        var unavailabilities = 
+            await _unavailabilityRepository.GetByMasterProfileIdAsync(query.MasterProfileId);
+        
+        var unavailabilityDtos = new List<UnavailabilityDto>();
 
-        var response = unavailabilities
-            .Select(u => new UnavailabilityResponse(
-                u.Id,
-                u.Date,
-                u.StartTime,
-                u.EndTime))
-            .ToList();
+        foreach (var unavailability in unavailabilities)
+        {
+            var unavailabilityDto = new UnavailabilityDto(
+                unavailability.Id,
+                unavailability.Date);
+            
+            unavailabilityDtos.Add(unavailabilityDto);
+        }
 
-        return new GetMasterUnavailabilitiesResponse(response);
+        return new GetMasterUnavailabilitiesResponse(unavailabilityDtos);
     }
 }

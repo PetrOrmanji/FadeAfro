@@ -1,9 +1,5 @@
+using FadeAfro.Application.Features.MasterUnavailabilities.Common;
+
 namespace FadeAfro.Application.Features.MasterUnavailabilities.GetMasterUnavailabilities;
 
-public record UnavailabilityResponse(
-    Guid Id,
-    DateOnly Date,
-    TimeOnly? StartTime,
-    TimeOnly? EndTime);
-
-public record GetMasterUnavailabilitiesResponse(List<UnavailabilityResponse> Unavailabilities);
+public record GetMasterUnavailabilitiesResponse(List<UnavailabilityDto> Unavailabilities);

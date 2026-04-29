@@ -60,7 +60,8 @@ public class ExceptionHandlingMiddleware
             ScheduleOfAnotherMasterException or 
             UnavailabilityOfAnotherMasterException or
             AppointmentOfAnotherClient or
-            AppointmentOfAnotherMaster
+            AppointmentOfAnotherMaster or
+            MasterUnavailabilityAlreadyExistsException
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or
@@ -71,8 +72,7 @@ public class ExceptionHandlingMiddleware
             InvalidServiceDurationException or
             InvalidAppointmentTimeException or
             InvalidAppointmentStatusException or
-            InvalidScheduleTimeException or
-            InvalidUnavailabilityTimeException
+            InvalidScheduleTimeException
                 => (HttpStatusCode.BadRequest, exception.Message),
 
             DomainException => (HttpStatusCode.BadRequest, exception.Message),

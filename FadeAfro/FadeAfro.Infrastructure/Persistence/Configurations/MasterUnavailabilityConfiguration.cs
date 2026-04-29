@@ -15,10 +15,6 @@ public class MasterUnavailabilityConfiguration : IEntityTypeConfiguration<Master
         builder.Property(mu => mu.Date)
             .IsRequired();
 
-        builder.Property(mu => mu.StartTime);
-
-        builder.Property(mu => mu.EndTime);
-
         builder.Property(mu => mu.CreatedAt)
             .IsRequired();
         

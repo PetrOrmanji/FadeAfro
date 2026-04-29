@@ -44,9 +44,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     {
         var addUnavailabilityCommand = new AddUnavailabilityCommand(
             User.GetUserId(),
-            request.Date,
-            request.StartTime,
-            request.EndTime);
+            request.Date);
         
         await _mediator.Send(addUnavailabilityCommand);
         return Ok();
