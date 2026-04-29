@@ -10,4 +10,5 @@ public interface IMasterUnavailabilityRepository
     Task AddAsync(MasterUnavailability unavailability);
     Task UpdateAsync(MasterUnavailability unavailability);
     Task DeleteAsync(Guid id);
+    Task DeleteRangeAsync(List<MasterUnavailability> unavailabilities);
 }

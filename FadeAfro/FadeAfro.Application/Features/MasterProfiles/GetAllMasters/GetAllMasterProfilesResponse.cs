@@ -8,4 +8,4 @@ public record MasterProfileResponse(
     string? PhotoUrl,
     string? Description);
 
-public record GetAllMastersResponse(List<MasterProfileResponse> Masters);
+public record GetAllMasterProfilesResponse(List<MasterProfileResponse> Masters);

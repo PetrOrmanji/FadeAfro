@@ -4,18 +4,18 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 
-public class UpdateMasterDescriptionHandler : IRequestHandler<UpdateMasterDescriptionCommand, Unit>
+public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMasterProfileDescriptionCommand, Unit>
 {
     private readonly IMasterProfileRepository _masterProfileRepository;
 
-    public UpdateMasterDescriptionHandler(IMasterProfileRepository masterProfileRepository)
+    public UpdateMasterProfileDescriptionHandler(IMasterProfileRepository masterProfileRepository)
     {
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(UpdateMasterDescriptionCommand command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(UpdateMasterProfileDescriptionCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();

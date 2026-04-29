@@ -10,17 +10,23 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
+    private readonly IMasterScheduleRepository _masterScheduleRepository;
+    private readonly IMasterUnavailabilityRepository _masterUnavailabilityRepository;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IFileStorageService _fileStorageService;
 
     public DismissMasterHandler(
         IUserRepository userRepository,
         IMasterProfileRepository masterProfileRepository,
+        IMasterScheduleRepository masterScheduleRepository,
+        IMasterUnavailabilityRepository masterUnavailabilityRepository,
         IAppointmentRepository appointmentRepository,
         IFileStorageService fileStorageService)
     {
         _userRepository = userRepository;
         _masterProfileRepository = masterProfileRepository;
+        _masterScheduleRepository = masterScheduleRepository;
+        _masterUnavailabilityRepository = masterUnavailabilityRepository;
         _appointmentRepository = appointmentRepository;
         _fileStorageService = fileStorageService;
     }
@@ -32,9 +38,6 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
         if (user is null)
             throw new UserNotFoundException();
 
-        user.RevokeMasterRole();
-        await _userRepository.UpdateAsync(user);
-
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.UserId);
 
         if (masterProfile is not null)
@@ -43,15 +46,32 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
                 .Where(a => a.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
                 .ToList();
 
-            foreach (var appointment in activeAppointments)
-                appointment.CancelByMaster();
-
-            if (activeAppointments.Count > 0)
+            if (activeAppointments.Any())
+            {
+                foreach (var appointment in activeAppointments)
+                    appointment.CancelByMaster();
+                
                 await _appointmentRepository.UpdateRangeAsync(activeAppointments);
+            }
+
+            var masterSchedules = 
+                await _masterScheduleRepository.GetByMasterProfileIdAsync(masterProfile.Id);
+
+            if (masterSchedules.Any())
+                await _masterScheduleRepository.DeleteRangeAsync(masterSchedules.ToList());
+            
+            var masterUnavailabilities =
+                await _masterUnavailabilityRepository.GetByMasterProfileIdAsync(command.UserId);
+
+            if (masterUnavailabilities.Any())
+                await _masterUnavailabilityRepository.DeleteRangeAsync(masterUnavailabilities.ToList());
+            
+            await _masterProfileRepository.DeleteAsync(masterProfile);
 
             _fileStorageService.DeleteMasterPhoto(masterProfile.Id);
-
-            await _masterProfileRepository.DeleteAsync(masterProfile);
         }
+        
+        user.RevokeMasterRole();
+        await _userRepository.UpdateAsync(user);
     }
 }

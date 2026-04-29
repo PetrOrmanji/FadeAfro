@@ -53,4 +53,13 @@ public class MasterScheduleRepository : IMasterScheduleRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async Task DeleteRangeAsync(List<MasterSchedule> schedules)
+    {
+        if (schedules.Count == 0)
+            return;
+        
+        _context.MasterSchedules.RemoveRange(schedules);
+        await _context.SaveChangesAsync();
+    }
 }

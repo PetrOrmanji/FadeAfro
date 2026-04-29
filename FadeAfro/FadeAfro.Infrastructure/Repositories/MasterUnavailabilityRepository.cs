@@ -54,4 +54,13 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async Task DeleteRangeAsync(List<MasterUnavailability> unavailabilities)
+    {
+        if (unavailabilities.Count == 0)
+            return;
+        
+        _context.MasterUnavailabilities.RemoveRange(unavailabilities);
+        await _context.SaveChangesAsync();
+    }
 }

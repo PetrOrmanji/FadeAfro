@@ -3,16 +3,16 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
 
-public class GetAllMastersHandler : IRequestHandler<GetAllMastersQuery, GetAllMastersResponse>
+public class GetAllMasterProfilesHandler : IRequestHandler<GetAllMasterProfilesQuery, GetAllMasterProfilesResponse>
 {
     private readonly IMasterProfileRepository _masterProfileRepository;
 
-    public GetAllMastersHandler(IMasterProfileRepository masterProfileRepository)
+    public GetAllMasterProfilesHandler(IMasterProfileRepository masterProfileRepository)
     {
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<GetAllMastersResponse> Handle(GetAllMastersQuery query, CancellationToken cancellationToken)
+    public async Task<GetAllMasterProfilesResponse> Handle(GetAllMasterProfilesQuery query, CancellationToken cancellationToken)
     {
         var masterProfiles = await _masterProfileRepository.GetAllAsync();
 
@@ -26,6 +26,6 @@ public class GetAllMastersHandler : IRequestHandler<GetAllMastersQuery, GetAllMa
                 mp.Description))
             .ToList();
 
-        return new GetAllMastersResponse(masters);
+        return new GetAllMasterProfilesResponse(masters);
     }
 }

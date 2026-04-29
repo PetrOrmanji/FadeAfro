@@ -1,14 +1,13 @@
 using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
-using FadeAfro.Application.Features.MasterProfiles.GetMasterAvailability;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterPhoto;
-using System.Security.Claims;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,73 +27,98 @@ public class MasterProfilesController : ControllerBase
     {
         _mediator = mediator;
     }
-
-    [HttpPost("create")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(Summary = "Create a master profile", Description = "Creates a new master profile for an existing user with the Master role.")]
-    public async Task<IActionResult> Create([FromBody] CreateMasterProfileCommand command)
-    {
-        var response = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { masterProfileId = response.Id }, response);
-    }
-
-    [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master profile by ID", Description = "Returns a master profile with the given ID.")]
-    public async Task<IActionResult> GetById(Guid masterProfileId)
-    {
-        var response = await _mediator.Send(new GetMasterProfileQuery(masterProfileId));
-        return Ok(response);
-    }
-
+    
     [HttpGet("my")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Get my master profile", Description = "Returns the master profile of the currently authenticated master.")]
+    [SwaggerOperation(
+        Summary = "Get my master profile", 
+        Description = "Returns the master profile of the currently authenticated master.")]
     public async Task<IActionResult> GetMy()
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var response = await _mediator.Send(new GetMyMasterProfileQuery(userId));
+        var getMyMasterProfileQuery = new GetMyMasterProfileQuery(
+            User.GetUserId());
+        
+        var response = await _mediator.Send(getMyMasterProfileQuery);
         return Ok(response);
     }
-
+    
+    [HttpGet("get/{masterProfileId:guid}")]
+    [SwaggerOperation(
+        Summary = "Get master profile by ID",
+        Description = "Returns a master profile with the given ID.")]
+    public async Task<IActionResult> GetById(Guid masterProfileId)
+    {
+        var getMasterProfileQuery = new GetMasterProfileQuery(masterProfileId);
+        
+        var response = await _mediator.Send(getMasterProfileQuery);
+        return Ok(response);
+    }
+    
     [HttpGet("all")]
-    [SwaggerOperation(Summary = "Get all master profiles", Description = "Returns a list of all master profiles.")]
+    [SwaggerOperation(
+        Summary = "Get all master profiles", 
+        Description = "Returns a list of all master profiles.")]
     public async Task<IActionResult> GetAll()
     {
-        var response = await _mediator.Send(new GetAllMastersQuery());
+        var getAllMasterProfilesQuery = new GetAllMasterProfilesQuery();
+        
+        var response = await _mediator.Send(getAllMasterProfilesQuery);
         return Ok(response);
     }
 
-    [HttpPut("update-description/{masterProfileId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Update master description", Description = "Updates description of the master profile.")]
-    public async Task<IActionResult> Update(Guid masterProfileId, [FromBody] UpdateMasterDescriptionCommand command)
+    [HttpPost("set-as-master")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(
+        Summary = "Set user as master",
+        Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
+    public async Task<IActionResult> Create([FromBody] SetAsMasterCommand command)
     {
-        await _mediator.Send(command with { MasterProfileId = masterProfileId });
+        await _mediator.Send(command);
+        return Ok();
+    }
+    
+    [HttpDelete("dismiss-master/{userId:guid}")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(
+        Summary = "Dismiss master",
+        Description = "Revokes the Master role and deletes the master profile.")]
+    public async Task<IActionResult> Dismiss(Guid userId)
+    {
+        var dismissMasterCommand = new DismissMasterCommand(userId);
+        
+        await _mediator.Send(dismissMasterCommand);
         return NoContent();
     }
 
-    [HttpDelete("dismiss/{userId:guid}")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(Summary = "Dismiss master", Description = "Revokes the Master role and deletes the master profile.")]
-    public async Task<IActionResult> Dismiss(Guid userId)
+    [HttpPut("update-description")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(
+        Summary = "Update master profile description", 
+        Description = "Updates description of the master profile.")]
+    public async Task<IActionResult> Update([FromBody] UpdateMasterProfileDescriptionRequest request)
     {
-        await _mediator.Send(new DismissMasterCommand(userId));
+        var updateMasterProfileDescriptionCommand = new UpdateMasterProfileDescriptionCommand(
+            User.GetUserId(),
+            request.Description);
+        
+        await _mediator.Send(updateMasterProfileDescriptionCommand);
         return NoContent();
     }
     
-    [HttpPost("upload-photo/{masterProfileId:guid}")]
+    [HttpPost("upload-photo")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Upload master photo", Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
-    public async Task<IActionResult> UploadPhoto(Guid masterProfileId, IFormFile file)
+    [SwaggerOperation(
+        Summary = "Upload master photo",
+        Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
+    public async Task<IActionResult> UploadPhoto(IFormFile file)
     {
-        var extension = Path.GetExtension(file.FileName);
-
-        await _mediator.Send(new UploadMasterPhotoCommand(
-            masterProfileId,
+        var uploadMasterPhotoCommand = new UploadMasterPhotoCommand(
+            User.GetUserId(),
             file.OpenReadStream(),
-            extension,
-            file.Length));
-
+            Path.GetExtension(file.FileName),
+            file.Length);
+        
+        await _mediator.Send(uploadMasterPhotoCommand);
         return NoContent();
     }
 
@@ -103,15 +127,9 @@ public class MasterProfilesController : ControllerBase
     [SwaggerOperation(Summary = "Get master photo", Description = "Returns the photo of the master profile.")]
     public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
     {
-        var response = await _mediator.Send(new GetMasterPhotoQuery(masterProfileId));
+        var getMasterPhotoQuery =  new GetMasterPhotoQuery(masterProfileId);
+        
+        var response = await _mediator.Send(getMasterPhotoQuery);
         return File(response.Stream, response.ContentType);
-    }
-
-    [HttpGet("availability/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master availability", Description = "Returns all available dates and time slots for the next 2 months.")]
-    public async Task<IActionResult> GetAvailability(Guid masterProfileId, [FromQuery] Guid serviceId)
-    {
-        var response = await _mediator.Send(new GetMasterAvailabilityQuery(masterProfileId, serviceId));
-        return Ok(response);
     }
 }

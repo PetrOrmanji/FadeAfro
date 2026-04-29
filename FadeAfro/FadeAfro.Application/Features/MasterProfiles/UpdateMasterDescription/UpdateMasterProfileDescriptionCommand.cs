@@ -2,6 +2,6 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 
-public record UpdateMasterDescriptionCommand(
-    Guid MasterProfileId,
+public record UpdateMasterProfileDescriptionCommand(
+    Guid MasterId,
     string? Description) : IRequest<Unit>;

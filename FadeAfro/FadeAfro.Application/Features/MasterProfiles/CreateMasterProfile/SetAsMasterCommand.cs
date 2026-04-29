@@ -2,7 +2,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 
-public record CreateMasterProfileCommand(
+public record SetAsMasterCommand(
     Guid MasterId,
     string? PhotoUrl,
-    string? Description) : IRequest<CreateMasterProfileResponse>;
+    string? Description) : IRequest<Unit>;

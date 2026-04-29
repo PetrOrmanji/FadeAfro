@@ -6,18 +6,18 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 
-public class CreateMasterProfileHandler : IRequestHandler<CreateMasterProfileCommand, CreateMasterProfileResponse>
+public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand, Unit>
 {
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IUserRepository _userRepository;
 
-    public CreateMasterProfileHandler(IMasterProfileRepository masterProfileRepository, IUserRepository userRepository)
+    public SetAsMasterHandler(IMasterProfileRepository masterProfileRepository, IUserRepository userRepository)
     {
         _masterProfileRepository = masterProfileRepository;
         _userRepository = userRepository;
     }
 
-    public async Task<CreateMasterProfileResponse> Handle(CreateMasterProfileCommand command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetAsMasterCommand command, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(command.MasterId);
 
@@ -39,6 +39,6 @@ public class CreateMasterProfileHandler : IRequestHandler<CreateMasterProfileCom
 
         await _masterProfileRepository.AddAsync(masterProfile);
 
-        return new CreateMasterProfileResponse(masterProfile.Id);
+        return Unit.Value;
     }
 }

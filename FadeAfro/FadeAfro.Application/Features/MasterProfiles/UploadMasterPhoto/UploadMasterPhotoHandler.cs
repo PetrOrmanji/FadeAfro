@@ -9,8 +9,8 @@ namespace FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
 public class UploadMasterPhotoHandler : IRequestHandler<UploadMasterPhotoCommand>
 {
     private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
-
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024; 
+    
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IFileStorageService _fileStorageService;
 
@@ -25,18 +25,18 @@ public class UploadMasterPhotoHandler : IRequestHandler<UploadMasterPhotoCommand
     public async Task Handle(UploadMasterPhotoCommand command, CancellationToken cancellationToken)
     {
         if (!AllowedExtensions.Contains(command.Extension.ToLower()))
-            throw new InvalidFileException("Допустимые форматы: JPEG, PNG, WebP.");
+            throw new InvalidFileException("Allowed formats: JPEG, PNG, WebP.");
 
         if (command.FileSize > MaxFileSizeBytes)
-            throw new InvalidFileException("Размер файла не должен превышать 5 МБ.");
+            throw new InvalidFileException("File size must not exceed 5 MB.");
 
-        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
+        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
 
         var photoUrl = await _fileStorageService.SaveMasterPhotoAsync(
-            command.MasterProfileId,
+            masterProfile.Id,
             command.FileStream,
             command.Extension);
 
