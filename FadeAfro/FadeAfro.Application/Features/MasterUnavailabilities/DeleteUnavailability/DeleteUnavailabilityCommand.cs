@@ -2,4 +2,6 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterUnavailabilities.DeleteUnavailability;
 
-public record DeleteUnavailabilityCommand(Guid UnavailabilityId) : IRequest<Unit>;
+public record DeleteUnavailabilityCommand(
+    Guid MasterId,
+    Guid UnavailabilityId) : IRequest<Unit>;

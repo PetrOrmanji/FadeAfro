@@ -25,7 +25,9 @@ public class ServicesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get services by master profile ID", Description = "Returns all services of the given master profile.")]
+    [SwaggerOperation(
+        Summary = "Get services by master profile ID", 
+        Description = "Returns all services of the given master profile.")]
     public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
     {
         var getMasterServicesQuery = new GetMasterServicesQuery(masterProfileId);
@@ -36,7 +38,9 @@ public class ServicesController : ControllerBase
 
     [HttpPost("add")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Add a service", Description = "Adds a new service to the master profile.")]
+    [SwaggerOperation(
+        Summary = "Add a service",
+        Description = "Adds a new service to the master profile.")]
     public async Task<IActionResult> Add([FromBody] AddServiceRequest request)
     {
         var addServiceCommand = new AddServiceCommand(
@@ -52,7 +56,9 @@ public class ServicesController : ControllerBase
 
     [HttpPut("update/{serviceId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Update a master's service", Description = "Updates name, description, price and duration of the master's service.")]
+    [SwaggerOperation(
+        Summary = "Update a master's service", 
+        Description = "Updates name, description, price and duration of the master's service.")]
     public async Task<IActionResult> Update(Guid serviceId, [FromBody] UpdateServiceRequest request)
     {
         var updateServiceCommand = new UpdateServiceCommand(
@@ -69,7 +75,9 @@ public class ServicesController : ControllerBase
 
     [HttpDelete("delete/{serviceId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Delete a master's service", Description = "Deletes the master's service with the given ID.")]
+    [SwaggerOperation(
+        Summary = "Delete a master's service",
+        Description = "Deletes the master's service with the given ID.")]
     public async Task<IActionResult> Delete(Guid serviceId)
     {
         var deleteServiceCommand = new DeleteServiceCommand(

@@ -1,3 +1,4 @@
+using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterUnavailability;
 using FadeAfro.Domain.Repositories;
 using MediatR;
@@ -7,18 +8,29 @@ namespace FadeAfro.Application.Features.MasterUnavailabilities.DeleteUnavailabil
 public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityCommand, Unit>
 {
     private readonly IMasterUnavailabilityRepository _unavailabilityRepository;
+    private readonly IMasterProfileRepository _masterProfileRepository;
 
-    public DeleteUnavailabilityHandler(IMasterUnavailabilityRepository unavailabilityRepository)
+    public DeleteUnavailabilityHandler(
+        IMasterUnavailabilityRepository unavailabilityRepository,
+        IMasterProfileRepository masterProfileRepository)
     {
         _unavailabilityRepository = unavailabilityRepository;
+        _masterProfileRepository = masterProfileRepository;
     }
 
     public async Task<Unit> Handle(DeleteUnavailabilityCommand command, CancellationToken cancellationToken)
     {
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
+        if (masterProfile == null)
+            throw new MasterProfileNotFoundException();
+        
         var unavailability = await _unavailabilityRepository.GetByIdAsync(command.UnavailabilityId);
 
         if (unavailability is null)
             throw new MasterUnavailabilityNotFoundException();
+
+        if (unavailability.MasterProfileId != masterProfile.Id)
+            throw new UnavailabilityOfAnotherMasterException();
 
         await _unavailabilityRepository.DeleteAsync(command.UnavailabilityId);
 

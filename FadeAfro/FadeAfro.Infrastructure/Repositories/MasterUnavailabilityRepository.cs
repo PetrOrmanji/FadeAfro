@@ -22,7 +22,8 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
     public async Task<MasterUnavailability?> GetByMasterProfileIdAndDateAsync(Guid masterProfileId, DateOnly date)
     {
         return await _context.MasterUnavailabilities
-            .FirstOrDefaultAsync(mu => mu.MasterProfileId == masterProfileId && mu.Date == date);
+            .Where(mu => mu.MasterProfileId == masterProfileId && mu.Date == date)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId)

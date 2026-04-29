@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterUnavailabilities.AddUnavailability;
 
-public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand, AddUnavailabilityResponse>
+public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand, Unit>
 {
     private readonly IMasterUnavailabilityRepository _unavailabilityRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -16,31 +16,30 @@ public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<AddUnavailabilityResponse> Handle(AddUnavailabilityCommand command, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AddUnavailabilityCommand command, CancellationToken cancellationToken)
     {
-        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
+        
+        var dayUnavailability = await _unavailabilityRepository.GetByMasterProfileIdAndDateAsync(
+            masterProfile.Id, command.Date);
 
-        var existing = await _unavailabilityRepository.GetByMasterProfileIdAndDateAsync(
-            command.MasterProfileId, command.Date);
-
-        if (existing is not null)
+        if (dayUnavailability is not null)
         {
-            existing.UpdateTimes(command.StartTime, command.EndTime);
-            await _unavailabilityRepository.UpdateAsync(existing);
-            return new AddUnavailabilityResponse(existing.Id);
+            dayUnavailability.UpdateTimes(command.StartTime, command.EndTime);
+            await _unavailabilityRepository.UpdateAsync(dayUnavailability);
+            return Unit.Value;
         }
 
-        var unavailability = new MasterUnavailability(
-            command.MasterProfileId,
+        dayUnavailability = new MasterUnavailability(
+            masterProfile.Id,
             command.Date,
             command.StartTime,
             command.EndTime);
 
-        await _unavailabilityRepository.AddAsync(unavailability);
-
-        return new AddUnavailabilityResponse(unavailability.Id);
+        await _unavailabilityRepository.AddAsync(dayUnavailability);
+        return Unit.Value;
     }
 }

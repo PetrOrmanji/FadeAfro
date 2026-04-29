@@ -24,7 +24,9 @@ public class UsersController : ControllerBase
 
     [HttpGet("me")]
     [Authorize]
-    [SwaggerOperation(Summary = "Get current user info", Description = "Returns the currently authenticated user's name.")]
+    [SwaggerOperation(
+        Summary = "Get current user info", 
+        Description = "Returns the currently authenticated user's name.")]
     public async Task<IActionResult> GetMe() 
     {
         var getUserQuery = new GetUserQuery(User.GetUserId());
@@ -49,7 +51,9 @@ public class UsersController : ControllerBase
 
     [HttpPut("update-full-name")]
     [Authorize]
-    [SwaggerOperation(Summary = "Update user's full name", Description = "Updates the first and last name of the currently authenticated user.")]
+    [SwaggerOperation(
+        Summary = "Update user's full name", 
+        Description = "Updates the first and last name of the currently authenticated user.")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
     {
         var updateUserFullNameCommand = new UpdateUserFullNameCommand(

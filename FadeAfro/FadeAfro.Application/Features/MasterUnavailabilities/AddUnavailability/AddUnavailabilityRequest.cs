@@ -1,9 +1,6 @@
-using MediatR;
-
 namespace FadeAfro.Application.Features.MasterUnavailabilities.AddUnavailability;
 
-public record AddUnavailabilityCommand(
-    Guid MasterId,
+public record AddUnavailabilityRequest(
     DateOnly Date,
     TimeOnly? StartTime,
-    TimeOnly? EndTime) : IRequest<Unit>;
+    TimeOnly? EndTime);
