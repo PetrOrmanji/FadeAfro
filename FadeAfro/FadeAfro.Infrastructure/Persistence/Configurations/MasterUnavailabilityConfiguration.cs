@@ -21,6 +21,9 @@ public class MasterUnavailabilityConfiguration : IEntityTypeConfiguration<Master
 
         builder.Property(mu => mu.CreatedAt)
             .IsRequired();
+        
+        builder.HasIndex(ms => new { ms.MasterProfileId, ms.Date })
+            .IsUnique();
 
         builder.HasOne(mu => mu.MasterProfile)
             .WithMany(mp => mp.Unavailabilities)
