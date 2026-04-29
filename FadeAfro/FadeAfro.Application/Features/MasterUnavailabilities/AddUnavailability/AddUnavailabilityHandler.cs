@@ -6,7 +6,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterUnavailabilities.AddUnavailability;
 
-public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand, Unit>
+public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand>
 {
     private readonly IMasterUnavailabilityRepository _unavailabilityRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -17,7 +17,7 @@ public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(AddUnavailabilityCommand command, CancellationToken cancellationToken)
+    public async Task Handle(AddUnavailabilityCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
@@ -35,6 +35,5 @@ public class AddUnavailabilityHandler : IRequestHandler<AddUnavailabilityCommand
             command.Date);
 
         await _unavailabilityRepository.AddAsync(dayUnavailability);
-        return Unit.Value;
     }
 }

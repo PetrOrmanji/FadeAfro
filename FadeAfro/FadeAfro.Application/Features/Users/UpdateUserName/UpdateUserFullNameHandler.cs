@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.Users.UpdateUserName;
 
-public class UpdateUserFullNameHandler : IRequestHandler<UpdateUserFullNameCommand, Unit>
+public class UpdateUserFullNameHandler : IRequestHandler<UpdateUserFullNameCommand>
 {
     private readonly IUserRepository _userRepository;
 
@@ -13,7 +13,7 @@ public class UpdateUserFullNameHandler : IRequestHandler<UpdateUserFullNameComma
         _userRepository = userRepository;
     }
 
-    public async Task<Unit> Handle(UpdateUserFullNameCommand command, CancellationToken cancellationToken)
+    public async Task Handle(UpdateUserFullNameCommand command, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(command.UserId);
 
@@ -22,7 +22,5 @@ public class UpdateUserFullNameHandler : IRequestHandler<UpdateUserFullNameComma
 
         user.UpdateFullName(command.FirstName, command.LastName);
         await _userRepository.UpdateAsync(user);
-
-        return Unit.Value;
     }
 }

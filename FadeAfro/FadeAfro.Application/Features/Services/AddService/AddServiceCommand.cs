@@ -7,4 +7,4 @@ public record AddServiceCommand(
     string Name,
     string? Description,
     int Price,
-    TimeSpan Duration) : IRequest<Unit>;
+    TimeSpan Duration) : IRequest;

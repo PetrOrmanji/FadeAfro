@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterSchedules.SetSchedule;
 
-public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, Unit>
+public class SetScheduleHandler : IRequestHandler<SetScheduleCommand>
 {
     private readonly IMasterScheduleRepository _masterScheduleRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -16,7 +16,7 @@ public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, Unit>
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(SetScheduleCommand command, CancellationToken cancellationToken)
+    public async Task Handle(SetScheduleCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
@@ -31,7 +31,6 @@ public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, Unit>
         {
             existing.UpdateTimes(command.StartTime, command.EndTime);
             await _masterScheduleRepository.UpdateAsync(existing);
-            return Unit.Value;
         }
 
         var schedule = new MasterSchedule(
@@ -41,7 +40,5 @@ public class SetScheduleHandler : IRequestHandler<SetScheduleCommand, Unit>
             command.EndTime);
 
         await _masterScheduleRepository.AddAsync(schedule);
-
-        return Unit.Value;
     }
 }

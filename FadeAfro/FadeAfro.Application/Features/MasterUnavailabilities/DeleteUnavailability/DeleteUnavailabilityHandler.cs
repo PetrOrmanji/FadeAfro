@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterUnavailabilities.DeleteUnavailability;
 
-public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityCommand, Unit>
+public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityCommand>
 {
     private readonly IMasterUnavailabilityRepository _unavailabilityRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -18,7 +18,7 @@ public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityC
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(DeleteUnavailabilityCommand command, CancellationToken cancellationToken)
+    public async Task Handle(DeleteUnavailabilityCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile == null)
@@ -33,7 +33,5 @@ public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityC
             throw new UnavailabilityOfAnotherMasterException();
 
         await _unavailabilityRepository.DeleteAsync(command.UnavailabilityId);
-
-        return Unit.Value;
     }
 }

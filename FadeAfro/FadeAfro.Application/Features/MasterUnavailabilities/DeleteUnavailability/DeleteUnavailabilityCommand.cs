@@ -4,4 +4,4 @@ namespace FadeAfro.Application.Features.MasterUnavailabilities.DeleteUnavailabil
 
 public record DeleteUnavailabilityCommand(
     Guid MasterId,
-    Guid UnavailabilityId) : IRequest<Unit>;
+    Guid UnavailabilityId) : IRequest;

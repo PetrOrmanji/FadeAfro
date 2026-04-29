@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.Services.UpdateService;
 
-public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand, Unit>
+public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand>
 {
     private readonly IServiceRepository _serviceRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -18,7 +18,7 @@ public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand, Unit>
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(UpdateServiceCommand command, CancellationToken cancellationToken)
+    public async Task Handle(UpdateServiceCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile == null)
@@ -34,7 +34,5 @@ public class UpdateServiceHandler : IRequestHandler<UpdateServiceCommand, Unit>
         service.Update(command.Name, command.Description, command.Price, command.Duration);
 
         await _serviceRepository.UpdateAsync(service);
-
-        return Unit.Value;
     }
 }

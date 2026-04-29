@@ -6,4 +6,4 @@ public record SetScheduleCommand(
     Guid MasterId,
     DayOfWeek DayOfWeek,
     TimeOnly StartTime,
-    TimeOnly EndTime) : IRequest<Unit>;
+    TimeOnly EndTime) : IRequest;

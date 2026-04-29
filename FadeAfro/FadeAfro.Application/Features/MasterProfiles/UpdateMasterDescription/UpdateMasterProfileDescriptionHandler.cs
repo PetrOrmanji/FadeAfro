@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 
-public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMasterProfileDescriptionCommand, Unit>
+public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMasterProfileDescriptionCommand>
 {
     private readonly IMasterProfileRepository _masterProfileRepository;
 
@@ -13,7 +13,7 @@ public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMaste
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(UpdateMasterProfileDescriptionCommand command, CancellationToken cancellationToken)
+    public async Task Handle(UpdateMasterProfileDescriptionCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
@@ -23,7 +23,5 @@ public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMaste
         masterProfile.UpdateDescription(command.Description);
 
         await _masterProfileRepository.UpdateAsync(masterProfile);
-
-        return Unit.Value;
     }
 }

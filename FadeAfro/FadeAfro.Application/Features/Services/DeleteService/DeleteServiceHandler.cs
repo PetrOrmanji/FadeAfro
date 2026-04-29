@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.Services.DeleteService;
 
-public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand, Unit>
+public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand>
 {
     private readonly IServiceRepository _serviceRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
@@ -18,7 +18,7 @@ public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand, Unit>
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(DeleteServiceCommand command, CancellationToken cancellationToken)
+    public async Task Handle(DeleteServiceCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile is null)
@@ -33,7 +33,5 @@ public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand, Unit>
             throw new ServiceFromAnotherMasterException();
 
         await _serviceRepository.DeleteAsync(command.ServiceId);
-
-        return Unit.Value;
     }
 }

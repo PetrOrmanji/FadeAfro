@@ -5,7 +5,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.MasterSchedules.DeleteSchedule;
 
-public class DeleteScheduleHandler : IRequestHandler<DeleteScheduleCommand, Unit>
+public class DeleteScheduleHandler : IRequestHandler<DeleteScheduleCommand>
 {
     private readonly IMasterScheduleRepository _masterScheduleRepository;
     private readonly IMasterProfileRepository  _masterProfileRepository;
@@ -18,7 +18,7 @@ public class DeleteScheduleHandler : IRequestHandler<DeleteScheduleCommand, Unit
         _masterProfileRepository = masterProfileRepository;
     }
 
-    public async Task<Unit> Handle(DeleteScheduleCommand command, CancellationToken cancellationToken)
+    public async Task Handle(DeleteScheduleCommand command, CancellationToken cancellationToken)
     {
         var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
         if (masterProfile == null)
@@ -33,7 +33,5 @@ public class DeleteScheduleHandler : IRequestHandler<DeleteScheduleCommand, Unit
             throw new ScheduleOfAnotherMasterException();
 
         await _masterScheduleRepository.DeleteAsync(command.ScheduleId);
-
-        return Unit.Value;
     }
 }
