@@ -42,8 +42,8 @@ public class DismissMasterHandler : IRequestHandler<DismissMasterCommand>
 
         if (masterProfile is not null)
         {
-            var activeAppointments = (await _appointmentRepository.GetByMasterProfileIdAsync(masterProfile.Id))
-                .Where(a => a.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
+            var activeAppointments = (await _appointmentRepository.GetActualByMasterProfileIdAsync(masterProfile.Id))
+                .Where(a => a.Status is AppointmentStatus.Confirmed)
                 .ToList();
 
             if (activeAppointments.Any())

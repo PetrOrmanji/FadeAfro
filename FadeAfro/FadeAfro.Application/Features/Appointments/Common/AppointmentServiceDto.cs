@@ -1,4 +1,4 @@
-namespace FadeAfro.Application.Common.Appointments;
+namespace FadeAfro.Application.Features.Appointments.Common;
 
 public record AppointmentServiceDto(
     Guid? ServiceId,

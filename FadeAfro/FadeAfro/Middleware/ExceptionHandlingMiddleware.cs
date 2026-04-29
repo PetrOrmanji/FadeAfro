@@ -58,7 +58,9 @@ public class ExceptionHandlingMiddleware
             UserAlreadyMasterException or
             ServiceFromAnotherMasterException or
             ScheduleOfAnotherMasterException or 
-            UnavailabilityOfAnotherMasterException
+            UnavailabilityOfAnotherMasterException or
+            AppointmentOfAnotherClient or
+            AppointmentOfAnotherMaster
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or

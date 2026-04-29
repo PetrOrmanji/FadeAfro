@@ -35,7 +35,7 @@ public class Appointment : Entity
         MasterProfileId = masterProfileId;
         StartTime = startTime;
         EndTime = endTime;
-        Status = AppointmentStatus.Pending;
+        Status = AppointmentStatus.Confirmed;
         Comment = comment;
     }
 
@@ -50,7 +50,7 @@ public class Appointment : Entity
 
     public void CancelByClient()
     {
-        if (Status != AppointmentStatus.Pending && Status != AppointmentStatus.Confirmed)
+        if (Status != AppointmentStatus.Confirmed)
             throw new InvalidAppointmentStatusException();
 
         Status = AppointmentStatus.CancelledByClient;
@@ -58,17 +58,9 @@ public class Appointment : Entity
 
     public void CancelByMaster()
     {
-        if (Status != AppointmentStatus.Pending && Status != AppointmentStatus.Confirmed)
-            throw new InvalidAppointmentStatusException();
-
-        Status = AppointmentStatus.CancelledByMaster;
-    }
-
-    public void Complete()
-    {
         if (Status != AppointmentStatus.Confirmed)
             throw new InvalidAppointmentStatusException();
 
-        Status = AppointmentStatus.Completed;
+        Status = AppointmentStatus.CancelledByMaster;
     }
 }

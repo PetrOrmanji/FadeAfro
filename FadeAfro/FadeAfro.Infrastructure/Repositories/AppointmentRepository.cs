@@ -1,4 +1,5 @@
 using FadeAfro.Domain.Entities;
+using FadeAfro.Domain.Enums;
 using FadeAfro.Domain.Repositories;
 using FadeAfro.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -19,44 +20,36 @@ public class AppointmentRepository : IAppointmentRepository
         return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetByMasterProfileIdAsync(Guid masterProfileId)
+    public async Task<IReadOnlyList<Appointment>> GetActualByClientIdAsync(
+        Guid clientId,
+        bool includeServices = false,
+        bool includeMasterInfo = false)
     {
-        return await _context.Appointments
-            .Where(a => a.MasterProfileId == masterProfileId)
-            .ToListAsync();
+        var query = GetActualAppointmentsQuery();
+        
+        if (includeServices)
+            query = query.Include(a => a.Services);
+        
+        if (includeMasterInfo)
+            query = query.Include(a => a.MasterProfile).ThenInclude(a => a.Master);
+        
+        return await query.Where(a => a.ClientId == clientId).ToListAsync();
     }
 
-    public async Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByClientIdPagedAsync(Guid clientId, int page, int pageSize)
+    public async Task<IReadOnlyList<Appointment>> GetActualByMasterProfileIdAsync(
+        Guid masterProfileId,
+        bool includeServices = false,
+        bool includeClientInfo = false)
     {
-        var query = _context.Appointments
-            .Include(a => a.MasterProfile).ThenInclude(mp => mp.Master)
-            .Include(a => a.Services)
-            .Where(a => a.ClientId == clientId);
+        var query = GetActualAppointmentsQuery();
+        
+        if (includeServices)
+            query = query.Include(a => a.Services);
 
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .OrderByDescending(a => a.StartTime)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return (items, totalCount);
-    }
-
-    public async Task<(IReadOnlyList<Appointment> Items, int TotalCount)> GetByMasterProfileIdPagedAsync(Guid masterProfileId, int page, int pageSize)
-    {
-        var query = _context.Appointments
-            .Include(a => a.Services)
-            .Where(a => a.MasterProfileId == masterProfileId);
-
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .OrderByDescending(a => a.StartTime)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return (items, totalCount);
+        if (includeClientInfo)
+            query = query.Include(a => a.Client);
+        
+        return await query.Where(a => a.MasterProfileId == masterProfileId).ToListAsync();
     }
 
     public async Task AddAsync(Appointment appointment)
@@ -75,5 +68,12 @@ public class AppointmentRepository : IAppointmentRepository
     {
         _context.Appointments.UpdateRange(appointments);
         await _context.SaveChangesAsync();
+    }
+    
+    private IQueryable<Appointment> GetActualAppointmentsQuery()
+    {
+        return _context.Appointments.Where(a => 
+            a.Status == AppointmentStatus.Confirmed && 
+            a.EndTime > DateTime.UtcNow);
     }
 }

@@ -1,10 +1,10 @@
-using FadeAfro.Application.Common;
-using FadeAfro.Application.Features.Appointments.CancelAppointment;
-using FadeAfro.Application.Features.Appointments.CompleteAppointment;
+using FadeAfro.Application.Features.Appointments.CancelAppointmentByClient;
+using FadeAfro.Application.Features.Appointments.CancelAppointmentByMaster;
 using FadeAfro.Application.Features.Appointments.CreateAppointment;
-using FadeAfro.Application.Features.Appointments.GetClientAppointments;
-using FadeAfro.Application.Features.Appointments.GetMasterAppointments;
+using FadeAfro.Application.Features.Appointments.GetClientActualAppointments;
+using FadeAfro.Application.Features.Appointments.GetMasterActualAppointments;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,58 +24,78 @@ public class AppointmentsController : ControllerBase
     {
         _mediator = mediator;
     }
+    
+    [HttpGet("get-actual-client-appointments")]
+    [Authorize(Roles = Roles.ClientOrOwner)]
+    [SwaggerOperation(
+        Summary = "Get actual client appointments", 
+        Description = "Returns acutal client appointments.")]
+    public async Task<IActionResult> GetActualClientAppointments()
+    {
+        var getClientActualAppointmentsQuery = new GetClientActualAppointmentsQuery(User.GetUserId());
+        
+        var response = await _mediator.Send(getClientActualAppointmentsQuery);
+        return Ok(response);
+    }
+
+    [HttpGet("get-actual-master-appointments")]
+    [Authorize(Roles = Roles.MasterOrOwner)]
+    [SwaggerOperation(
+        Summary = "Get actual master appointments", 
+        Description = "Returns actual master appointments.")]
+    public async Task<IActionResult> GetActualMasterAppointments()
+    {
+        var getMasterActualAppointmentsQuery = new GetMasterActualAppointmentsQuery(User.GetUserId());
+        
+        var response = await _mediator.Send(getMasterActualAppointmentsQuery);
+        return Ok(response);
+    }
 
     [HttpPost("create")]
     [Authorize(Roles = Roles.Client)]
-    [SwaggerOperation(Summary = "Create an appointment", Description = "Books a new appointment for the client with the specified master and service.")]
-    public async Task<IActionResult> Create([FromBody] CreateAppointmentCommand command)
+    [SwaggerOperation(
+        Summary = "Create an appointment", 
+        Description = "Books a new appointment for the client with the specified master and service.")]
+    public async Task<IActionResult> Create([FromBody] CreateAppointmentRequest request)
     {
-        var response = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetByClientId), new { clientId = command.ClientId }, response);
+        var createdAppointmentCommand = new CreateAppointmentCommand(
+            User.GetUserId(),
+            request.MasterProfileId,
+            request.ServiceIds,
+            request.StartTime,
+            request.Comment);
+        
+        await _mediator.Send(createdAppointmentCommand);
+        return Ok();
     }
-
-    [HttpGet("get/client/{clientId:guid}")]
-    [Authorize(Roles = Roles.ClientOrOwner)]
-    [SwaggerOperation(Summary = "Get appointments by client ID", Description = "Returns paginated appointments for the given client.")]
-    public async Task<IActionResult> GetByClientId(Guid clientId, [FromQuery] PaginationParams pagination)
-    {
-        var response = await _mediator.Send(new GetClientAppointmentsQuery(clientId, pagination));
-        return Ok(response);
-    }
-
-    [HttpGet("get/master/{masterProfileId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Get appointments by master profile ID", Description = "Returns paginated appointments for the given master profile.")]
-    public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId, [FromQuery] PaginationParams pagination)
-    {
-        var response = await _mediator.Send(new GetMasterAppointmentsQuery(masterProfileId, pagination));
-        return Ok(response);
-    }
-
+    
     [HttpPatch("cancel-by-client/{appointmentId:guid}")]
     [Authorize(Roles = Roles.Client)]
-    [SwaggerOperation(Summary = "Cancel an appointment by client", Description = "Cancels the appointment on behalf of the client.")]
+    [SwaggerOperation(
+        Summary = "Cancel an appointment by client", 
+        Description = "Cancels the appointment on behalf of the client.")]
     public async Task<IActionResult> CancelByClient(Guid appointmentId)
     {
-        await _mediator.Send(new CancelAppointmentCommand(appointmentId, CancelledByMaster: false));
+        var cancelAppointmentByClientCommand = new CancelAppointmentByClientCommand(
+            User.GetUserId(),
+            appointmentId);
+        
+        await _mediator.Send(cancelAppointmentByClientCommand);
         return NoContent();
     }
 
     [HttpPatch("cancel-by-master/{appointmentId:guid}")]
     [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Cancel an appointment by master", Description = "Cancels the appointment on behalf of the master.")]
+    [SwaggerOperation(
+        Summary = "Cancel an appointment by master", 
+        Description = "Cancels the appointment on behalf of the master.")]
     public async Task<IActionResult> CancelByMaster(Guid appointmentId)
     {
-        await _mediator.Send(new CancelAppointmentCommand(appointmentId, CancelledByMaster: true));
-        return NoContent();
-    }
-
-    [HttpPatch("complete/{appointmentId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
-    [SwaggerOperation(Summary = "Complete an appointment", Description = "Marks the appointment as completed.")]
-    public async Task<IActionResult> Complete(Guid appointmentId)
-    {
-        await _mediator.Send(new CompleteAppointmentCommand(appointmentId));
+        var cancelAppointmentByClientCommand = new CancelAppointmentByMasterCommand(
+            User.GetUserId(),
+            appointmentId);
+        
+        await _mediator.Send(cancelAppointmentByClientCommand);
         return NoContent();
     }
 }

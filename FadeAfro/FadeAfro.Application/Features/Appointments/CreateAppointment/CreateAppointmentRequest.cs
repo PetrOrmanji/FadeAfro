@@ -1,10 +1,7 @@
-using MediatR;
-
 namespace FadeAfro.Application.Features.Appointments.CreateAppointment;
 
-public record CreateAppointmentCommand(
-    Guid ClientId,
+public record CreateAppointmentRequest(
     Guid MasterProfileId,
     List<Guid> ServiceIds,
     DateTime StartTime,
-    string? Comment) : IRequest;
+    string? Comment);
