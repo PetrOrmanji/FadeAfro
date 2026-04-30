@@ -45,14 +45,10 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(MasterUnavailability unavailability)
     {
-        var unavailability = await _context.MasterUnavailabilities.FindAsync(id);
-        if (unavailability is not null)
-        {
-            _context.MasterUnavailabilities.Remove(unavailability);
-            await _context.SaveChangesAsync();
-        }
+        _context.MasterUnavailabilities.Remove(unavailability);
+        await _context.SaveChangesAsync();
     }
     
     public async Task DeleteRangeAsync(List<MasterUnavailability> unavailabilities)

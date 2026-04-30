@@ -44,14 +44,10 @@ public class MasterScheduleRepository : IMasterScheduleRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(MasterSchedule schedule)
     {
-        var schedule = await _context.MasterSchedules.FindAsync(id);
-        if (schedule is not null)
-        {
-            _context.MasterSchedules.Remove(schedule);
-            await _context.SaveChangesAsync();
-        }
+        _context.MasterSchedules.Remove(schedule);
+        await _context.SaveChangesAsync();
     }
     
     public async Task DeleteRangeAsync(List<MasterSchedule> schedules)

@@ -9,6 +9,6 @@ public interface IMasterUnavailabilityRepository
     Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId);
     Task AddAsync(MasterUnavailability unavailability);
     Task UpdateAsync(MasterUnavailability unavailability);
-    Task DeleteAsync(Guid id);
+    Task DeleteAsync(MasterUnavailability unavailability);
     Task DeleteRangeAsync(List<MasterUnavailability> unavailabilities);
 }

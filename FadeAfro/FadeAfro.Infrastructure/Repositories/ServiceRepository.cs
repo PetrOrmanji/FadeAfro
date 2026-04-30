@@ -38,13 +38,9 @@ public class ServiceRepository : IServiceRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Service service)
     {
-        var service = await _context.Services.FindAsync(id);
-        if (service is not null)
-        {
-            _context.Services.Remove(service);
-            await _context.SaveChangesAsync();
-        }
+        _context.Services.Remove(service);
+        await _context.SaveChangesAsync();
     }
 }

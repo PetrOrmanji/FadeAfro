@@ -32,6 +32,6 @@ public class DeleteUnavailabilityHandler : IRequestHandler<DeleteUnavailabilityC
         if (unavailability.MasterProfileId != masterProfile.Id)
             throw new UnavailabilityOfAnotherMasterException();
 
-        await _unavailabilityRepository.DeleteAsync(command.UnavailabilityId);
+        await _unavailabilityRepository.DeleteAsync(unavailability);
     }
 }

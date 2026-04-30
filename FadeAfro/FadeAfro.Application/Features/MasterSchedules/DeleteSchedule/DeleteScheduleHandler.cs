@@ -32,6 +32,6 @@ public class DeleteScheduleHandler : IRequestHandler<DeleteScheduleCommand>
         if (schedule.MasterProfileId != masterProfile.Id)
             throw new ScheduleOfAnotherMasterException();
 
-        await _masterScheduleRepository.DeleteAsync(command.ScheduleId);
+        await _masterScheduleRepository.DeleteAsync(schedule);
     }
 }

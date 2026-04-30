@@ -32,6 +32,6 @@ public class DeleteServiceHandler : IRequestHandler<DeleteServiceCommand>
         if (service.MasterProfileId != masterProfile.Id)
             throw new ServiceFromAnotherMasterException();
 
-        await _serviceRepository.DeleteAsync(command.ServiceId);
+        await _serviceRepository.DeleteAsync(service);
     }
 }

@@ -9,6 +9,6 @@ public interface IMasterScheduleRepository
     Task<MasterSchedule?> GetByMasterProfileIdAndDayAsync(Guid masterProfileId, DayOfWeek dayOfWeek);
     Task AddAsync(MasterSchedule schedule);
     Task UpdateAsync(MasterSchedule schedule);
-    Task DeleteAsync(Guid id);
+    Task DeleteAsync(MasterSchedule schedule);
     Task DeleteRangeAsync(List<MasterSchedule> schedules);
 }
