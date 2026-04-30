@@ -24,7 +24,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master's unavailabilities.")]
+    [SwaggerOperation(Summary = "Get master's unavailabilities")]
     public async Task<IActionResult> GetMasterUnavailabilities(Guid masterProfileId)
     {
         var getMasterUnavailabilitiesQuery = new GetMasterUnavailabilitiesQuery(masterProfileId);
@@ -35,7 +35,7 @@ public class MasterUnavailabilitiesController : ControllerBase
 
     [HttpPost("add/me")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Add my master profile unavailability")]
+    [SwaggerOperation(Summary = "Add my master profile day unavailability")]
     public async Task<IActionResult> AddMyUnavailability([FromBody] AddMasterUnavailabilityRequest request)
     {
         var addUnavailabilityCommand = new AddMasterUnavailabilityCommand(
@@ -48,7 +48,7 @@ public class MasterUnavailabilitiesController : ControllerBase
 
     [HttpDelete("delete/me/{unavailabilityId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Delete my master profile unavailability")]
+    [SwaggerOperation(Summary = "Delete my master profile day unavailability")]
     public async Task<IActionResult> DeleteMyUnavailability(Guid unavailabilityId)
     {
         var deleteUnavailabilityCommand = new DeleteMasterUnavailabilityCommand(

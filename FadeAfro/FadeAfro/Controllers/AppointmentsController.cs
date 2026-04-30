@@ -1,8 +1,8 @@
 using FadeAfro.Application.Features.Appointments.CancelAppointmentByClient;
 using FadeAfro.Application.Features.Appointments.CancelAppointmentByMaster;
 using FadeAfro.Application.Features.Appointments.CreateClientAppointment;
-using FadeAfro.Application.Features.Appointments.GetClientActualAppointments;
-using FadeAfro.Application.Features.Appointments.GetMasterActualAppointments;
+using FadeAfro.Application.Features.Appointments.GetClientActiveAppointments;
+using FadeAfro.Application.Features.Appointments.GetMasterActiveAppointments;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;
 using MediatR;
@@ -30,9 +30,9 @@ public class AppointmentsController : ControllerBase
     [SwaggerOperation(
         Summary = "Get my actual client appointments", 
         Description = "Returns my actual client appointments.")]
-    public async Task<IActionResult> GetMyActualClientAppointments()
+    public async Task<IActionResult> GetMyActiveClientAppointments()
     {
-        var getClientActualAppointmentsQuery = new GetClientActualAppointmentsQuery(User.GetUserId());
+        var getClientActualAppointmentsQuery = new GetClientActiveAppointmentsQuery(User.GetUserId());
         
         var response = await _mediator.Send(getClientActualAppointmentsQuery);
         return Ok(response);
@@ -43,9 +43,9 @@ public class AppointmentsController : ControllerBase
     [SwaggerOperation(
         Summary = "Get my actual master appointments", 
         Description = "Returns my actual master appointments.")]
-    public async Task<IActionResult> GetMyActualMasterAppointments()
+    public async Task<IActionResult> GetMyActiveMasterAppointments()
     {
-        var getMasterActualAppointmentsQuery = new GetMasterActualAppointmentsQuery(User.GetUserId());
+        var getMasterActualAppointmentsQuery = new GetMasterActiveAppointmentsQuery(User.GetUserId());
         
         var response = await _mediator.Send(getMasterActualAppointmentsQuery);
         return Ok(response);
@@ -74,7 +74,7 @@ public class AppointmentsController : ControllerBase
     [SwaggerOperation(
         Summary = "Cancel an appointment by client", 
         Description = "Cancels the appointment on behalf of the client.")]
-    public async Task<IActionResult> CancelMyAppointmentByClient(Guid appointmentId)
+    public async Task<IActionResult> CancelMyAppointmentAsClient(Guid appointmentId)
     {
         var cancelAppointmentByClientCommand = new CancelAppointmentByClientCommand(
             User.GetUserId(),
@@ -89,7 +89,7 @@ public class AppointmentsController : ControllerBase
     [SwaggerOperation(
         Summary = "Cancel an appointment by master", 
         Description = "Cancels the appointment on behalf of the master.")]
-    public async Task<IActionResult> CancelByAppointmentByMaster(Guid appointmentId)
+    public async Task<IActionResult> CancelMyAppointmentAsMaster(Guid appointmentId)
     {
         var cancelAppointmentByClientCommand = new CancelAppointmentByMasterCommand(
             User.GetUserId(),

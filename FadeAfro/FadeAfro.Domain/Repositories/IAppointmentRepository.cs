@@ -6,12 +6,12 @@ public interface IAppointmentRepository
 {
     Task<Appointment?> GetByIdAsync(Guid id);
 
-    Task<IReadOnlyList<Appointment>> GetActualByClientIdAsync(
+    Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,
         bool includeMasterInfo = false);
 
-    Task<IReadOnlyList<Appointment>> GetActualByMasterProfileIdAsync(
+    Task<IReadOnlyList<Appointment>> GetActiveByMasterProfileIdAsync(
         Guid masterProfileId,
         bool includeServices = false,
         bool includeClientInfo = false);

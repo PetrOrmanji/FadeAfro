@@ -20,12 +20,12 @@ public class AppointmentRepository : IAppointmentRepository
         return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetActualByClientIdAsync(
+    public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,
         bool includeMasterInfo = false)
     {
-        var query = GetActualAppointmentsQuery();
+        var query = GetActiveAppointmentsQuery();
         
         if (includeServices)
             query = query.Include(a => a.Services);
@@ -36,12 +36,12 @@ public class AppointmentRepository : IAppointmentRepository
         return await query.Where(a => a.ClientId == clientId).ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetActualByMasterProfileIdAsync(
+    public async Task<IReadOnlyList<Appointment>> GetActiveByMasterProfileIdAsync(
         Guid masterProfileId,
         bool includeServices = false,
         bool includeClientInfo = false)
     {
-        var query = GetActualAppointmentsQuery();
+        var query = GetActiveAppointmentsQuery();
         
         if (includeServices)
             query = query.Include(a => a.Services);
@@ -70,7 +70,7 @@ public class AppointmentRepository : IAppointmentRepository
         await _context.SaveChangesAsync();
     }
     
-    private IQueryable<Appointment> GetActualAppointmentsQuery()
+    private IQueryable<Appointment> GetActiveAppointmentsQuery()
     {
         return _context.Appointments.Where(a => 
             a.Status == AppointmentStatus.Confirmed && 

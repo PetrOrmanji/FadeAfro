@@ -35,7 +35,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpPost("set/me")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Set my master profile schedule")]
+    [SwaggerOperation(Summary = "Set my master profile day schedule")]
     public async Task<IActionResult> SetMasterDaySchedule([FromBody] SetMasterScheduleRequest request)
     {
         var setScheduleCommand = new SetMasterScheduleCommand(
@@ -50,7 +50,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpDelete("delete/me/{scheduleId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Delete my master profile schedule")]
+    [SwaggerOperation(Summary = "Delete my master profile day schedule")]
     public async Task<IActionResult> DeleteMyDaySchedule(Guid scheduleId)
     {
         var deleteScheduleCommand = new DeleteMasterScheduleCommand(

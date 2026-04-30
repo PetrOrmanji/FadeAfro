@@ -104,7 +104,7 @@ public class MasterProfilesController : ControllerBase
     [HttpPost("assign/{userId:guid}")]
     [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(
-        Summary = "Set user as master",
+        Summary = "Assign master role to user",
         Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
     public async Task<IActionResult> AssignMaster(Guid userId)
     {

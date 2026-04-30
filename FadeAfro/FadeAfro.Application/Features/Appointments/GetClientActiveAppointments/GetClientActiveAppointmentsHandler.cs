@@ -2,28 +2,28 @@ using FadeAfro.Application.Features.Appointments.Common;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.Appointments.GetClientActualAppointments;
+namespace FadeAfro.Application.Features.Appointments.GetClientActiveAppointments;
 
-public class GetClientActualAppointmentsHandler : IRequestHandler<GetClientActualAppointmentsQuery, GetClientActualAppointmentsResponse>
+public class GetClientActiveAppointmentsHandler : IRequestHandler<GetClientActiveAppointmentsQuery, GetClientActiveAppointmentsResponse>
 {
     private readonly IAppointmentRepository _appointmentRepository;
 
-    public GetClientActualAppointmentsHandler(IAppointmentRepository appointmentRepository)
+    public GetClientActiveAppointmentsHandler(IAppointmentRepository appointmentRepository)
     {
         _appointmentRepository = appointmentRepository;
     }
 
-    public async Task<GetClientActualAppointmentsResponse> Handle(
-        GetClientActualAppointmentsQuery query, CancellationToken cancellationToken)
+    public async Task<GetClientActiveAppointmentsResponse> Handle(
+        GetClientActiveAppointmentsQuery query, CancellationToken cancellationToken)
     {
-        var actualAppointments = await _appointmentRepository.GetActualByClientIdAsync(
+        var activeAppointments = await _appointmentRepository.GetActiveByClientIdAsync(
             query.ClientId,
             includeServices: true,
             includeMasterInfo: true);
         
         var appointmentDtos = new List<AppointmentDto>();
 
-        foreach (var appointment in actualAppointments)
+        foreach (var appointment in activeAppointments)
         {
             var appointmentServiceDtos = appointment.Services.Select(x =>
                 new AppointmentServiceDto(x.ServiceId, x.ServiceName, x.Price, x.Duration)).ToList();
@@ -45,6 +45,6 @@ public class GetClientActualAppointmentsHandler : IRequestHandler<GetClientActua
             appointmentDtos.Add(appointmentDto);
         }
 
-        return new GetClientActualAppointmentsResponse(appointmentDtos);
+        return new GetClientActiveAppointmentsResponse(appointmentDtos);
     }
 }
