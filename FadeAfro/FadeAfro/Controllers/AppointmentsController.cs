@@ -1,6 +1,6 @@
 using FadeAfro.Application.Features.Appointments.CancelAppointmentByClient;
 using FadeAfro.Application.Features.Appointments.CancelAppointmentByMaster;
-using FadeAfro.Application.Features.Appointments.CreateAppointment;
+using FadeAfro.Application.Features.Appointments.CreateClientAppointment;
 using FadeAfro.Application.Features.Appointments.GetClientActualAppointments;
 using FadeAfro.Application.Features.Appointments.GetMasterActualAppointments;
 using FadeAfro.Domain.Constants;
@@ -56,9 +56,9 @@ public class AppointmentsController : ControllerBase
     [SwaggerOperation(
         Summary = "Create an appointment", 
         Description = "Books a new appointment for the client with the specified master and service.")]
-    public async Task<IActionResult> Create([FromBody] CreateAppointmentRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateClientAppointmentRequest request)
     {
-        var createdAppointmentCommand = new CreateAppointmentCommand(
+        var createdAppointmentCommand = new CreateClientAppointmentCommand(
             User.GetUserId(),
             request.MasterProfileId,
             request.ServiceIds,

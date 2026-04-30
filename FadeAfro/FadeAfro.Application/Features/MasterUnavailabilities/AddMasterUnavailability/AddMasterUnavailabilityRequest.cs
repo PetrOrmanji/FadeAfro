@@ -1,0 +1,3 @@
+namespace FadeAfro.Application.Features.MasterUnavailabilities.AddMasterUnavailability;
+
+public record AddMasterUnavailabilityRequest(DateOnly Date);

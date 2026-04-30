@@ -1,11 +1,11 @@
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.GetMasterProfilePhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
-using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
-using FadeAfro.Application.Features.MasterProfiles.GetMasterPhoto;
 using FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
 using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfileDescription;
+using FadeAfro.Application.Features.MasterProfiles.UploadMasterProfilePhoto;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;
 using MediatR;
@@ -112,7 +112,7 @@ public class MasterProfilesController : ControllerBase
         Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
     public async Task<IActionResult> UploadPhoto(IFormFile file)
     {
-        var uploadMasterPhotoCommand = new UploadMasterPhotoCommand(
+        var uploadMasterPhotoCommand = new UploadMasterProfilePhotoCommand(
             User.GetUserId(),
             file.OpenReadStream(),
             Path.GetExtension(file.FileName),
@@ -127,7 +127,7 @@ public class MasterProfilesController : ControllerBase
     [SwaggerOperation(Summary = "Get master photo", Description = "Returns the photo of the master profile.")]
     public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
     {
-        var getMasterPhotoQuery =  new GetMasterPhotoQuery(masterProfileId);
+        var getMasterPhotoQuery =  new GetMasterProfilePhotoQuery(masterProfileId);
         
         var response = await _mediator.Send(getMasterPhotoQuery);
         return File(response.Stream, response.ContentType);
