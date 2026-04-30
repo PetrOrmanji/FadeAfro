@@ -20,6 +20,12 @@ public class AppointmentRepository : IAppointmentRepository
         return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
     }
 
+    public async Task<bool> HasActiveAppointmentsOnDateAsync(DateOnly date)
+    {
+        return await _context.Appointments.AnyAsync(x => 
+            DateOnly.FromDateTime(x.StartTime) == date && x.Status == AppointmentStatus.Confirmed);
+    }
+
     public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,

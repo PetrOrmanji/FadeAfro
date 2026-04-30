@@ -10,11 +10,16 @@ public class AddMasterUnavailabilityHandler : IRequestHandler<AddMasterUnavailab
 {
     private readonly IMasterUnavailabilityRepository _unavailabilityRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
+    private readonly IAppointmentRepository _appointmentRepository;
 
-    public AddMasterUnavailabilityHandler(IMasterUnavailabilityRepository unavailabilityRepository, IMasterProfileRepository masterProfileRepository)
+    public AddMasterUnavailabilityHandler(
+        IMasterUnavailabilityRepository unavailabilityRepository,
+        IMasterProfileRepository masterProfileRepository,
+        IAppointmentRepository appointmentRepository)
     {
         _unavailabilityRepository = unavailabilityRepository;
         _masterProfileRepository = masterProfileRepository;
+        _appointmentRepository = appointmentRepository;
     }
 
     public async Task Handle(AddMasterUnavailabilityCommand command, CancellationToken cancellationToken)
@@ -29,6 +34,13 @@ public class AddMasterUnavailabilityHandler : IRequestHandler<AddMasterUnavailab
 
         if (dayUnavailability is not null)
             throw new MasterUnavailabilityAlreadyExistsException();
+        
+        var hasActiveAppointmentsOnDate = 
+            await _appointmentRepository.HasActiveAppointmentsOnDateAsync(command.Date);
+
+        if (hasActiveAppointmentsOnDate)
+            throw new MasterUnavailabilityConflictException(
+                "Cannot set unavailability: there are active appointments on the specified date.");
 
         dayUnavailability = new MasterUnavailability(
             masterProfile.Id,
