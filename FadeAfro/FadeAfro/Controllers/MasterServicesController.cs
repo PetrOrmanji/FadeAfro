@@ -25,7 +25,7 @@ public class MasterServicesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master's services")]
+    [SwaggerOperation(Summary = "Get master services")]
     public async Task<IActionResult> GetMasterServices(Guid masterProfileId)
     {
         var getMasterServicesQuery = new GetMasterServicesQuery(masterProfileId);

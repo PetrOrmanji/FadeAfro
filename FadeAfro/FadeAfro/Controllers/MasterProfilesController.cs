@@ -39,7 +39,7 @@ public class MasterProfilesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master's profile")]
+    [SwaggerOperation(Summary = "Get master profile")]
     public async Task<IActionResult> GetMasterProfile(Guid masterProfileId)
     {
         var getMasterProfileQuery = new GetMasterProfileQuery(masterProfileId);

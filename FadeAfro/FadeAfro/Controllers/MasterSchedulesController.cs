@@ -24,7 +24,7 @@ public class MasterSchedulesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get master's schedule")]
+    [SwaggerOperation(Summary = "Get master schedule")]
     public async Task<IActionResult> GetMasterSchedule(Guid masterProfileId)
     {
         var getMasterScheduleQuery = new GetMasterScheduleQuery(masterProfileId);
@@ -35,7 +35,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpPost("set/me")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Set my master profile day schedule")]
+    [SwaggerOperation(Summary = "Set my schedule for a day of week")]
     public async Task<IActionResult> SetMasterDaySchedule([FromBody] SetMasterScheduleRequest request)
     {
         var setScheduleCommand = new SetMasterScheduleCommand(

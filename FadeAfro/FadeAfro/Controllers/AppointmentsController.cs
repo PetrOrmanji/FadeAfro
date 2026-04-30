@@ -28,26 +28,26 @@ public class AppointmentsController : ControllerBase
     [HttpGet("client/get/me/appointments")]
     [Authorize(Roles = Roles.Client)]
     [SwaggerOperation(
-        Summary = "Get my actual client appointments", 
-        Description = "Returns my actual client appointments.")]
+        Summary = "Get my active client appointments", 
+        Description = "Returns my active client appointments.")]
     public async Task<IActionResult> GetMyActiveClientAppointments()
     {
-        var getClientActualAppointmentsQuery = new GetClientActiveAppointmentsQuery(User.GetUserId());
+        var getClientActiveAppointmentsQuery = new GetClientActiveAppointmentsQuery(User.GetUserId());
         
-        var response = await _mediator.Send(getClientActualAppointmentsQuery);
+        var response = await _mediator.Send(getClientActiveAppointmentsQuery);
         return Ok(response);
     }
 
     [HttpGet("master/get/me/appointments")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
-        Summary = "Get my actual master appointments", 
-        Description = "Returns my actual master appointments.")]
+        Summary = "Get my active master appointments", 
+        Description = "Returns my active master appointments.")]
     public async Task<IActionResult> GetMyActiveMasterAppointments()
     {
-        var getMasterActualAppointmentsQuery = new GetMasterActiveAppointmentsQuery(User.GetUserId());
+        var getMasterActiveAppointmentsQuery = new GetMasterActiveAppointmentsQuery(User.GetUserId());
         
-        var response = await _mediator.Send(getMasterActualAppointmentsQuery);
+        var response = await _mediator.Send(getMasterActiveAppointmentsQuery);
         return Ok(response);
     }
 
