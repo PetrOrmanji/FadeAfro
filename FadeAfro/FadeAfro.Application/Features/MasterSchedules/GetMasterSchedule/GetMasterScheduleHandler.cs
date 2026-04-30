@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.MasterSchedules.Common;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using MediatR;
@@ -9,7 +10,9 @@ public class GetMasterScheduleHandler : IRequestHandler<GetMasterScheduleQuery, 
     private readonly IMasterScheduleRepository _masterScheduleRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
 
-    public GetMasterScheduleHandler(IMasterScheduleRepository masterScheduleRepository, IMasterProfileRepository masterProfileRepository)
+    public GetMasterScheduleHandler(
+        IMasterScheduleRepository masterScheduleRepository,
+        IMasterProfileRepository masterProfileRepository)
     {
         _masterScheduleRepository = masterScheduleRepository;
         _masterProfileRepository = masterProfileRepository;
@@ -24,14 +27,19 @@ public class GetMasterScheduleHandler : IRequestHandler<GetMasterScheduleQuery, 
 
         var schedules = await _masterScheduleRepository.GetByMasterProfileIdAsync(query.MasterProfileId);
 
-        var response = schedules
-            .Select(s => new ScheduleResponse(
-                s.Id,
-                s.DayOfWeek,
-                s.StartTime,
-                s.EndTime))
-            .ToList();
+        var scheduleDtos = new List<ScheduleDto>();
 
-        return new GetMasterScheduleResponse(response);
+        foreach (var schedule in schedules)
+        {
+            var scheduleDto = new ScheduleDto(
+                schedule.Id,
+                schedule.DayOfWeek,
+                schedule.StartTime,
+                schedule.EndTime);
+            
+            scheduleDtos.Add(scheduleDto);
+        }
+       
+        return new GetMasterScheduleResponse(scheduleDtos);
     }
 }

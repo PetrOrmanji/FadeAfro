@@ -1,10 +1,5 @@
+using FadeAfro.Application.Features.Services.Common;
+
 namespace FadeAfro.Application.Features.Services.GetMasterServices;
 
-public record ServiceResponse(
-    Guid Id,
-    string Name,
-    string? Description,
-    int Price,
-    TimeSpan Duration);
-
-public record GetMasterServicesResponse(List<ServiceResponse> Services);
+public record GetMasterServicesResponse(List<ServiceDto> Services);

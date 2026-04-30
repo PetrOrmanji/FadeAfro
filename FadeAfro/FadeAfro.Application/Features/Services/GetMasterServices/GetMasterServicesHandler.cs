@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.Services.Common;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using MediatR;
@@ -23,16 +24,21 @@ public class GetMasterServicesHandler : IRequestHandler<GetMasterServicesQuery, 
             throw new MasterProfileNotFoundException();
 
         var services = await _serviceRepository.GetByMasterProfileIdAsync(query.MasterProfileId);
+        
+        var serviceDtos = new List<ServiceDto>();
 
-        var response = services
-            .Select(s => new ServiceResponse(
-                s.Id,
-                s.Name,
-                s.Description,
-                s.Price,
-                s.Duration))
-            .ToList();
-
-        return new GetMasterServicesResponse(response);
+        foreach (var service in services)
+        {
+            var serviceDto = new ServiceDto(
+                service.Id,
+                service.Name,
+                service.Description,
+                service.Price,
+                service.Duration);
+            
+            serviceDtos.Add(serviceDto);
+        }
+        
+        return new GetMasterServicesResponse(serviceDtos);
     }
 }
