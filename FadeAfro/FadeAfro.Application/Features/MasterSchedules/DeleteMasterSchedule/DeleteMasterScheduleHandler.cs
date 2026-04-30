@@ -39,7 +39,7 @@ public class DeleteMasterScheduleHandler : IRequestHandler<DeleteMasterScheduleC
         var scheduleDatesFromToday = GetScheduleDatesFromToday(schedule);
         
         var hasActiveAppointmentsOnDates = 
-            await _appointmentRepository.HasActiveAppointmentsOnDatesAsync(scheduleDatesFromToday);
+            await _appointmentRepository.HasActiveAppointmentsOnDatesAsync(masterProfile.Id, scheduleDatesFromToday);
 
         if (hasActiveAppointmentsOnDates)
             throw new MasterScheduleConflictException(

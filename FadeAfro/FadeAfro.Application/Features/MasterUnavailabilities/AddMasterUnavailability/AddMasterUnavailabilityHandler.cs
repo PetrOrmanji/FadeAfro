@@ -36,7 +36,7 @@ public class AddMasterUnavailabilityHandler : IRequestHandler<AddMasterUnavailab
             throw new MasterUnavailabilityAlreadyExistsException();
         
         var hasActiveAppointmentsOnDate = 
-            await _appointmentRepository.HasActiveAppointmentsOnDateAsync(command.Date);
+            await _appointmentRepository.HasActiveAppointmentsOnDateAsync(masterProfile.Id, command.Date);
 
         if (hasActiveAppointmentsOnDate)
             throw new MasterUnavailabilityConflictException(
