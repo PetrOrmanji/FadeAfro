@@ -19,8 +19,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    [AllowAnonymous]
-    [SwaggerOperation(Summary = "Authenticate via Telegram", Description = "Validates Telegram Mini App initData and returns a JWT token.")]
+    [SwaggerOperation(
+        Summary = "Authenticate via Telegram", 
+        Description = "Validates Telegram Mini App initData and returns a JWT token.")]
     public async Task<IActionResult> Login([FromBody] AuthenticateTelegramUserCommand command)
     {
         var response = await _mediator.Send(command);

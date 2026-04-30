@@ -19,12 +19,12 @@ public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
 
     public async Task Handle(SetAsMasterCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByIdAsync(command.MasterId);
+        var user = await _userRepository.GetByIdAsync(command.UserId);
 
         if (user is null)
             throw new UserNotFoundException();
 
-        var existingProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
+        var existingProfile = await _masterProfileRepository.GetByMasterIdAsync(command.UserId);
 
         if (existingProfile is not null)
             throw new MasterProfileAlreadyExistsException();
@@ -33,7 +33,7 @@ public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
         await _userRepository.UpdateAsync(user);
 
         var masterProfile = new MasterProfile(
-            command.MasterId,
+            command.UserId,
             command.PhotoUrl,
             command.Description);
 

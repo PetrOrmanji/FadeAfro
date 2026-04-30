@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.MasterProfiles.Common;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -15,17 +16,21 @@ public class GetAllMasterProfilesHandler : IRequestHandler<GetAllMasterProfilesQ
     public async Task<GetAllMasterProfilesResponse> Handle(GetAllMasterProfilesQuery query, CancellationToken cancellationToken)
     {
         var masterProfiles = await _masterProfileRepository.GetAllAsync();
+        
+        var masterProfileDtos = new List<MasterProfileDto>();
 
-        var masters = masterProfiles
-            .Select(mp => new MasterProfileResponse(
-                mp.Id,
-                mp.MasterId,
-                mp.Master.FirstName,
-                mp.Master.LastName,
-                mp.PhotoUrl,
-                mp.Description))
-            .ToList();
-
-        return new GetAllMasterProfilesResponse(masters);
+        foreach (var masterProfile in masterProfiles)
+        {
+            var masterProfileDto = new MasterProfileDto(
+                masterProfile.Id,
+                masterProfile.Master.FirstName,
+                masterProfile.Master.LastName,
+                masterProfile.PhotoUrl,
+                masterProfile.Description);
+            
+            masterProfileDtos.Add(masterProfileDto);
+        }
+        
+        return new GetAllMasterProfilesResponse(masterProfileDtos);
     }
 }

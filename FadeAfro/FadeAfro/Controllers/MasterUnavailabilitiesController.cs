@@ -36,7 +36,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     }
 
     [HttpPost("add")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Add master's unavailability", 
         Description = "Marks a date (or time range within a date) as unavailable for the master profile.")]
@@ -51,7 +51,7 @@ public class MasterUnavailabilitiesController : ControllerBase
     }
 
     [HttpDelete("delete/{unavailabilityId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Delete master's unavailability", 
         Description = "Deletes the unavailability entry with the given ID.")]

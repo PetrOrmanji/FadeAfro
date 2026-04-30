@@ -1,11 +1,5 @@
+using FadeAfro.Application.Features.MasterProfiles.Common;
+
 namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 
-public record MasterProfileResponse(
-    Guid Id,
-    Guid MasterId,
-    string FirstName,
-    string? LastName,
-    string? PhotoUrl,
-    string? Description);
-
-public record GetAllMasterProfilesResponse(List<MasterProfileResponse> Masters);
+public record GetAllMasterProfilesResponse(List<MasterProfileDto> Masters);

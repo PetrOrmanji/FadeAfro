@@ -37,7 +37,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPost("add")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Add a service",
         Description = "Adds a new service to the master profile.")]
@@ -55,7 +55,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPut("update/{serviceId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Update a master's service", 
         Description = "Updates name, description, price and duration of the master's service.")]
@@ -74,7 +74,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpDelete("delete/{serviceId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Delete a master's service",
         Description = "Deletes the master's service with the given ID.")]

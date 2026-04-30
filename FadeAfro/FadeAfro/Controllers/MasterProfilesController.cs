@@ -29,7 +29,7 @@ public class MasterProfilesController : ControllerBase
     }
     
     [HttpGet("my")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Get my master profile", 
         Description = "Returns the master profile of the currently authenticated master.")]
@@ -91,7 +91,7 @@ public class MasterProfilesController : ControllerBase
     }
 
     [HttpPut("update-description")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Update master profile description", 
         Description = "Updates description of the master profile.")]
@@ -106,7 +106,7 @@ public class MasterProfilesController : ControllerBase
     }
     
     [HttpPost("upload-photo")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Upload master photo",
         Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]

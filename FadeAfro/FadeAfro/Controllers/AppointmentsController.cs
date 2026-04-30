@@ -26,10 +26,10 @@ public class AppointmentsController : ControllerBase
     }
     
     [HttpGet("get-actual-client-appointments")]
-    [Authorize(Roles = Roles.ClientOrOwner)]
+    [Authorize(Roles = Roles.Client)]
     [SwaggerOperation(
         Summary = "Get actual client appointments", 
-        Description = "Returns acutal client appointments.")]
+        Description = "Returns actual client appointments.")]
     public async Task<IActionResult> GetActualClientAppointments()
     {
         var getClientActualAppointmentsQuery = new GetClientActualAppointmentsQuery(User.GetUserId());
@@ -39,7 +39,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet("get-actual-master-appointments")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Get actual master appointments", 
         Description = "Returns actual master appointments.")]
@@ -85,7 +85,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpPatch("cancel-by-master/{appointmentId:guid}")]
-    [Authorize(Roles = Roles.MasterOrOwner)]
+    [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Cancel an appointment by master", 
         Description = "Cancels the appointment on behalf of the master.")]
