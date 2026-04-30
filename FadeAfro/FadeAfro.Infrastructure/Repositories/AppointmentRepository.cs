@@ -26,6 +26,12 @@ public class AppointmentRepository : IAppointmentRepository
             DateOnly.FromDateTime(x.StartTime) == date && x.Status == AppointmentStatus.Confirmed);
     }
 
+    public async Task<bool> HasActiveAppointmentsOnDatesAsync(List<DateOnly> dates)
+    {
+        return await _context.Appointments.AnyAsync(x => 
+            dates.Contains(DateOnly.FromDateTime(x.StartTime)) && x.Status == AppointmentStatus.Confirmed);
+    }
+
     public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,

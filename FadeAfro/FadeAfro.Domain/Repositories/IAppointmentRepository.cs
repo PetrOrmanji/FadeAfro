@@ -7,6 +7,8 @@ public interface IAppointmentRepository
     Task<Appointment?> GetByIdAsync(Guid id);
 
     Task<bool> HasActiveAppointmentsOnDateAsync(DateOnly date);
+    
+    Task<bool> HasActiveAppointmentsOnDatesAsync(List<DateOnly> dates);
 
     Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
