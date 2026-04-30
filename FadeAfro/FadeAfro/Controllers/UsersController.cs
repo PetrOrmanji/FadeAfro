@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
         return Ok(response);
     }
     
-    [HttpPost("update-current-user-full-name")]
+    [HttpPut("update-current-user-full-name")]
     [Authorize]
     [SwaggerOperation(Summary = "Update the first and last name of the user")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)

@@ -24,10 +24,8 @@ public class ServicesController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(
-        Summary = "Get services by master profile ID", 
-        Description = "Returns all services of the given master profile.")]
+    [HttpGet("get-master-services/{masterProfileId:guid}")]
+    [SwaggerOperation(Summary = "Get master's services")]
     public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
     {
         var getMasterServicesQuery = new GetMasterServicesQuery(masterProfileId);
@@ -36,11 +34,9 @@ public class ServicesController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("add")]
+    [HttpPost("add-master-service")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(
-        Summary = "Add a service",
-        Description = "Adds a new service to the master profile.")]
+    [SwaggerOperation(Summary = "Add a new master's service")]
     public async Task<IActionResult> Add([FromBody] AddServiceRequest request)
     {
         var addServiceCommand = new AddServiceCommand(
@@ -54,11 +50,9 @@ public class ServicesController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("update/{serviceId:guid}")]
+    [HttpPut("update-master-service/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(
-        Summary = "Update a master's service", 
-        Description = "Updates name, description, price and duration of the master's service.")]
+    [SwaggerOperation(Summary = "Update master's service")]
     public async Task<IActionResult> Update(Guid serviceId, [FromBody] UpdateServiceRequest request)
     {
         var updateServiceCommand = new UpdateServiceCommand(
@@ -73,11 +67,9 @@ public class ServicesController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("delete/{serviceId:guid}")]
+    [HttpDelete("delete-master-service/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(
-        Summary = "Delete a master's service",
-        Description = "Deletes the master's service with the given ID.")]
+    [SwaggerOperation(Summary = "Delete master's service")]
     public async Task<IActionResult> Delete(Guid serviceId)
     {
         var deleteServiceCommand = new DeleteServiceCommand(
