@@ -1,4 +1,4 @@
-namespace FadeAfro.Application.Features.Users.GetCurrentUser;
+namespace FadeAfro.Application.Features.Users.GetUser;
 
 public record GetUserResponse(
     Guid Id,

@@ -1,5 +1,5 @@
 using FadeAfro.Application.Features.Users.GetAllUsers;
-using FadeAfro.Application.Features.Users.GetCurrentUser;
+using FadeAfro.Application.Features.Users.GetUser;
 using FadeAfro.Application.Features.Users.UpdateUserName;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;

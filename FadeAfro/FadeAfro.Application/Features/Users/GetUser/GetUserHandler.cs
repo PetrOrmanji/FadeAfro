@@ -2,7 +2,7 @@ using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.Users.GetCurrentUser;
+namespace FadeAfro.Application.Features.Users.GetUser;
 
 public class GetUserHandler : IRequestHandler<GetUserQuery, GetUserResponse>
 {
