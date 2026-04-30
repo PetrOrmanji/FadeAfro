@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace FadeAfro.Application.Features.Users.UpdateUserName;
+namespace FadeAfro.Application.Features.Users.UpdateUserFullName;
 
 public record UpdateUserFullNameCommand(
     Guid UserId,

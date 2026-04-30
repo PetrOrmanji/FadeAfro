@@ -2,7 +2,7 @@ using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.Users.UpdateUserName;
+namespace FadeAfro.Application.Features.Users.UpdateUserFullName;
 
 public class UpdateUserFullNameHandler : IRequestHandler<UpdateUserFullNameCommand>
 {
