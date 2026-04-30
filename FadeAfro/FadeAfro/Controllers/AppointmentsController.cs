@@ -25,11 +25,11 @@ public class AppointmentsController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("get-actual-client-appointments")]
+    [HttpGet("client/get/me/appointments")]
     [Authorize(Roles = Roles.Client)]
     [SwaggerOperation(
-        Summary = "Get actual client appointments", 
-        Description = "Returns actual client appointments.")]
+        Summary = "Get my actual client appointments", 
+        Description = "Returns my actual client appointments.")]
     public async Task<IActionResult> GetActualClientAppointments()
     {
         var getClientActualAppointmentsQuery = new GetClientActualAppointmentsQuery(User.GetUserId());
@@ -38,11 +38,11 @@ public class AppointmentsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("get-actual-master-appointments")]
+    [HttpGet("master/get/me/appointments")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
-        Summary = "Get actual master appointments", 
-        Description = "Returns actual master appointments.")]
+        Summary = "Get my actual master appointments", 
+        Description = "Returns my actual master appointments.")]
     public async Task<IActionResult> GetActualMasterAppointments()
     {
         var getMasterActualAppointmentsQuery = new GetMasterActualAppointmentsQuery(User.GetUserId());
@@ -51,7 +51,7 @@ public class AppointmentsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("create")]
+    [HttpPost("client/me/book")]
     [Authorize(Roles = Roles.Client)]
     [SwaggerOperation(
         Summary = "Create an appointment", 
@@ -69,7 +69,7 @@ public class AppointmentsController : ControllerBase
         return Ok();
     }
     
-    [HttpPatch("cancel-by-client/{appointmentId:guid}")]
+    [HttpPatch("client/cancel/me/{appointmentId:guid}")]
     [Authorize(Roles = Roles.Client)]
     [SwaggerOperation(
         Summary = "Cancel an appointment by client", 
@@ -84,7 +84,7 @@ public class AppointmentsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("cancel-by-master/{appointmentId:guid}")]
+    [HttpPatch("master/cancel/me/{appointmentId:guid}")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
         Summary = "Cancel an appointment by master", 

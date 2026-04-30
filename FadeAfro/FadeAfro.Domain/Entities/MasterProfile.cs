@@ -12,7 +12,7 @@ public class MasterProfile : Entity
     public ICollection<Appointment> Appointments { get; private set; } = [];
     public ICollection<MasterUnavailability> Unavailabilities { get; private set; } = [];
 
-    public MasterProfile(Guid masterId, string? photoUrl, string? description)
+    public MasterProfile(Guid masterId, string? photoUrl = null, string? description = null)
     {
         MasterId = masterId;
         PhotoUrl = photoUrl;

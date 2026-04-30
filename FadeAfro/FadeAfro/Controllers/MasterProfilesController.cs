@@ -28,11 +28,29 @@ public class MasterProfilesController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("my")]
+    [HttpGet("get/all")]
+    [SwaggerOperation(Summary = "Get all master profiles")]
+    public async Task<IActionResult> GetAll()
+    {
+        var getAllMasterProfilesQuery = new GetAllMasterProfilesQuery();
+        
+        var response = await _mediator.Send(getAllMasterProfilesQuery);
+        return Ok(response);
+    }
+    
+    [HttpGet("get/{masterProfileId:guid}")]
+    [SwaggerOperation(Summary = "Get master's profile")]
+    public async Task<IActionResult> GetById(Guid masterProfileId)
+    {
+        var getMasterProfileQuery = new GetMasterProfileQuery(masterProfileId);
+        
+        var response = await _mediator.Send(getMasterProfileQuery);
+        return Ok(response);
+    }
+    
+    [HttpGet("get/me")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(
-        Summary = "Get my master profile", 
-        Description = "Returns the master profile of the currently authenticated master.")]
+    [SwaggerOperation(Summary = "Get my master profile")]
     public async Task<IActionResult> GetMy()
     {
         var getMyMasterProfileQuery = new GetMyMasterProfileQuery(
@@ -42,59 +60,20 @@ public class MasterProfilesController : ControllerBase
         return Ok(response);
     }
     
-    [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(
-        Summary = "Get master profile by ID",
-        Description = "Returns a master profile with the given ID.")]
-    public async Task<IActionResult> GetById(Guid masterProfileId)
+    [HttpGet("get/{masterProfileId:guid}/photo")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Get master profile photo")]
+    public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
     {
-        var getMasterProfileQuery = new GetMasterProfileQuery(masterProfileId);
+        var getMasterPhotoQuery =  new GetMasterProfilePhotoQuery(masterProfileId);
         
-        var response = await _mediator.Send(getMasterProfileQuery);
-        return Ok(response);
+        var response = await _mediator.Send(getMasterPhotoQuery);
+        return File(response.Stream, response.ContentType);
     }
     
-    [HttpGet("all")]
-    [SwaggerOperation(
-        Summary = "Get all master profiles", 
-        Description = "Returns a list of all master profiles.")]
-    public async Task<IActionResult> GetAll()
-    {
-        var getAllMasterProfilesQuery = new GetAllMasterProfilesQuery();
-        
-        var response = await _mediator.Send(getAllMasterProfilesQuery);
-        return Ok(response);
-    }
-
-    [HttpPost("set-as-master")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(
-        Summary = "Set user as master",
-        Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
-    public async Task<IActionResult> Create([FromBody] SetAsMasterCommand command)
-    {
-        await _mediator.Send(command);
-        return Ok();
-    }
-    
-    [HttpDelete("dismiss-master/{userId:guid}")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(
-        Summary = "Dismiss master",
-        Description = "Revokes the Master role and deletes the master profile.")]
-    public async Task<IActionResult> Dismiss(Guid userId)
-    {
-        var dismissMasterCommand = new DismissMasterCommand(userId);
-        
-        await _mediator.Send(dismissMasterCommand);
-        return NoContent();
-    }
-
-    [HttpPut("update-description")]
+    [HttpPut("update/me/description")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(
-        Summary = "Update master profile description", 
-        Description = "Updates description of the master profile.")]
+    [SwaggerOperation(Summary = "Update my master profile description")]
     public async Task<IActionResult> Update([FromBody] UpdateMasterProfileDescriptionRequest request)
     {
         var updateMasterProfileDescriptionCommand = new UpdateMasterProfileDescriptionCommand(
@@ -105,10 +84,10 @@ public class MasterProfilesController : ControllerBase
         return NoContent();
     }
     
-    [HttpPost("upload-photo")]
+    [HttpPost("upload/me/photo")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(
-        Summary = "Upload master photo",
+        Summary = "Upload my master profile photo",
         Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
     public async Task<IActionResult> UploadPhoto(IFormFile file)
     {
@@ -122,14 +101,29 @@ public class MasterProfilesController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("get-photo/{masterProfileId:guid}")]
-    [AllowAnonymous]
-    [SwaggerOperation(Summary = "Get master photo", Description = "Returns the photo of the master profile.")]
-    public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
+    [HttpPost("assign/{userId:guid}")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(
+        Summary = "Set user as master",
+        Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
+    public async Task<IActionResult> Create(Guid userId)
     {
-        var getMasterPhotoQuery =  new GetMasterProfilePhotoQuery(masterProfileId);
+        var setAsMasterCommand = new SetAsMasterCommand(userId);
         
-        var response = await _mediator.Send(getMasterPhotoQuery);
-        return File(response.Stream, response.ContentType);
+        await _mediator.Send(setAsMasterCommand);
+        return Ok();
+    }
+    
+    [HttpDelete("dismiss/{masterId:guid}")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(
+        Summary = "Dismiss master",
+        Description = "Revokes the Master role and deletes the master profile.")]
+    public async Task<IActionResult> Dismiss(Guid masterId)
+    {
+        var dismissMasterCommand = new DismissMasterCommand(masterId);
+        
+        await _mediator.Send(dismissMasterCommand);
+        return NoContent();
     }
 }

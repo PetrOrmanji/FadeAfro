@@ -22,7 +22,7 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("get-all")]
+    [HttpGet("get/all")]
     [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Get all users (paged)")]
     public async Task<IActionResult> GetAll([FromQuery] GetAllUsersQuery query)
@@ -31,9 +31,9 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("get-my")]
+    [HttpGet("get/me")]
     [Authorize]
-    [SwaggerOperation(Summary = "Get current user info")]
+    [SwaggerOperation(Summary = "Get my user info")]
     public async Task<IActionResult> GetMe() 
     {
         var getUserQuery = new GetUserQuery(User.GetUserId());
@@ -42,9 +42,9 @@ public class UsersController : ControllerBase
         return Ok(response);
     }
     
-    [HttpPut("update-my-full-name")]
+    [HttpPut("update/me/full-name")]
     [Authorize]
-    [SwaggerOperation(Summary = "Update the first and last name of the user")]
+    [SwaggerOperation(Summary = "Update my first and last name")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
     {
         var updateUserFullNameCommand = new UpdateUserFullNameCommand(

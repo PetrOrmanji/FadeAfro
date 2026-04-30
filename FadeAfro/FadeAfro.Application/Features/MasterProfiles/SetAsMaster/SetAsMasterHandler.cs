@@ -32,10 +32,7 @@ public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
         user.AssignMasterRole();
         await _userRepository.UpdateAsync(user);
 
-        var masterProfile = new MasterProfile(
-            command.UserId,
-            command.PhotoUrl,
-            command.Description);
+        var masterProfile = new MasterProfile(command.UserId);
 
         await _masterProfileRepository.AddAsync(masterProfile);
     }

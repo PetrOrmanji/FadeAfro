@@ -34,9 +34,9 @@ public class MasterServicesController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("add")]
+    [HttpPost("add/me")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Add master's service")]
+    [SwaggerOperation(Summary = "Add my master profile service")]
     public async Task<IActionResult> Add([FromBody] AddMasterServiceRequest request)
     {
         var addServiceCommand = new AddMasterServiceCommand(
@@ -50,9 +50,9 @@ public class MasterServicesController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("update/{serviceId:guid}")]
+    [HttpPut("update/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Update master's service")]
+    [SwaggerOperation(Summary = "Update my master profile service")]
     public async Task<IActionResult> Update(Guid serviceId, [FromBody] UpdateMasterServiceRequest request)
     {
         var updateServiceCommand = new UpdateMasterServiceCommand(
@@ -67,9 +67,9 @@ public class MasterServicesController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("delete/{serviceId:guid}")]
+    [HttpDelete("delete/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Delete master's service")]
+    [SwaggerOperation(Summary = "Delete my master profile service")]
     public async Task<IActionResult> Delete(Guid serviceId)
     {
         var deleteServiceCommand = new DeleteMasterServiceCommand(
