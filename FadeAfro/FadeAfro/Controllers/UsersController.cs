@@ -21,12 +21,19 @@ public class UsersController : ControllerBase
     {
         _mediator = mediator;
     }
+    
+    [HttpGet("get-all-users")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Get all users (paged)")]
+    public async Task<IActionResult> GetAll([FromQuery] GetAllUsersQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
 
-    [HttpGet("me")]
+    [HttpGet("get-current-user")]
     [Authorize]
-    [SwaggerOperation(
-        Summary = "Get current user info", 
-        Description = "Returns the currently authenticated user's name.")]
+    [SwaggerOperation(Summary = "Get current user info")]
     public async Task<IActionResult> GetMe() 
     {
         var getUserQuery = new GetUserQuery(User.GetUserId());
@@ -35,25 +42,9 @@ public class UsersController : ControllerBase
         return Ok(response);
     }
     
-    [HttpGet("all")]
-    [Authorize(Roles = Roles.Owner)]
-    [SwaggerOperation(Summary = "Get all users (paged)")]
-    public async Task<IActionResult> GetAll([FromQuery] GetAllUsersRequest request)
-    {
-        var getAllUsersQuery = new GetAllUsersQuery(
-            request.Page,
-            request.PageSize,
-            request.Search);
-        
-        var result = await _mediator.Send(getAllUsersQuery);
-        return Ok(result);
-    }
-
-    [HttpPut("update-full-name")]
+    [HttpPost("update-current-user-full-name")]
     [Authorize]
-    [SwaggerOperation(
-        Summary = "Update user's full name", 
-        Description = "Updates the first and last name of the currently authenticated user.")]
+    [SwaggerOperation(Summary = "Update the first and last name of the user")]
     public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
     {
         var updateUserFullNameCommand = new UpdateUserFullNameCommand(
