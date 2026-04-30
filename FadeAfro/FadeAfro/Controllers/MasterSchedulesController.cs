@@ -24,7 +24,7 @@ public class MasterSchedulesController : ControllerBase
     }
     
     [HttpGet("get/{masterProfileId:guid}")]
-    [SwaggerOperation(Summary = "Get schedule by master profile ID", Description = "Returns all schedule entries for the given master profile.")]
+    [SwaggerOperation(Summary = "Get master's schedule")]
     public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
     {
         var getMasterScheduleQuery = new GetMasterScheduleQuery(masterProfileId);
@@ -35,7 +35,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpPost("set")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Set master's schedule", Description = "Sets a working schedule for a specific day of week for the master profile.")]
+    [SwaggerOperation(Summary = "Set master's schedule")]
     public async Task<IActionResult> Set([FromBody] SetMasterScheduleRequest request)
     {
         var setScheduleCommand = new SetMasterScheduleCommand(
@@ -50,7 +50,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpDelete("delete/{scheduleId:guid}")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Delete master's schedule entry", Description = "Deletes master's schedule entry with the given ID.")]
+    [SwaggerOperation(Summary = "Delete master's schedule")]
     public async Task<IActionResult> Delete(Guid scheduleId)
     {
         var deleteScheduleCommand = new DeleteMasterScheduleCommand(

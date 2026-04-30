@@ -36,7 +36,7 @@ public class MasterServicesController : ControllerBase
 
     [HttpPost("add")]
     [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Add a new master's service")]
+    [SwaggerOperation(Summary = "Add master's service")]
     public async Task<IActionResult> Add([FromBody] AddMasterServiceRequest request)
     {
         var addServiceCommand = new AddMasterServiceCommand(

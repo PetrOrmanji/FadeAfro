@@ -23,7 +23,7 @@ public class MasterUnavailabilitiesController : ControllerBase
         _mediator = mediator;
     }
     
-    [HttpGet("get-master-unavailabilities/{masterProfileId:guid}")]
+    [HttpGet("get/{masterProfileId:guid}")]
     [SwaggerOperation(Summary = "Get master's unavailabilities.")]
     public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
     {
@@ -33,7 +33,7 @@ public class MasterUnavailabilitiesController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("add-master-unavailability")]
+    [HttpPost("add")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Add master's unavailability")]
     public async Task<IActionResult> Add([FromBody] AddMasterUnavailabilityRequest request)
@@ -46,7 +46,7 @@ public class MasterUnavailabilitiesController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("delete-master-unavailability/{unavailabilityId:guid}")]
+    [HttpDelete("delete/{unavailabilityId:guid}")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Delete master's unavailability")]
     public async Task<IActionResult> Delete(Guid unavailabilityId)
