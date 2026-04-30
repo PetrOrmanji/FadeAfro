@@ -1,0 +1,3 @@
+namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfileDescription;
+
+public record UpdateMasterProfileDescriptionRequest(string? Description);

@@ -1,11 +1,11 @@
-using FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
-using FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
+using FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
-using FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterPhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterPhoto;
+using FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
+using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfileDescription;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;
 using MediatR;

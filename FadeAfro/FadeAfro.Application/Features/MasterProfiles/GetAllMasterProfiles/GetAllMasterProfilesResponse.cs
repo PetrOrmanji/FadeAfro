@@ -1,4 +1,4 @@
-namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
+namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 
 public record MasterProfileResponse(
     Guid Id,

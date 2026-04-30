@@ -4,7 +4,7 @@ using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.MasterProfiles.CreateMasterProfile;
+namespace FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
 
 public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
 {

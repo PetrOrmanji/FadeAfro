@@ -1,7 +1,7 @@
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasters;
+namespace FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 
 public class GetAllMasterProfilesHandler : IRequestHandler<GetAllMasterProfilesQuery, GetAllMasterProfilesResponse>
 {

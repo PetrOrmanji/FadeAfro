@@ -2,7 +2,7 @@ using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterDescription;
+namespace FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfileDescription;
 
 public class UpdateMasterProfileDescriptionHandler : IRequestHandler<UpdateMasterProfileDescriptionCommand>
 {
