@@ -31,12 +31,12 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.HasOne(a => a.Client)
             .WithMany(u => u.Appointments)
             .HasForeignKey(a => a.ClientId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(a => a.MasterProfile)
             .WithMany(mp => mp.Appointments)
             .HasForeignKey(a => a.MasterProfileId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(a => a.Services)
             .WithOne(s => s.Appointment)

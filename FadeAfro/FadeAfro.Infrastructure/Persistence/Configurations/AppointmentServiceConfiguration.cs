@@ -31,6 +31,6 @@ public class AppointmentServiceConfiguration : IEntityTypeConfiguration<Appointm
         builder.HasOne(s => s.Service)
             .WithMany(s => s.AppointmentServices)
             .HasForeignKey(s => s.ServiceId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
