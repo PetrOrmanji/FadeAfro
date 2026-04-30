@@ -26,7 +26,7 @@ public class MasterServicesController : ControllerBase
     
     [HttpGet("get/{masterProfileId:guid}")]
     [SwaggerOperation(Summary = "Get master's services")]
-    public async Task<IActionResult> GetByMasterProfileId(Guid masterProfileId)
+    public async Task<IActionResult> GetMasterServices(Guid masterProfileId)
     {
         var getMasterServicesQuery = new GetMasterServicesQuery(masterProfileId);
         
@@ -37,7 +37,7 @@ public class MasterServicesController : ControllerBase
     [HttpPost("add/me")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Add my master profile service")]
-    public async Task<IActionResult> Add([FromBody] AddMasterServiceRequest request)
+    public async Task<IActionResult> AddMyService([FromBody] AddMasterServiceRequest request)
     {
         var addServiceCommand = new AddMasterServiceCommand(
             User.GetUserId(),
@@ -53,7 +53,7 @@ public class MasterServicesController : ControllerBase
     [HttpPut("update/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Update my master profile service")]
-    public async Task<IActionResult> Update(Guid serviceId, [FromBody] UpdateMasterServiceRequest request)
+    public async Task<IActionResult> UpdateMyService(Guid serviceId, [FromBody] UpdateMasterServiceRequest request)
     {
         var updateServiceCommand = new UpdateMasterServiceCommand(
             User.GetUserId(),
@@ -70,7 +70,7 @@ public class MasterServicesController : ControllerBase
     [HttpDelete("delete/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Delete my master profile service")]
-    public async Task<IActionResult> Delete(Guid serviceId)
+    public async Task<IActionResult> DeleteMyService(Guid serviceId)
     {
         var deleteServiceCommand = new DeleteMasterServiceCommand(
             User.GetUserId(),

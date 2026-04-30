@@ -45,7 +45,7 @@ public class UsersController : ControllerBase
     [HttpPut("update/me/full-name")]
     [Authorize]
     [SwaggerOperation(Summary = "Update my first and last name")]
-    public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameRequest request)
+    public async Task<IActionResult> UpdateMyFullName([FromBody] UpdateUserFullNameRequest request)
     {
         var updateUserFullNameCommand = new UpdateUserFullNameCommand(
             User.GetUserId(), 

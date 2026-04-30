@@ -30,7 +30,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpGet("get/all")]
     [SwaggerOperation(Summary = "Get all master profiles")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetMasterProfiles()
     {
         var getAllMasterProfilesQuery = new GetAllMasterProfilesQuery();
         
@@ -40,7 +40,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpGet("get/{masterProfileId:guid}")]
     [SwaggerOperation(Summary = "Get master's profile")]
-    public async Task<IActionResult> GetById(Guid masterProfileId)
+    public async Task<IActionResult> GetMasterProfile(Guid masterProfileId)
     {
         var getMasterProfileQuery = new GetMasterProfileQuery(masterProfileId);
         
@@ -51,7 +51,7 @@ public class MasterProfilesController : ControllerBase
     [HttpGet("get/me")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Get my master profile")]
-    public async Task<IActionResult> GetMy()
+    public async Task<IActionResult> GetMyMasterProfile()
     {
         var getMyMasterProfileQuery = new GetMyMasterProfileQuery(
             User.GetUserId());
@@ -74,7 +74,7 @@ public class MasterProfilesController : ControllerBase
     [HttpPut("update/me/description")]
     [Authorize(Roles = Roles.Master)]
     [SwaggerOperation(Summary = "Update my master profile description")]
-    public async Task<IActionResult> Update([FromBody] UpdateMasterProfileDescriptionRequest request)
+    public async Task<IActionResult> UpdateMyMasterProfile([FromBody] UpdateMasterProfileDescriptionRequest request)
     {
         var updateMasterProfileDescriptionCommand = new UpdateMasterProfileDescriptionCommand(
             User.GetUserId(),
@@ -89,7 +89,7 @@ public class MasterProfilesController : ControllerBase
     [SwaggerOperation(
         Summary = "Upload my master profile photo",
         Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
-    public async Task<IActionResult> UploadPhoto(IFormFile file)
+    public async Task<IActionResult> UploadMyMasterProfilePhoto(IFormFile file)
     {
         var uploadMasterPhotoCommand = new UploadMasterProfilePhotoCommand(
             User.GetUserId(),
@@ -106,7 +106,7 @@ public class MasterProfilesController : ControllerBase
     [SwaggerOperation(
         Summary = "Set user as master",
         Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
-    public async Task<IActionResult> Create(Guid userId)
+    public async Task<IActionResult> AssignMaster(Guid userId)
     {
         var setAsMasterCommand = new SetAsMasterCommand(userId);
         
@@ -119,7 +119,7 @@ public class MasterProfilesController : ControllerBase
     [SwaggerOperation(
         Summary = "Dismiss master",
         Description = "Revokes the Master role and deletes the master profile.")]
-    public async Task<IActionResult> Dismiss(Guid masterId)
+    public async Task<IActionResult> DismissMaster(Guid masterId)
     {
         var dismissMasterCommand = new DismissMasterCommand(masterId);
         
