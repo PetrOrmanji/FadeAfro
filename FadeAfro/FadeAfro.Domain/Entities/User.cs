@@ -12,6 +12,7 @@ public class User : Entity
     public List<Role> Roles { get; private set; }
 
     public ICollection<Appointment> Appointments { get; private set; } = [];
+    public ICollection<Notification> Notifications { get; private set; } = [];
 
     public User(long telegramId, string firstName, string? lastName, string? username, List<Role> roles)
     {

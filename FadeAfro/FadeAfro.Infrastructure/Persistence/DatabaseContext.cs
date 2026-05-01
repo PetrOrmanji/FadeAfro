@@ -16,6 +16,7 @@ public class DatabaseContext : DbContext
     public DbSet<MasterUnavailability> MasterUnavailabilities => Set<MasterUnavailability>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<AppointmentService> AppointmentServices => Set<AppointmentService>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

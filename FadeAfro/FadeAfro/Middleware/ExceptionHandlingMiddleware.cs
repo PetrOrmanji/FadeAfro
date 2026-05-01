@@ -7,6 +7,7 @@ using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
 using FadeAfro.Domain.Exceptions.MasterService;
 using FadeAfro.Domain.Exceptions.MasterUnavailability;
+using FadeAfro.Domain.Exceptions.Notification;
 using FadeAfro.Domain.Exceptions.User;
 
 namespace FadeAfro.Middleware;
@@ -74,7 +75,8 @@ public class ExceptionHandlingMiddleware
             InvalidMasterServiceDurationException or
             InvalidAppointmentTimeException or
             InvalidAppointmentStatusException or
-            InvalidMasterScheduleTimeException
+            InvalidMasterScheduleTimeException or
+            InvalidNotificationTextException
                 => (HttpStatusCode.BadRequest, exception.Message),
 
             DomainException => (HttpStatusCode.BadRequest, exception.Message),
