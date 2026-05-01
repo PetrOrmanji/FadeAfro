@@ -24,5 +24,4 @@ public interface IAppointmentRepository
             
     Task AddAsync(Appointment appointment);
     Task UpdateAsync(Appointment appointment);
-    Task UpdateRangeAsync(IEnumerable<Appointment> appointments);
 }

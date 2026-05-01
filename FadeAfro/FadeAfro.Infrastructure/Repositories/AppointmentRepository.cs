@@ -88,12 +88,6 @@ public class AppointmentRepository : IAppointmentRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateRangeAsync(IEnumerable<Appointment> appointments)
-    {
-        _context.Appointments.UpdateRange(appointments);
-        await _context.SaveChangesAsync();
-    }
-    
     private IQueryable<Appointment> GetActiveAppointmentsQuery()
     {
         return _context.Appointments.Where(a => 

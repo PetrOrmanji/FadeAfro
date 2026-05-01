@@ -10,5 +10,4 @@ public interface IMasterScheduleRepository
     Task AddAsync(MasterSchedule schedule);
     Task UpdateAsync(MasterSchedule schedule);
     Task DeleteAsync(MasterSchedule schedule);
-    Task DeleteRangeAsync(List<MasterSchedule> schedules);
 }
