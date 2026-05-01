@@ -1,5 +1,4 @@
 using FadeAfro.Domain.Entities;
-using FadeAfro.Domain.Enums;
 using FadeAfro.Domain.Repositories;
 using FadeAfro.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,22 +23,19 @@ public class AppointmentRepository : IAppointmentRepository
     {
         return await _context.Appointments.AnyAsync(x => 
             x.MasterProfileId == masterProfileId &&
-            DateOnly.FromDateTime(x.StartTime) == date && 
-            x.Status == AppointmentStatus.Confirmed);
+            DateOnly.FromDateTime(x.StartTime) == date);
     }
 
     public async Task<bool> HasActiveAppointmentsOnDatesAsync(Guid masterProfileId, List<DateOnly> dates)
     {
         return await _context.Appointments.AnyAsync(x => 
             x.MasterProfileId == masterProfileId &&
-            dates.Contains(DateOnly.FromDateTime(x.StartTime)) && 
-            x.Status == AppointmentStatus.Confirmed);
+            dates.Contains(DateOnly.FromDateTime(x.StartTime)));
     }
 
     public async Task<bool> HasActiveAppointmentsForServiceAsync(Guid serviceId)
     {
         return await _context.Appointments.AnyAsync(x =>
-            x.Status == AppointmentStatus.Confirmed &&
             x.StartTime > DateTime.UtcNow &&
             x.Services.Any(y => y.ServiceId == serviceId));
     }
@@ -91,7 +87,6 @@ public class AppointmentRepository : IAppointmentRepository
     private IQueryable<Appointment> GetActiveAppointmentsQuery()
     {
         return _context.Appointments.Where(a => 
-            a.Status == AppointmentStatus.Confirmed && 
             a.EndTime > DateTime.UtcNow);
     }
 }

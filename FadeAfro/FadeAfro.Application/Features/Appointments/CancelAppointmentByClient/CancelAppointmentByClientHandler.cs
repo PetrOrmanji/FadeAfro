@@ -23,7 +23,7 @@ public class CancelAppointmentByClientHandler : IRequestHandler<CancelAppointmen
         if (appointment.ClientId != command.ClientId)
             throw new AppointmentOfAnotherClient();
         
-        appointment.CancelByClient();
+        //appointment.CancelByClient();
 
         await _appointmentRepository.UpdateAsync(appointment);
     }

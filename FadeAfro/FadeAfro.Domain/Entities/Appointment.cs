@@ -9,7 +9,6 @@ public class Appointment : Entity
     public Guid MasterProfileId { get; private set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
-    public AppointmentStatus Status { get; private set; }
     public string? Comment { get; private set; }
 
     private readonly List<AppointmentService> _services = new();
@@ -35,7 +34,6 @@ public class Appointment : Entity
         MasterProfileId = masterProfileId;
         StartTime = startTime;
         EndTime = endTime;
-        Status = AppointmentStatus.Confirmed;
         Comment = comment;
     }
 
@@ -46,21 +44,5 @@ public class Appointment : Entity
 
         var appointmentService = new AppointmentService(Id, serviceId, serviceName, price, duration);
         _services.Add(appointmentService);
-    }
-
-    public void CancelByClient()
-    {
-        if (Status != AppointmentStatus.Confirmed)
-            throw new InvalidAppointmentStatusException();
-
-        Status = AppointmentStatus.CancelledByClient;
-    }
-
-    public void CancelByMaster()
-    {
-        if (Status != AppointmentStatus.Confirmed)
-            throw new InvalidAppointmentStatusException();
-
-        Status = AppointmentStatus.CancelledByMaster;
     }
 }

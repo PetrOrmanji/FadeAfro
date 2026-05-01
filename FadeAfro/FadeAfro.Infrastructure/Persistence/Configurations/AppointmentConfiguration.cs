@@ -18,10 +18,6 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.Property(a => a.EndTime)
             .IsRequired();
 
-        builder.Property(a => a.Status)
-            .IsRequired()
-            .HasConversion<string>();
-
         builder.Property(a => a.Comment)
             .HasMaxLength(500);
 

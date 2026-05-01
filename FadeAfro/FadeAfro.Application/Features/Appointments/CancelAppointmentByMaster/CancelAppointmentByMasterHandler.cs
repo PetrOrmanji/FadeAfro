@@ -32,7 +32,7 @@ public class CancelAppointmentByMasterHandler : IRequestHandler<CancelAppointmen
         if (appointment.MasterProfileId != masterProfile.Id)
             throw new AppointmentOfAnotherClient();
         
-        appointment.CancelByMaster();
+        //appointment.CancelByMaster();
 
         await _appointmentRepository.UpdateAsync(appointment);
     }
