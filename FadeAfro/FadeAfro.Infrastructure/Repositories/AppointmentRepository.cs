@@ -14,9 +14,20 @@ public class AppointmentRepository : IAppointmentRepository
         _context = context;
     }
 
-    public async Task<Appointment?> GetByIdAsync(Guid id)
+    public async Task<Appointment?> GetByIdAsync(
+        Guid id, 
+        bool includeMasterInfo = false,
+        bool includeClientInfo = false)
     {
-        return await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
+        var query = _context.Appointments.AsQueryable();
+
+        if (includeMasterInfo)
+            query = query.Include(a => a.MasterProfile).ThenInclude(mp => mp.Master);
+        
+        if (includeClientInfo)
+            query = query.Include(a => a.Client);
+        
+        return await query.FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<bool> HasActiveAppointmentsOnDateAsync(Guid masterProfileId, DateOnly date)
@@ -77,10 +88,10 @@ public class AppointmentRepository : IAppointmentRepository
         await _context.Appointments.AddAsync(appointment);
         await _context.SaveChangesAsync();
     }
-
-    public async Task UpdateAsync(Appointment appointment)
+    
+    public async Task DeleteAsync(Appointment appointment)
     {
-        _context.Appointments.Update(appointment);
+        _context.Appointments.Remove(appointment);
         await _context.SaveChangesAsync();
     }
 

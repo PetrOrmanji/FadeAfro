@@ -4,7 +4,10 @@ namespace FadeAfro.Domain.Repositories;
 
 public interface IAppointmentRepository
 {
-    Task<Appointment?> GetByIdAsync(Guid id);
+    Task<Appointment?> GetByIdAsync(
+        Guid id, 
+        bool includeMasterInfo = false,
+        bool includeClientInfo = false);
 
     Task<bool> HasActiveAppointmentsOnDateAsync(Guid masterProfileId, DateOnly date);
     
@@ -23,5 +26,5 @@ public interface IAppointmentRepository
         bool includeClientInfo = false);
             
     Task AddAsync(Appointment appointment);
-    Task UpdateAsync(Appointment appointment);
+    Task DeleteAsync(Appointment appointment);
 }
