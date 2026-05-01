@@ -86,6 +86,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMasterScheduleRepository, MasterScheduleRepository>();
         services.AddScoped<IMasterUnavailabilityRepository, MasterUnavailabilityRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+
+        return services;
+    }
+    
+    public static IServiceCollection AddNotifications(this IServiceCollection services)
+    {
+        services.AddScoped<INotificationService, NotificationService>();
 
         return services;
     }

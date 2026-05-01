@@ -12,6 +12,7 @@ builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
 builder.Services.AddTelegram();
 builder.Services.AddCorsPolicy(builder.Configuration, builder.Environment);
+builder.Services.AddNotifications();
 builder.Services.AddFileStorage();
 builder.Services.AddControllersWithOptions();
 builder.Services.AddAuthorization();

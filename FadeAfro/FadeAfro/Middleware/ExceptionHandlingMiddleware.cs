@@ -48,7 +48,8 @@ public class ExceptionHandlingMiddleware
             MasterServiceNotFoundException or
             MasterScheduleNotFoundException or
             MasterUnavailabilityNotFoundException or
-            AppointmentNotFoundException
+            AppointmentNotFoundException or 
+            NotificationNotFoundException
                 => (HttpStatusCode.NotFound, exception.Message),
 
             InvalidInitDataException

@@ -14,9 +14,14 @@ public class NotificationRepository : INotificationRepository
         _context = context;
     }
     
-    public async Task<IReadOnlyList<Notification>> GetNotificationsByUserId(Guid userId)
+    public async Task<List<Notification>> GetNotificationsByUserId(Guid userId)
     {
         return await _context.Notifications.Where(x => x.UserId == userId).ToListAsync();
+    }
+    
+    public async Task<Notification?> GetNotificationByIdAndUserId(Guid id, Guid userId)
+    {
+        return await _context.Notifications.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
     }
 
     public async Task AddAsync(Notification notification)
