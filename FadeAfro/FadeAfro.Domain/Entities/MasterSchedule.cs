@@ -14,7 +14,7 @@ public class MasterSchedule : Entity
     public MasterSchedule(Guid masterProfileId, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime)
     {
         if (endTime <= startTime)
-            throw new InvalidScheduleTimeException();
+            throw new InvalidMasterScheduleTimeException();
 
         MasterProfileId = masterProfileId;
         DayOfWeek = dayOfWeek;
@@ -25,7 +25,7 @@ public class MasterSchedule : Entity
     public void UpdateTimes(TimeOnly startTime, TimeOnly endTime)
     {
         if (endTime <= startTime)
-            throw new InvalidScheduleTimeException();
+            throw new InvalidMasterScheduleTimeException();
 
         StartTime = startTime;
         EndTime = endTime;

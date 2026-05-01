@@ -1,5 +1,5 @@
 using FadeAfro.Domain.Exceptions.MasterProfile;
-using FadeAfro.Domain.Exceptions.Service;
+using FadeAfro.Domain.Exceptions.MasterService;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -26,7 +26,7 @@ public class UpdateMasterServiceHandler : IRequestHandler<UpdateMasterServiceCom
         
         var service = await _serviceRepository.GetByIdAsync(command.ServiceId);
         if (service is null)
-            throw new ServiceNotFoundException();
+            throw new MasterServiceNotFoundException();
 
         if (service.MasterProfileId != masterProfile.Id)
             throw new ServiceFromAnotherMasterException();

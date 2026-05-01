@@ -1,4 +1,4 @@
-using FadeAfro.Domain.Exceptions.Service;
+using FadeAfro.Domain.Exceptions.MasterService;
 
 namespace FadeAfro.Domain.Entities;
 
@@ -16,13 +16,13 @@ public class Service : Entity
     public Service(Guid masterProfileId, string name, string? description, int price, TimeSpan duration)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new InvalidServiceNameException();
+            throw new InvalidMasterServiceNameException();
 
         if (price <= 0)
-            throw new InvalidServicePriceException();
+            throw new InvalidMasterServicePriceException();
 
         if (duration <= TimeSpan.Zero)
-            throw new InvalidServiceDurationException();
+            throw new InvalidMasterServiceDurationException();
 
         MasterProfileId = masterProfileId;
         Name = name;
@@ -34,13 +34,13 @@ public class Service : Entity
     public void Update(string name, string? description, int price, TimeSpan duration)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new InvalidServiceNameException();
+            throw new InvalidMasterServiceNameException();
 
         if (price <= 0)
-            throw new InvalidServicePriceException();
+            throw new InvalidMasterServicePriceException();
 
         if (duration <= TimeSpan.Zero)
-            throw new InvalidServiceDurationException();
+            throw new InvalidMasterServiceDurationException();
 
         Name = name;
         Description = description;

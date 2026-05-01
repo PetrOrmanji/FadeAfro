@@ -36,6 +36,14 @@ public class AppointmentRepository : IAppointmentRepository
             x.Status == AppointmentStatus.Confirmed);
     }
 
+    public async Task<bool> HasActiveAppointmentsForServiceAsync(Guid serviceId)
+    {
+        return await _context.Appointments.AnyAsync(x =>
+            x.Status == AppointmentStatus.Confirmed &&
+            x.StartTime > DateTime.UtcNow &&
+            x.Services.Any(y => y.ServiceId == serviceId));
+    }
+
     public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,

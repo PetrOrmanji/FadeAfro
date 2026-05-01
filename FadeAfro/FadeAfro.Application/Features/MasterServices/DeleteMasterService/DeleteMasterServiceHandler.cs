@@ -1,5 +1,5 @@
 using FadeAfro.Domain.Exceptions.MasterProfile;
-using FadeAfro.Domain.Exceptions.Service;
+using FadeAfro.Domain.Exceptions.MasterService;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -9,13 +9,16 @@ public class DeleteMasterServiceHandler : IRequestHandler<DeleteMasterServiceCom
 {
     private readonly IServiceRepository _serviceRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
+    private readonly IAppointmentRepository _appointmentRepository;
     
     public DeleteMasterServiceHandler(
         IServiceRepository serviceRepository,
-        IMasterProfileRepository masterProfileRepository)
+        IMasterProfileRepository masterProfileRepository,
+        IAppointmentRepository appointmentRepository)
     {
         _serviceRepository = serviceRepository;
         _masterProfileRepository = masterProfileRepository;
+        _appointmentRepository = appointmentRepository;
     }
 
     public async Task Handle(DeleteMasterServiceCommand command, CancellationToken cancellationToken)
@@ -27,11 +30,18 @@ public class DeleteMasterServiceHandler : IRequestHandler<DeleteMasterServiceCom
         var service = await _serviceRepository.GetByIdAsync(command.ServiceId);
 
         if (service is null)
-            throw new ServiceNotFoundException();
+            throw new MasterServiceNotFoundException();
         
         if (service.MasterProfileId != masterProfile.Id)
             throw new ServiceFromAnotherMasterException();
 
+        var hasActiveAppointmentsForService = 
+            await _appointmentRepository.HasActiveAppointmentsForServiceAsync(service.Id);
+        
+        if (hasActiveAppointmentsForService)
+            throw new MasterServiceConflictException(
+                "Master service has active appointments");
+            
         await _serviceRepository.DeleteAsync(service);
     }
 }

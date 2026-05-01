@@ -5,8 +5,8 @@ using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.Auth;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
+using FadeAfro.Domain.Exceptions.MasterService;
 using FadeAfro.Domain.Exceptions.MasterUnavailability;
-using FadeAfro.Domain.Exceptions.Service;
 using FadeAfro.Domain.Exceptions.User;
 
 namespace FadeAfro.Middleware;
@@ -44,7 +44,7 @@ public class ExceptionHandlingMiddleware
             UserNotFoundException or
             MasterProfileNotFoundException or
             MasterProfilePhotoNotFoundException or
-            ServiceNotFoundException or
+            MasterServiceNotFoundException or
             MasterScheduleNotFoundException or
             MasterUnavailabilityNotFoundException or
             AppointmentNotFoundException
@@ -62,18 +62,19 @@ public class ExceptionHandlingMiddleware
             AppointmentOfAnotherClient or
             AppointmentOfAnotherMaster or
             MasterUnavailabilityAlreadyExistsException or
-            MasterUnavailabilityConflictException
+            MasterUnavailabilityConflictException or
+            MasterServiceConflictException
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or
             InvalidTelegramIdException or
             EmptyRolesException or
-            InvalidServiceNameException or
-            InvalidServicePriceException or
-            InvalidServiceDurationException or
+            InvalidMasterServiceNameException or
+            InvalidMasterServicePriceException or
+            InvalidMasterServiceDurationException or
             InvalidAppointmentTimeException or
             InvalidAppointmentStatusException or
-            InvalidScheduleTimeException
+            InvalidMasterScheduleTimeException
                 => (HttpStatusCode.BadRequest, exception.Message),
 
             DomainException => (HttpStatusCode.BadRequest, exception.Message),

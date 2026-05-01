@@ -1,7 +1,7 @@
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.MasterProfile;
-using FadeAfro.Domain.Exceptions.Service;
+using FadeAfro.Domain.Exceptions.MasterService;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -39,7 +39,7 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
             var service = await _serviceRepository.GetByIdAsync(serviceId);
             
             if (service is null)
-                throw new ServiceNotFoundException();
+                throw new MasterServiceNotFoundException();
 
             if (service.MasterProfileId != masterProfile.Id)
                 throw new ServiceFromAnotherMasterException();
