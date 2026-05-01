@@ -1,6 +1,7 @@
 using FadeAfro.Application.Features.MasterProfiles.DismissMaster;
 using FadeAfro.Application.Features.MasterProfiles.GetAllMasterProfiles;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfile;
+using FadeAfro.Application.Features.MasterProfiles.GetMasterProfileDayAvailability;
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfilePhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
@@ -69,6 +70,22 @@ public class MasterProfilesController : ControllerBase
         
         var response = await _mediator.Send(getMasterPhotoQuery);
         return File(response.Stream, response.ContentType);
+    }
+    
+    [HttpGet("get/{masterProfileId:guid}/day-availability")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Get master profile day availability")]
+    public async Task<IActionResult> GetMasterProfileDayAvailability(
+        Guid masterProfileId, 
+        [FromQuery] GetMasterProfileDayAvailabilityRequest request)
+    {
+        var getMasterProfileDayAvailabilityQuery =  new GetMasterProfileDayAvailabilityQuery(
+            masterProfileId,
+            request.Date,
+            request.ServiceDuration);
+        
+        var response = await _mediator.Send(getMasterProfileDayAvailabilityQuery);
+        return Ok(response);
     }
     
     [HttpPut("update/me/description")]

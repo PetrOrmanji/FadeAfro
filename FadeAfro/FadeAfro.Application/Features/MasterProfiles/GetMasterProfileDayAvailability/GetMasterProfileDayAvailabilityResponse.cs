@@ -1,0 +1,5 @@
+using FadeAfro.Application.Features.MasterProfiles.Common;
+
+namespace FadeAfro.Application.Features.MasterProfiles.GetMasterProfileDayAvailability;
+
+public record GetMasterProfileDayAvailabilityResponse(List<MasterProfileDateSlotDto> DateSlots);
