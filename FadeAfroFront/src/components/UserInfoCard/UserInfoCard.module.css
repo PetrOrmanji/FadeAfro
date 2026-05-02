@@ -18,7 +18,7 @@
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: var(--accent);
+  background-color: var(--tg-button);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +34,7 @@
 .initials {
   font-size: 18px;
   font-weight: 600;
-  color: var(--accent-text);
+  color: var(--tg-button-text);
   user-select: none;
 }
 
@@ -69,6 +69,6 @@
 }
 
 .settingsBtn:hover {
-  background-color: var(--accent);
-  color: #ffffff;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
 }

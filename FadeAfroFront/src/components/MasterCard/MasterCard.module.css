@@ -57,15 +57,15 @@
 .selectBtn {
   width: 100%;
   padding: 10px;
-  background-color: var(--accent);
-  color: var(--accent-text);
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
   font-size: 15px;
   font-weight: 600;
   border-radius: var(--radius-sm);
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .selectBtn:hover {
-  background-color: var(--accent-dark);
+  opacity: 0.85;
 }
