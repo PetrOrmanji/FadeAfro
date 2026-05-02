@@ -32,6 +32,8 @@
 /* ── База ─────────────────────────────────────────────────────────────────── */
 html, body {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -42,7 +44,6 @@ body {
   background-color: var(--tg-secondary-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
 #root {

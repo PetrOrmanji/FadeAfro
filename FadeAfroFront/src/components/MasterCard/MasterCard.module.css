@@ -2,6 +2,7 @@
   background-color: var(--tg-bg);
   border-radius: var(--radius);
   overflow: hidden;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   cursor: pointer;
