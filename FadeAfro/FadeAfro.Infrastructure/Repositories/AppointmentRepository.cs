@@ -44,6 +44,14 @@ public class AppointmentRepository : IAppointmentRepository
             dates.Contains(DateOnly.FromDateTime(x.StartTime)));
     }
 
+    public async Task<bool> HasConflictingAppointmentAsync(Guid masterProfileId, DateTime startTime, DateTime endTime)
+    {
+        return await _context.Appointments.AnyAsync(a =>
+            a.MasterProfileId == masterProfileId &&
+            a.StartTime < endTime &&
+            a.EndTime > startTime);
+    }
+
     public async Task<bool> HasActiveAppointmentsForServiceAsync(Guid serviceId)
     {
         return await _context.Appointments.AnyAsync(x =>

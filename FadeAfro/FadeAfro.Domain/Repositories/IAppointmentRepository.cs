@@ -14,6 +14,8 @@ public interface IAppointmentRepository
     Task<bool> HasActiveAppointmentsOnDatesAsync(Guid masterProfileId, List<DateOnly> dates);
 
     Task<bool> HasActiveAppointmentsForServiceAsync(Guid serviceId);
+
+    Task<bool> HasConflictingAppointmentAsync(Guid masterProfileId, DateTime startTime, DateTime endTime);
     
     Task<int> GetActiveAppointmentsCountByClientIdAsync(Guid masterProfileId);
 

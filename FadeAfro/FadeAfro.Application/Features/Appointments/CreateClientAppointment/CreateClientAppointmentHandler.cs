@@ -62,12 +62,20 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
             services.Add(service);
         }
 
-        var endTime = services.Aggregate(TimeSpan.Zero, (sum, x) => sum + x.Duration);
+        var duration = services.Aggregate(TimeSpan.Zero, (sum, x) => sum + x.Duration);
+        var appointmentEndTime = command.StartTime.Add(duration);
+
+        var hasConflict = await _appointmentRepository.HasConflictingAppointmentAsync(
+            command.MasterProfileId, command.StartTime, appointmentEndTime);
+
+        if (hasConflict)
+            throw new AppointmentTimeConflictException();
+
         var appointment = new Appointment(
             command.ClientId,
             command.MasterProfileId,
             command.StartTime,
-            command.StartTime.Add(endTime),
+            appointmentEndTime,
             command.Comment);
 
         foreach (var service in services)

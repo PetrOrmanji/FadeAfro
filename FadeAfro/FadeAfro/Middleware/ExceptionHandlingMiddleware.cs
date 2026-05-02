@@ -66,7 +66,8 @@ public class ExceptionHandlingMiddleware
             MasterUnavailabilityConflictException or
             MasterServiceConflictException or
             MasterScheduleConflictException or
-            ClientAppointmentLimitExceededException
+            ClientAppointmentLimitExceededException or
+            AppointmentTimeConflictException
                 => (HttpStatusCode.Conflict, exception.Message),
 
             InvalidFirstNameException or
