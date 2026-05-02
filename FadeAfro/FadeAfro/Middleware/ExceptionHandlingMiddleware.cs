@@ -76,7 +76,6 @@ public class ExceptionHandlingMiddleware
             InvalidMasterServicePriceException or
             InvalidMasterServiceDurationException or
             InvalidAppointmentTimeException or
-            InvalidAppointmentStatusException or
             InvalidMasterScheduleTimeException or
             InvalidNotificationTextException
                 => (HttpStatusCode.BadRequest, exception.Message),
