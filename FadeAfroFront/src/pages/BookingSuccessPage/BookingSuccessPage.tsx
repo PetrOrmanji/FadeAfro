@@ -91,7 +91,7 @@ const BookingSuccessPage = () => {
         <button className={styles.mainBtn} onClick={() => navigate('/client')}>
           На главную
         </button>
-        <button className={styles.secondaryBtn} onClick={() => navigate('/client')}>
+        <button className={styles.secondaryBtn} onClick={() => navigate('/client/appointments')}>
           Мои записи
         </button>
       </div>

@@ -8,6 +8,7 @@ import SelectTimePage from '../pages/SelectTimePage/SelectTimePage'
 import ConfirmPage from '../pages/ConfirmPage/ConfirmPage'
 import BookingSuccessPage from '../pages/BookingSuccessPage/BookingSuccessPage'
 import ErrorPage from '../pages/ErrorPage/ErrorPage'
+import MyAppointmentsPage from '../pages/MyAppointmentsPage/MyAppointmentsPage'
 import MasterPage from '../pages/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
 
@@ -47,6 +48,7 @@ const AppRouter = () => {
         <Route path="/client/master/:masterProfileId/confirm"  element={<ConfirmPage />} />
         <Route path="/client/booking-success" element={<BookingSuccessPage />} />
         <Route path="/error" element={<ErrorPage />} />
+        <Route path="/client/appointments" element={<MyAppointmentsPage />} />
         <Route path="/master" element={<MasterPage />} />
         <Route path="/owner"  element={<OwnerPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
