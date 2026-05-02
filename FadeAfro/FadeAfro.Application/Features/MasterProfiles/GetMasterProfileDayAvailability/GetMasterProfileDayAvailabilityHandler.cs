@@ -2,7 +2,6 @@ using FadeAfro.Application.Features.MasterProfiles.Common;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
-
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -72,16 +71,16 @@ public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterP
 
         while (current + duration <= end)
         {
-            var slotStart = TimeOnly.FromTimeSpan(current);
-            var slotEnd = TimeOnly.FromTimeSpan(current + duration);
+            var slotStartLocal = date.ToDateTime(TimeOnly.FromTimeSpan(current));
+            var slotStartUtc = TimeZoneInfo.ConvertTimeToUtc(slotStartLocal, TimeZoneInfo.Local);
+            var slotEndUtc = slotStartUtc + duration;
 
             var isActive = !appointments.Any(a =>
-                DateOnly.FromDateTime(a.StartTime) == date &&
-                TimeOnly.FromDateTime(a.StartTime) < slotEnd &&
-                TimeOnly.FromDateTime(a.EndTime) > slotStart);
-
+                a.StartTime < slotEndUtc &&
+                a.EndTime > slotStartUtc);
+            
             var masterProfileDateSlotDto = new MasterProfileDateSlotDto(
-                slotStart, 
+                slotStartUtc, 
                 isActive);
 
             slots.Add(masterProfileDateSlotDto);
