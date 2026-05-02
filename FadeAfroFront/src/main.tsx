@@ -4,6 +4,11 @@ import { SDKProvider } from '@tma.js/sdk-react'
 import './index.css'
 import App from './App.tsx'
 
+if (import.meta.env.DEV) {
+  const { setupTelegramMock } = await import('./mock/telegramMock')
+  setupTelegramMock()
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SDKProvider acceptCustomStyles debug>
