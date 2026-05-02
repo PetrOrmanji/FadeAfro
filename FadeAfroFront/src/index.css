@@ -14,7 +14,7 @@
 
   /* Берём цвета из темы Telegram, с fallback на светлую тему */
   --tg-bg:           var(--tg-theme-bg-color,          #ffffff);
-  --tg-secondary-bg: var(--tg-theme-secondary-bg-color,#f1f1f1);
+  --tg-secondary-bg: var(--tg-theme-secondary-bg-color,#efeff3);
   --tg-text:         var(--tg-theme-text-color,         #000000);
   --tg-hint:         var(--tg-theme-hint-color,         #999999);
   --tg-link:         var(--tg-theme-link-color,         #2481cc);
@@ -39,7 +39,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--tg-text);
-  background-color: var(--tg-bg);
+  background-color: var(--tg-secondary-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;

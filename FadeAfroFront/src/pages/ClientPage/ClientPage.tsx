@@ -29,8 +29,7 @@ const ClientPage = () => {
   }, [])
 
   const handleSelectMaster = (master: MasterProfile) => {
-    // TODO: переход к выбору услуги/времени
-    console.log('selected master:', master)
+    navigate(`/client/master/${master.id}/services`, { state: { master } })
   }
 
   const navigate = useNavigate()
