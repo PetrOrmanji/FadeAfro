@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.Appointment;
 
 public class AppointmentOfAnotherClient()
-    : DomainException("Appointment of another client.");
+    : DomainException("Эта запись принадлежит другому клиенту.");

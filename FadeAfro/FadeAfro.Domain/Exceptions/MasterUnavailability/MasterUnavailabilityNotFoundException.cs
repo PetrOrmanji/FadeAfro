@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.MasterUnavailability;
 
 public class MasterUnavailabilityNotFoundException()
-    : DomainException("Master unavailability not found.");
+    : DomainException("Отгул мастера на указанный день не найден.");

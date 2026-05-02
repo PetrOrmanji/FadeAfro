@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.MasterService;
 
 public class InvalidMasterServicePriceException()
-    : DomainException("Service price must be greater than zero.");
+    : DomainException("Цена услуги должна быть больше нуля.");

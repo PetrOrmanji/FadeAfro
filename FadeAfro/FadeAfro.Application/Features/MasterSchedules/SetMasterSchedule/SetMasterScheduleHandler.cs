@@ -42,7 +42,7 @@ public class SetMasterScheduleHandler : IRequestHandler<SetMasterScheduleCommand
 
             if (hasActiveAppointmentsOnDates)
                 throw new MasterScheduleConflictException(
-                    "Cannot delete schedule: there are active appointments on scheduled dates.");
+                    "Нельзя удалить расписание: есть активные записи на эти дни.");
             
             existing.UpdateTimes(command.StartTime, command.EndTime);
             await _masterScheduleRepository.UpdateAsync(existing);

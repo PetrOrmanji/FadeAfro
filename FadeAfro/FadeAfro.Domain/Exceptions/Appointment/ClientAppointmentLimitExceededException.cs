@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.Appointment;
 
 public class ClientAppointmentLimitExceededException()
-    : DomainException("Client appointment limit exceeded.");
+    : DomainException("Превышен лимит активных записей.");

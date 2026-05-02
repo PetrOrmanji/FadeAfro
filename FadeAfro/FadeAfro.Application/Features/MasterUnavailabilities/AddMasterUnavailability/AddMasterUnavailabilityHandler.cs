@@ -40,7 +40,7 @@ public class AddMasterUnavailabilityHandler : IRequestHandler<AddMasterUnavailab
 
         if (hasActiveAppointmentsOnDate)
             throw new MasterUnavailabilityConflictException(
-                "Cannot set unavailability: there are active appointments on the specified date.");
+                "Нельзя взять отгул: есть активные записи на указанный день.");
 
         dayUnavailability = new MasterUnavailability(
             masterProfile.Id,

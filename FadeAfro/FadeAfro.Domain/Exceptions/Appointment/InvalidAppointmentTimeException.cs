@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.Appointment;
 
 public class InvalidAppointmentTimeException()
-    : DomainException("Appointment start time must be in the future.");
+    : DomainException("Время начала записи должно быть в будущем.");

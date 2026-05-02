@@ -25,10 +25,10 @@ public class UploadMasterProfilePhotoHandler : IRequestHandler<UploadMasterProfi
     public async Task Handle(UploadMasterProfilePhotoCommand command, CancellationToken cancellationToken)
     {
         if (!AllowedExtensions.Contains(command.Extension.ToLower()))
-            throw new InvalidFileException("Allowed formats: JPEG, PNG, WebP.");
+            throw new InvalidFileException("Допустимые форматы: JPEG, PNG, WebP.");
 
         if (command.FileSize > MaxFileSizeBytes)
-            throw new InvalidFileException("File size must not exceed 5 MB.");
+            throw new InvalidFileException("Размер файла не должен превышать 5 МБ.");
 
         var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterId);
 

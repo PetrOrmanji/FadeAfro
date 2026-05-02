@@ -40,7 +40,7 @@ public class DeleteMasterServiceHandler : IRequestHandler<DeleteMasterServiceCom
         
         if (hasActiveAppointmentsForService)
             throw new MasterServiceConflictException(
-                "Master service has active appointments");
+                "Нельзя удалить услугу: есть активные записи.");
             
         await _serviceRepository.DeleteAsync(service);
     }

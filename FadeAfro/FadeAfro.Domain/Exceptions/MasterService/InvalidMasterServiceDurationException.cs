@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.MasterService;
 
 public class InvalidMasterServiceDurationException()
-    : DomainException("Service duration must be greater than zero.");
+    : DomainException("Длительность услуги не может составлять 0 минут.");

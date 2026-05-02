@@ -1,4 +1,4 @@
 namespace FadeAfro.Domain.Exceptions.Notification;
 
 public class InvalidNotificationTextException()
-    : DomainException("Notification text cannot be empty.");
+    : DomainException("Текст уведомления не может быть пустым.");
