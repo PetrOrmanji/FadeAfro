@@ -2,7 +2,7 @@ using FadeAfro.Application.Features.MasterProfiles.Common;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
-using FadeAfro.Domain.Exceptions.MasterUnavailability;
+
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
@@ -44,7 +44,7 @@ public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterP
             await _masterUnavailabilityRepository.GetByMasterProfileIdAndDateAsync(masterProfile.Id, query.Date);
 
         if (unavailability is not null)
-            throw new MasterUnavailabilityAlreadyExistsException();
+            return new GetMasterProfileDayAvailabilityResponse([]);
 
         var appointments =
             await _appointmentRepository.GetActiveByMasterProfileIdAsync(masterProfile.Id);
