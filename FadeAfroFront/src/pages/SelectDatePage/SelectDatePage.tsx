@@ -142,6 +142,7 @@ const SelectDatePage = () => {
   if (loading) return <div className={styles.loading}>Загрузка...</div>
 
   return (
+    <>
     <div className={`${styles.page} ${selectedDate ? styles.pageWithPanel : ''}`}>
 
       {/* Логотип */}
@@ -200,13 +201,15 @@ const SelectDatePage = () => {
         <span className={styles.legendText}>Выходные мастера</span>
       </div>
 
-      {/* Нижняя панель */}
+    </div>
+
+      {/* Нижняя панель — вне анимированного div */}
       {selectedDate && (
         <div className={styles.bottomPanel}>
           <button className={styles.nextBtn} onClick={handleNext}>Далее</button>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

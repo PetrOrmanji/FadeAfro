@@ -133,6 +133,7 @@ const SelectServicePage = () => {
   if (loading) return <div className={styles.loading}>Загрузка...</div>
 
   return (
+    <>
     <div className={`${styles.page} ${selectedIds.size > 0 ? styles.pageWithPanel : ''}`}>
 
       {/* Логотип */}
@@ -163,11 +164,13 @@ const SelectServicePage = () => {
         ))}
       </div>
 
-      {/* Нижняя панель — появляется при выборе услуг */}
+    </div>
+
+      {/* Нижняя панель — вне анимированного div, чтобы fixed работал корректно */}
       {selectedIds.size > 0 && (
         <BottomPanel selectedServices={selectedServices} onNext={handleNext} />
       )}
-    </div>
+    </>
   )
 }
 
