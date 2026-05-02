@@ -29,6 +29,7 @@
   font-weight: 700;
   color: var(--tg-hint);
   background-color: var(--tg-secondary-bg);
+  user-select: none;
 }
 
 .footer {
