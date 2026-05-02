@@ -55,14 +55,12 @@ public class ExceptionHandlingMiddleware
             InvalidInitDataException
                 => (HttpStatusCode.Unauthorized, exception.Message),
 
-            UserAlreadyExistsException or
             MasterProfileAlreadyExistsException or
             UserAlreadyMasterException or
             ServiceFromAnotherMasterException or
-            ScheduleOfAnotherMasterException or 
+            ScheduleOfAnotherMasterException or
             UnavailabilityOfAnotherMasterException or
             AppointmentOfAnotherClient or
-            AppointmentOfAnotherMaster or
             MasterUnavailabilityAlreadyExistsException or
             MasterUnavailabilityConflictException or
             MasterServiceConflictException or
