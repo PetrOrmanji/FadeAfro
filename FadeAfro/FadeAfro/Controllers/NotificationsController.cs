@@ -12,7 +12,7 @@ namespace FadeAfro.Controllers;
 [ApiController]
 [Route("api/notifications")]
 [Tags("Notifications")]
-public class NotificationsController : Controller
+public class NotificationsController : ControllerBase
 {
     private readonly IMediator _mediator;
 

@@ -46,6 +46,7 @@ public class SetMasterScheduleHandler : IRequestHandler<SetMasterScheduleCommand
             
             existing.UpdateTimes(command.StartTime, command.EndTime);
             await _masterScheduleRepository.UpdateAsync(existing);
+            return;
         }
 
         var schedule = new MasterSchedule(

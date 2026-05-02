@@ -12,8 +12,7 @@ public class AddMasterServiceHandler : IRequestHandler<AddMasterServiceCommand>
 
     public AddMasterServiceHandler(
         IServiceRepository serviceRepository, 
-        IMasterProfileRepository masterProfileRepository,
-        IUserRepository userRepository)
+        IMasterProfileRepository masterProfileRepository)
     {
         _serviceRepository = serviceRepository;
         _masterProfileRepository = masterProfileRepository;

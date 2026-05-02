@@ -15,7 +15,6 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
 
     public CreateClientAppointmentHandler(
         IAppointmentRepository appointmentRepository,
-        IUserRepository userRepository,
         IMasterProfileRepository masterProfileRepository,
         IServiceRepository serviceRepository)
     {
@@ -28,6 +27,9 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
     {
         if (command.ServiceIds is null || command.ServiceIds.Count == 0)
             throw new AppointmentMustHaveAtLeastOneServiceException();
+
+        if (command.ServiceIds.Distinct().Count() != command.ServiceIds.Count)
+            throw new DuplicateAppointmentServiceException();
 
         var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
         if (masterProfile is null)

@@ -61,9 +61,11 @@ public class ExceptionHandlingMiddleware
             ScheduleOfAnotherMasterException or
             UnavailabilityOfAnotherMasterException or
             AppointmentOfAnotherClient or
+            AppointmentOfAnotherMaster or
             MasterUnavailabilityAlreadyExistsException or
             MasterUnavailabilityConflictException or
             MasterServiceConflictException or
+            MasterScheduleConflictException or
             ClientAppointmentLimitExceededException
                 => (HttpStatusCode.Conflict, exception.Message),
 
@@ -74,6 +76,9 @@ public class ExceptionHandlingMiddleware
             InvalidMasterServicePriceException or
             InvalidMasterServiceDurationException or
             InvalidAppointmentTimeException or
+            InvalidAppointmentEndTimeException or
+            AppointmentMustHaveAtLeastOneServiceException or
+            DuplicateAppointmentServiceException or
             InvalidMasterScheduleTimeException or
             InvalidNotificationTextException
                 => (HttpStatusCode.BadRequest, exception.Message),

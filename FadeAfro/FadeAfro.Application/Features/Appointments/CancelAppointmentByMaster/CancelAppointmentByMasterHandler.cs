@@ -38,13 +38,13 @@ public class CancelAppointmentByMasterHandler : IRequestHandler<CancelAppointmen
             throw new AppointmentNotFoundException();
 
         if (appointment.MasterProfileId != masterProfile.Id)
-            throw new AppointmentOfAnotherClient();
-        
+            throw new AppointmentOfAnotherMaster();
+
         await _appointmentRepository.DeleteAsync(appointment);
-        
+
         await _notificationService.NotifyAsync(
-            appointment.MasterProfile.Master.Id, 
-            appointment.MasterProfile.Master.TelegramId,
+            appointment.Client.Id,
+            appointment.Client.TelegramId,
             PrepareNotificationText(appointment));
     }
     
