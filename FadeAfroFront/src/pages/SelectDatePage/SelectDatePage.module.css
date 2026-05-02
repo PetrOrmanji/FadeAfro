@@ -23,7 +23,7 @@
 .logoWrap {
   display: flex;
   justify-content: center;
-  padding: 8px 0;
+  padding: 8px 0 32px;
 }
 
 .logoPlaceholder {
@@ -41,7 +41,7 @@
 
 /* ── Заголовок ────────────────────────────────────────────────────────────── */
 .title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--tg-text);
 }
@@ -187,7 +187,6 @@
   right: 0;
   background-color: var(--tg-bg);
   padding: 12px 16px 24px;
-  border-top: 1px solid var(--tg-secondary-bg);
 }
 
 .nextBtn {
