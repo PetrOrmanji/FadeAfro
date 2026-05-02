@@ -13,7 +13,7 @@ const MasterCard = ({ master, onSelect }: Props) => {
     : master.firstName
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={() => onSelect(master)}>
       <div className={styles.photo}>
         {master.photoUrl
           ? <img src={getMasterPhotoUrl(master.id)} alt={fullName} />
@@ -22,7 +22,7 @@ const MasterCard = ({ master, onSelect }: Props) => {
       </div>
       <div className={styles.footer}>
         <span className={styles.name}>{fullName}</span>
-        <button className={styles.selectBtn} onClick={() => onSelect(master)}>
+        <button className={styles.selectBtn} onClick={(e) => { e.stopPropagation(); onSelect(master) }}>
           Выбрать
         </button>
       </div>
