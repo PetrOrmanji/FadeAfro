@@ -32,7 +32,13 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
         var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterProfileId);
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
+        
+        var clientActiveAppointmentsCount = 
+            await _appointmentRepository.GetActiveAppointmentsCountByClientIdAsync(command.ClientId);
 
+        if (clientActiveAppointmentsCount >= 3)
+            throw new ClientAppointmentLimitExceededException();
+            
         var services = new List<Service>();
         foreach (var serviceId in command.ServiceIds)
         {

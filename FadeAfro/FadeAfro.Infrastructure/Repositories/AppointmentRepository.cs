@@ -51,6 +51,13 @@ public class AppointmentRepository : IAppointmentRepository
             x.Services.Any(y => y.ServiceId == serviceId));
     }
 
+    public async Task<int> GetActiveAppointmentsCountByClientIdAsync(Guid clientId)
+    {
+        return await _context.Appointments.CountAsync(a => 
+            a.ClientId == clientId &&
+            a.EndTime > DateTime.UtcNow);
+    }
+
     public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,
