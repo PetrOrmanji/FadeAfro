@@ -1,9 +1,21 @@
+@keyframes pageSlideIn {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .page {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 16px;
   min-height: 100%;
+  animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .logoWrap {
@@ -16,11 +28,12 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background-color: var(--accent);
+  background-color: var(--tg-button);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
+  color: #ffffff;
   user-select: none;
 }
 
@@ -45,7 +58,7 @@
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: var(--accent);
+  background-color: var(--tg-button);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +74,7 @@
 .initials {
   font-size: 28px;
   font-weight: 600;
-  color: var(--accent-text);
+  color: var(--tg-button-text);
   user-select: none;
 }
 
