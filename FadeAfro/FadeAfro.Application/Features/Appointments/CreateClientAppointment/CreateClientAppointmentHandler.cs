@@ -1,3 +1,4 @@
+using FadeAfro.Application.Services;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.MasterProfile;
@@ -12,15 +13,21 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IServiceRepository _serviceRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly INotificationService _notificationService;
 
     public CreateClientAppointmentHandler(
         IAppointmentRepository appointmentRepository,
         IMasterProfileRepository masterProfileRepository,
-        IServiceRepository serviceRepository)
+        IServiceRepository serviceRepository,
+        IUserRepository userRepository,
+        INotificationService notificationService)
     {
         _appointmentRepository = appointmentRepository;
         _masterProfileRepository = masterProfileRepository;
         _serviceRepository = serviceRepository;
+        _userRepository = userRepository;
+        _notificationService = notificationService;
     }
 
     public async Task Handle(CreateClientAppointmentCommand command, CancellationToken cancellationToken)
@@ -67,5 +74,23 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
             appointment.AddService(service.Id, service.Name, service.Price, service.Duration);
 
         await _appointmentRepository.AddAsync(appointment);
+
+        var client = await _userRepository.GetByIdAsync(command.ClientId);
+
+        await _notificationService.NotifyAsync(
+            masterProfile.Master.Id,
+            masterProfile.Master.TelegramId,
+            PrepareNotificationText(client, command.StartTime));
+    }
+
+    private string PrepareNotificationText(User? client, DateTime startTime)
+    {
+        var clientName = client?.GetFullName() ?? "Клиент";
+        var clientInfo = client is null || string.IsNullOrWhiteSpace(client.Username)
+            ? clientName
+            : $"{clientName} (@{client.Username})";
+
+        return $"📅 {clientInfo} записался на " +
+               $"{startTime:dd.MM.yyyy} в {startTime:HH:mm}.";
     }
 }
