@@ -57,6 +57,15 @@ const ServiceItem = ({
 
 // ── Фиксированная панель снизу ─────────────────────────────────────────────
 
+const pluralService = (n: number) => {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 14) return 'услуг'
+  if (mod10 === 1) return 'услуга'
+  if (mod10 >= 2 && mod10 <= 4) return 'услуги'
+  return 'услуг'
+}
+
 const BottomPanel = ({
   selectedServices,
   onNext,
@@ -72,7 +81,7 @@ const BottomPanel = ({
     <div className={styles.bottomPanel}>
       <div className={styles.summary}>
         <span className={styles.summaryLeft}>
-          {count} {count === 1 ? 'Выбрано' : 'Выбрано'} · {minutesToFormatted(totalMinutes)}
+          {count} {pluralService(count)} · {minutesToFormatted(totalMinutes)}
         </span>
         <span className={styles.summaryPrice}>{totalPrice} ₽</span>
       </div>
