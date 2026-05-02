@@ -1,0 +1,211 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { ClientAppointment } from '../../api/appointments'
+import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
+import { getMasterPhotoUrl } from '../../api/masters'
+import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
+import styles from './MyAppointmentsPage.module.css'
+
+// ── Утилиты ────────────────────────────────────────────────────────────────
+
+const MONTHS_RU = [
+  'января','февраля','марта','апреля','мая','июня',
+  'июля','августа','сентября','октября','ноября','декабря',
+]
+
+const formatDate = (isoUtc: string) => {
+  const d = new Date(isoUtc)
+  return `${d.getDate()} ${MONTHS_RU[d.getMonth()]} ${d.getFullYear()}`
+}
+
+const formatTime = (isoUtc: string) => {
+  const d = new Date(isoUtc)
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+// ── Карточка записи ────────────────────────────────────────────────────────
+
+const AppointmentCard = ({
+  appointment,
+  onCancel,
+}: {
+  appointment: ClientAppointment
+  onCancel: (id: string) => void
+}) => {
+  const [cancelling, setCancelling] = useState(false)
+  const [photoError, setPhotoError] = useState(false)
+
+  const masterName = appointment.master
+    ? [appointment.master.firstName, appointment.master.lastName].filter(Boolean).join(' ')
+    : 'Мастер'
+
+  const initials = [
+    appointment.master?.firstName?.charAt(0),
+    appointment.master?.lastName?.charAt(0),
+  ].filter(Boolean).join('')
+
+  const totalPrice    = appointment.services.reduce((s, svc) => s + svc.price, 0)
+  const totalMinutes  = appointment.services.reduce((s, svc) => s + durationToMinutes(svc.duration), 0)
+  const totalDuration = minutesToFormatted(totalMinutes)
+
+  const handleCancel = async () => {
+    setCancelling(true)
+    try {
+      await cancelMyAppointment(appointment.id)
+      onCancel(appointment.id)
+    } finally {
+      setCancelling(false)
+    }
+  }
+
+  return (
+    <div className={styles.card}>
+
+      {/* Мастер */}
+      <div className={styles.section}>
+        <div className={styles.masterAvatar}>
+          {!photoError
+            ? <img
+                src={getMasterPhotoUrl(appointment.master!.masterProfileId)}
+                alt={masterName}
+                className={styles.avatarImg}
+                onError={() => setPhotoError(true)}
+              />
+            : <span className={styles.avatarInitials}>{initials}</span>
+          }
+        </div>
+        <div className={styles.sectionInfo}>
+          <span className={styles.sectionTitle}>{masterName}</span>
+          <span className={styles.sectionSub}>Ваш мастер</span>
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* Услуги */}
+      <div className={styles.section}>
+        <div className={styles.iconCircle}><ScissorsIcon /></div>
+        <div className={styles.sectionInfo}>
+          {appointment.services.map((s, i) => (
+            <span key={i} className={styles.sectionTitle}>{s.serviceName}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* Дата и время */}
+      <div className={styles.section}>
+        <div className={styles.iconCircle}><CalendarIcon /></div>
+        <div className={styles.sectionInfo}>
+          <span className={styles.sectionTitle}>{formatDate(appointment.startTime)}</span>
+          <span className={styles.sectionSub}>в {formatTime(appointment.startTime)} часов</span>
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* Статистика */}
+      <div className={styles.stats}>
+        <div className={styles.statItem}>
+          <span className={styles.statValue}>{totalPrice} ₽</span>
+          <span className={styles.statLabel}>Итого</span>
+        </div>
+        <div className={styles.statDivider} />
+        <div className={styles.statItem}>
+          <span className={styles.statValue}>{totalDuration}</span>
+          <span className={styles.statLabel}>Длительность</span>
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* Отмена */}
+      <button
+        className={styles.cancelBtn}
+        onClick={handleCancel}
+        disabled={cancelling}
+      >
+        {cancelling ? 'Отмена...' : 'Отменить запись'}
+      </button>
+
+    </div>
+  )
+}
+
+// ── Страница ───────────────────────────────────────────────────────────────
+
+const MyAppointmentsPage = () => {
+  const navigate = useNavigate()
+  const [appointments, setAppointments] = useState<ClientAppointment[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getMyAppointments()
+      .then(setAppointments)
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleCancel = (id: string) => {
+    setAppointments(prev => prev.filter(a => a.id !== id))
+  }
+
+  if (loading) return <div className={styles.loading}>Загрузка...</div>
+
+  return (
+    <div className={styles.page}>
+
+      <div className={styles.header}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          <ChevronLeftIcon />
+        </button>
+        <h1 className={styles.title}>Мои записи</h1>
+      </div>
+
+      {appointments.length === 0 ? (
+        <div className={styles.empty}>
+          <p className={styles.emptyText}>У вас нет активных записей</p>
+        </div>
+      ) : (
+        <div className={styles.list}>
+          {appointments.map(a => (
+            <AppointmentCard key={a.id} appointment={a} onCancel={handleCancel} />
+          ))}
+        </div>
+      )}
+
+    </div>
+  )
+}
+
+// ── Иконки ─────────────────────────────────────────────────────────────────
+
+const ScissorsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="6" cy="18" r="3" />
+    <line x1="20" y1="4" x2="8.12" y2="15.88" />
+    <line x1="14.47" y1="14.48" x2="20" y2="20" />
+    <line x1="8.12" y1="8.12" x2="12" y2="12" />
+  </svg>
+)
+
+const CalendarIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8"  y1="2" x2="8"  y2="6" />
+    <line x1="3"  y1="10" x2="21" y2="10" />
+  </svg>
+)
+
+const ChevronLeftIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="15 18 9 12 15 6" />
+  </svg>
+)
+
+export default MyAppointmentsPage

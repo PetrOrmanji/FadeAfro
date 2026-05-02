@@ -8,9 +8,9 @@ export interface AppointmentService {
 }
 
 export interface AppointmentMaster {
+  masterProfileId: string
   firstName: string
   lastName: string | null
-  photoUrl: string | null
 }
 
 export interface ClientAppointment {
