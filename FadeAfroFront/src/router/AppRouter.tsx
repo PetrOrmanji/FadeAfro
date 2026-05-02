@@ -1,6 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { hasRole, useAuth } from '../context/AuthContext'
 import ClientPage from '../pages/ClientPage/ClientPage'
+import SettingsPage from '../pages/SettingsPage/SettingsPage'
 import MasterPage from '../pages/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
 
@@ -27,6 +28,7 @@ const AppRouter = () => {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/client" element={<ClientPage />} />
+        <Route path="/client/settings" element={<SettingsPage />} />
         <Route path="/master" element={<MasterPage />} />
         <Route path="/owner"  element={<OwnerPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

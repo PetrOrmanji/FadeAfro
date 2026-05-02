@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getAllMasters, type MasterProfile } from '../../api/masters'
 import { getMe, type UserResponse } from '../../api/user'
 import MasterCard from '../../components/MasterCard/MasterCard'
@@ -32,8 +33,10 @@ const ClientPage = () => {
     console.log('selected master:', master)
   }
 
+  const navigate = useNavigate()
+
   const handleSettingsClick = () => {
-    // TODO: открыть настройки
+    navigate('/client/settings')
   }
 
   if (loading) {
