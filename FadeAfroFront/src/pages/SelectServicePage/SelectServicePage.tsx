@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getMasterServices, type MasterService } from '../../api/services'
 import { getMasterPhotoUrl, type MasterProfile } from '../../api/masters'
 import { formatDuration, durationToMinutes, minutesToFormatted } from '../../utils/duration'
@@ -100,6 +100,7 @@ interface LocationState {
 
 const SelectServicePage = () => {
   const { masterProfileId } = useParams<{ masterProfileId: string }>()
+  const navigate = useNavigate()
   const master = (history.state?.usr as LocationState)?.master
 
   const [services, setServices] = useState<MasterService[]>([])
@@ -124,7 +125,9 @@ const SelectServicePage = () => {
   const selectedServices = services.filter(s => selectedIds.has(s.id))
 
   const handleNext = () => {
-    // TODO: переход к выбору времени
+    navigate(`/client/master/${masterProfileId}/date`, {
+      state: { master, selectedServices },
+    })
   }
 
   if (loading) return <div className={styles.loading}>Загрузка...</div>

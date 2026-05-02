@@ -1,0 +1,211 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  min-height: 100%;
+}
+
+.pageWithPanel {
+  padding-bottom: 100px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--tg-hint);
+  font-size: 15px;
+}
+
+/* ── Логотип ──────────────────────────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: #ffffff;
+  user-select: none;
+}
+
+/* ── Заголовок ────────────────────────────────────────────────────────────── */
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tg-text);
+}
+
+/* ── Карточка календаря ───────────────────────────────────────────────────── */
+.calendarCard {
+  background-color: var(--tg-bg);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.navBtn {
+  background: none;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--tg-button);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navBtn:hover:not(.navBtnDisabled) {
+  background-color: rgba(36, 129, 204, 0.1);
+}
+
+.navBtnDisabled {
+  color: var(--tg-hint);
+  cursor: default;
+}
+
+.monthTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--tg-text);
+}
+
+/* ── Сетка ────────────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 2px;
+}
+
+.dayHeader {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tg-hint);
+  padding: 4px 0 12px;
+}
+
+/* ── Ячейка дня ───────────────────────────────────────────────────────────── */
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 50%;
+  background: none;
+  color: var(--tg-text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.1s;
+  user-select: none;
+}
+
+/* hover только для кликабельных (не off, не past, не other-month, не selected) */
+.day:not(.dayOff):not(.dayPast):not(.dayOtherMonth):not(.daySelected):hover {
+  background-color: rgba(36, 129, 204, 0.1);
+}
+
+/* Дни другого месяца */
+.dayOtherMonth {
+  color: var(--tg-hint);
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Прошедшие дни */
+.dayPast {
+  color: var(--tg-hint);
+  cursor: default;
+}
+
+/* Выходные мастера (недоступные) */
+.dayOff {
+  color: #ff8a80;
+  text-decoration: line-through;
+  cursor: default;
+}
+
+/* Сегодня */
+.dayToday {
+  color: var(--tg-button);
+  font-weight: 700;
+}
+
+/* Выбранный день */
+.daySelected {
+  background-color: var(--tg-button);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ── Легенда ──────────────────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legendDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #ff8a80;
+  flex-shrink: 0;
+}
+
+.legendText {
+  font-size: 15px;
+  color: var(--tg-text);
+}
+
+/* ── Нижняя панель ────────────────────────────────────────────────────────── */
+.bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--tg-bg);
+  padding: 12px 16px 24px;
+  border-top: 1px solid var(--tg-secondary-bg);
+}
+
+.nextBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nextBtn:hover {
+  opacity: 0.85;
+}
+
+.nextBtn:active {
+  opacity: 0.7;
+}
