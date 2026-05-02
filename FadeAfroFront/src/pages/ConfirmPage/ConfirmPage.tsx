@@ -61,10 +61,12 @@ const ConfirmPage = () => {
       await bookAppointment({
         masterProfileId,
         serviceIds: selectedServices.map(s => s.id),
-        startTime: `${selectedDate}T${selectedTime}`,
+        startTime: new Date(`${selectedDate}T${selectedTime}`).toISOString(),
         comment: comment.trim() || undefined,
       })
-      navigate('/client')
+      navigate('/client/booking-success', {
+        state: { master, selectedServices, selectedDate, selectedTime, totalPrice },
+      })
     } catch {
       setError('Не удалось создать запись. Попробуйте ещё раз.')
     } finally {
