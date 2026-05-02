@@ -35,7 +35,17 @@ public class User : Entity
     public string GetFullName() =>
         string.IsNullOrWhiteSpace(LastName) ? FirstName : $"{FirstName} {LastName}";
 
-    public void UpdateUsername(string? username)
+    public void Update(string firstName, string? lastName, string? username)
+    {
+        if (string.IsNullOrWhiteSpace(firstName))
+            throw new InvalidFirstNameException();
+
+        FirstName = firstName;
+        LastName = lastName;
+        Username = username;
+    }
+    
+    public void UpdateUserName(string? username)
     {
         Username = username;
     }
