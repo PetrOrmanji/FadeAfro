@@ -6,7 +6,6 @@ namespace FadeAfro.Infrastructure.Services;
 public class LocalFileStorageService : IFileStorageService
 {
     private const string MastersDirectory = "uploads/masters";
-    private const string PhotoUrlBase = "/api/master-profiles/get-photo";
 
     private readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
 
@@ -35,7 +34,7 @@ public class LocalFileStorageService : IFileStorageService
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await stream.CopyToAsync(fileStream);
 
-        return $"{PhotoUrlBase}/{masterProfileId}";
+        return $"/api/master-profiles/get/{masterProfileId}/photo";
     }
 
     public void DeleteMasterPhoto(Guid masterProfileId)

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
-import { getMasterPhotoUrl } from '../../api/masters'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
 import styles from './MyAppointmentsPage.module.css'
 
@@ -64,9 +63,9 @@ const AppointmentCard = ({
       {/* Мастер */}
       <div className={styles.section}>
         <div className={styles.masterAvatar}>
-          {!photoError
+          {appointment.master?.photoUrl && !photoError
             ? <img
-                src={getMasterPhotoUrl(appointment.master!.masterProfileId)}
+                src={appointment.master.photoUrl}
                 alt={masterName}
                 className={styles.avatarImg}
                 onError={() => setPhotoError(true)}
