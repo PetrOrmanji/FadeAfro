@@ -14,36 +14,35 @@ export const MOCK_USER_ID = 100000003
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Только Telegram-поля, без role — роль придёт из JWT от бэкенда
 const MOCK_USERS: Record<number, {
   id: number
   first_name: string
   last_name: string
   username: string
-  role: 'Client' | 'Master' | 'Owner' | 'OwnerMaster'
 }> = {
-  777777777: { id: 777777777, first_name: 'Petr',  last_name: 'Masterov', username: 'petr_masterov',  role: 'Master'      },
-  100000001: { id: 100000001, first_name: 'Oleg',  last_name: 'Ownerow',  username: 'oleg_ownerow',  role: 'OwnerMaster' },
-  100000002: { id: 100000002, first_name: 'Artem', last_name: 'Masterov', username: 'artem_masterov', role: 'Master'      },
-  100000003: { id: 100000003, first_name: 'Vasya', last_name: 'Clientov', username: 'vasya_clientov', role: 'Client'      },
+  777777777: { id: 777777777, first_name: 'Petr',  last_name: 'Masterov', username: 'petr_masterov'  },
+  100000001: { id: 100000001, first_name: 'Oleg',  last_name: 'Ownerow',  username: 'oleg_ownerow'   },
+  100000002: { id: 100000002, first_name: 'Artem', last_name: 'Masterov', username: 'artem_masterov' },
+  100000003: { id: 100000003, first_name: 'Vasya', last_name: 'Clientov', username: 'vasya_clientov' },
 }
 
-export const getMockUser = () => MOCK_USERS[MOCK_USER_ID]
+export const getMockInitData = () => {
+  const user = MOCK_USERS[MOCK_USER_ID]
+  return `user=${JSON.stringify(user)}&auth_date=9999999999&hash=mockhash&signature=mocksignature`
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const setupTelegramMock = async () => {
   const { mockTelegramEnv } = await import('@tma.js/sdk-react')
-  const user = MOCK_USERS[MOCK_USER_ID]
-
-  // signature — обязательное поле схемы initData в tma.js v3
-  const rawInitData = `user=${JSON.stringify(user)}&auth_date=9999999999&hash=mockhash&signature=mocksignature`
 
   mockTelegramEnv({
     launchParams: {
       tgWebAppPlatform: 'web',
       tgWebAppVersion: '8.0',
       tgWebAppThemeParams: {},
-      tgWebAppData: rawInitData,
+      tgWebAppData: getMockInitData(),
     },
   })
 }

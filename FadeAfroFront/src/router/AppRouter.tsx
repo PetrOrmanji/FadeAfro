@@ -1,6 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { hasRole, useAuth } from '../context/AuthContext'
-import ClientPage from '../pages/ClientPage'
+import ClientPage from '../pages/ClientPage/ClientPage'
 import MasterPage from '../pages/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
 

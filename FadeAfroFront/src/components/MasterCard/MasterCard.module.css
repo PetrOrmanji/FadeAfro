@@ -1,0 +1,60 @@
+.card {
+  background-color: var(--tg-secondary-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: var(--tg-secondary-bg);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noPhoto {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--tg-hint);
+  background-color: var(--tg-secondary-bg);
+}
+
+.footer {
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tg-text);
+  text-align: center;
+}
+
+.selectBtn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--accent);
+  color: var(--accent-text);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.selectBtn:hover {
+  background-color: var(--accent-dark);
+}

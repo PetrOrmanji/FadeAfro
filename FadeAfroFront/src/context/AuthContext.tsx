@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useRawInitData } from '@tma.js/sdk-react'
 import { login } from '../api/auth'
-import { getMockUser } from '../mock/telegramMock'
+import { getMockInitData } from '../mock/telegramMock'
 
 export type Role = 'Client' | 'Master' | 'Owner'
 
@@ -25,14 +25,6 @@ export const hasRole = (roles: Role[], role: Role) => roles.includes(role)
 
 const DEV = import.meta.env.DEV
 
-// Роли мок-пользователей (Owner + Master — частный случай)
-const MOCK_ROLES: Record<string, Role[]> = {
-  Client: ['Client'],
-  Master: ['Master'],
-  Owner: ['Owner'],
-  OwnerMaster: ['Owner', 'Master'],
-}
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
@@ -40,22 +32,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading: true,
   })
 
-  const initData = useRawInitData()
+  const rawInitData = useRawInitData()
 
   useEffect(() => {
-    // DEV: пропускаем backend, берём роли из мока
-    if (DEV) {
-      const mockUser = getMockUser()
-      const roles = MOCK_ROLES[mockUser.role] ?? ['Client']
-      setState({ isAuthenticated: true, roles, isLoading: false })
-      return
-    }
+    // DEV: используем мок initData (бэкенд пропускает валидацию через SkipValidation)
+    // PROD: используем реальные данные от Telegram SDK
+    const initData = DEV ? getMockInitData() : rawInitData
+    if (!initData) return
 
-    // PROD: реальная авторизация через Telegram initData
-    const raw = initData
-    if (!raw) return
-
-    login(raw)
+    login(initData)
       .then((token) => {
         localStorage.setItem('token', token)
         const payload = JSON.parse(atob(token.split('.')[1]))
@@ -66,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .catch(() => {
         setState({ isAuthenticated: false, roles: [], isLoading: false })
       })
-  }, [initData])
+  }, [rawInitData])
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>
 }

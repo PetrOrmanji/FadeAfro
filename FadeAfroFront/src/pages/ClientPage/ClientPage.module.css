@@ -1,0 +1,60 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  min-height: 100%;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--tg-hint);
+  font-size: 15px;
+}
+
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+/* Реальный логотип — когда появится файл */
+.logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Плейсхолдер до появления логотипа */
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.mastersSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tg-text);
+}
+
+.mastersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
