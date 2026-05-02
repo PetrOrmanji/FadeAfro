@@ -69,5 +69,6 @@
 }
 
 .settingsBtn:hover {
-  opacity: 0.7;
+  background-color: var(--accent);
+  color: #ffffff;
 }
