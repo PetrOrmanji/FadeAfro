@@ -1,0 +1,224 @@
+@keyframes pageSlideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  min-height: 100%;
+  animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.pageWithPanel {
+  padding-bottom: 100px;
+}
+
+/* ── Логотип ──────────────────────────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 28px;
+}
+
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: #ffffff;
+  user-select: none;
+}
+
+/* ── Карточка ─────────────────────────────────────────────────────────────── */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  gap: 12px;
+}
+
+.cardLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-text);
+}
+
+.cardSub {
+  font-size: 13px;
+  color: var(--tg-text);
+  font-weight: 300;
+}
+
+/* Аватар мастера */
+.masterAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--tg-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarInitials {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tg-button-text);
+  user-select: none;
+}
+
+/* Круг с иконкой */
+.iconCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--tg-secondary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--tg-text);
+}
+
+
+/* ── Статистика ───────────────────────────────────────────────────────────── */
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 8px 0;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--tg-text);
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--tg-text);
+  font-weight: 400;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background-color: var(--tg-secondary-bg);
+  flex-shrink: 0;
+}
+
+/* ── Поле комментария ─────────────────────────────────────────────────────── */
+.inputCard {
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tg-text);
+}
+
+.textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--tg-text);
+  line-height: 1.5;
+}
+
+.textarea::placeholder {
+  color: var(--tg-hint);
+}
+
+/* ── Ошибка ───────────────────────────────────────────────────────────────── */
+.error {
+  font-size: 14px;
+  color: #ff3b30;
+  text-align: center;
+}
+
+/* ── Нижняя панель ────────────────────────────────────────────────────────── */
+.bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: var(--tg-bg);
+  padding: 12px 16px 24px;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  transition: opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.submitBtn:hover:not(:disabled) { opacity: 0.85; }
+.submitBtn:active:not(:disabled) { opacity: 0.7; }
+.submitBtn:disabled { opacity: 0.5; }
