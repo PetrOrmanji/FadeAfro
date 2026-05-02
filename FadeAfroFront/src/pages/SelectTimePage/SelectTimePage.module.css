@@ -139,6 +139,7 @@
   color: var(--tg-hint);
   text-decoration: line-through;
   cursor: default;
+  background-color: transparent;
 }
 
 /* ── Пусто ────────────────────────────────────────────────────────────────── */
