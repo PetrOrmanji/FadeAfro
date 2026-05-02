@@ -29,10 +29,10 @@ public class GetClientActiveAppointmentsHandler : IRequestHandler<GetClientActiv
                 new AppointmentServiceDto(x.ServiceId, x.ServiceName, x.Price, x.Duration)).ToList();
 
             var appointmentMasterDto = new AppointmentMasterDto(
+                appointment.MasterProfile.Id,
                 appointment.MasterProfile.Master.FirstName,
                 appointment.MasterProfile.Master.LastName,
-                appointment.MasterProfile.Description,
-                appointment.MasterProfile.PhotoUrl);
+                appointment.MasterProfile.Description);
 
             var appointmentDto = new AppointmentDto(
                 appointment.Id,
