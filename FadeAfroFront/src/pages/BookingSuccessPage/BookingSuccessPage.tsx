@@ -15,7 +15,10 @@ const formatDate = (iso: string) => {
   return `${d} ${MONTHS_RU[m - 1]} ${y}`
 }
 
-const formatTime = (t: string) => t.substring(0, 5)
+const formatTime = (isoUtc: string) => {
+  const d = new Date(isoUtc)
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
 
 // ── Типы ───────────────────────────────────────────────────────────────────
 
