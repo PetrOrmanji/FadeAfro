@@ -5,6 +5,7 @@ import SettingsPage from '../pages/SettingsPage/SettingsPage'
 import SelectServicePage from '../pages/SelectServicePage/SelectServicePage'
 import SelectDatePage from '../pages/SelectDatePage/SelectDatePage'
 import SelectTimePage from '../pages/SelectTimePage/SelectTimePage'
+import ConfirmPage from '../pages/ConfirmPage/ConfirmPage'
 import MasterPage from '../pages/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
 
@@ -35,6 +36,7 @@ const AppRouter = () => {
         <Route path="/client/master/:masterProfileId/services" element={<SelectServicePage />} />
         <Route path="/client/master/:masterProfileId/date"     element={<SelectDatePage />} />
         <Route path="/client/master/:masterProfileId/time"     element={<SelectTimePage />} />
+        <Route path="/client/master/:masterProfileId/confirm"  element={<ConfirmPage />} />
         <Route path="/master" element={<MasterPage />} />
         <Route path="/owner"  element={<OwnerPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
