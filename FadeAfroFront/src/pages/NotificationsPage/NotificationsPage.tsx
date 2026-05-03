@@ -77,8 +77,10 @@ const NotificationsPage = () => {
 
       {/* Список — листается */}
       {notifications.length === 0 ? (
-        <div className={styles.empty}>
-          <p className={styles.emptyText}>Нет новых уведомлений</p>
+        <div className={styles.emptyCard}>
+          <EmptyBellIllustration />
+          <p className={styles.emptyTitle}>Всё прочитано</p>
+          <p className={styles.emptyText}>Новых уведомлений нет</p>
         </div>
       ) : (
         <div className={styles.list}>
@@ -140,5 +142,26 @@ const NotificationCard = ({
     </div>
   )
 }
+
+const EmptyBellIllustration = () => (
+  <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Фоновый круг */}
+    <circle cx="70" cy="70" r="56" fill="var(--tg-button)" opacity="0.08"/>
+    {/* Колокольчик */}
+    <path d="M70 32C70 32 46 46 46 72V90H94V72C94 46 70 32 70 32Z"
+      fill="var(--tg-button)" opacity="0.18"
+      stroke="var(--tg-button)" strokeWidth="3.5" strokeLinejoin="round"/>
+    {/* Полоска снизу колокольчика */}
+    <rect x="38" y="88" width="64" height="8" rx="4" fill="var(--tg-button)" opacity="0.22"/>
+    {/* Дужка */}
+    <path d="M60 96C60 101.5 64.5 106 70 106C75.5 106 80 101.5 80 96"
+      stroke="var(--tg-button)" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+    {/* Точка сверху */}
+    <circle cx="70" cy="32" r="5" fill="var(--tg-button)" opacity="0.5"/>
+    {/* Диагональная линия-зачёркивание */}
+    <line x1="42" y1="42" x2="98" y2="98" stroke="var(--tg-secondary-bg)" strokeWidth="7" strokeLinecap="round"/>
+    <line x1="42" y1="42" x2="98" y2="98" stroke="var(--tg-button)" strokeWidth="4" strokeLinecap="round" opacity="0.7"/>
+  </svg>
+)
 
 export default NotificationsPage

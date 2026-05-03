@@ -165,8 +165,10 @@ const MyAppointmentsPage = () => {
       <h1 className={styles.title}>Мои записи</h1>
 
       {appointments.length === 0 ? (
-        <div className={styles.empty}>
-          <p className={styles.emptyText}>У вас нет активных записей</p>
+        <div className={styles.emptyCard}>
+          <EmptyCalendarIllustration />
+          <p className={styles.emptyTitle}>Нет активных записей</p>
+          <p className={styles.emptyText}>Запишитесь к мастеру прямо сейчас</p>
         </div>
       ) : (
         <div className={styles.list}>
@@ -200,6 +202,25 @@ const CalendarIcon = () => (
     <line x1="16" y1="2" x2="16" y2="6" />
     <line x1="8"  y1="2" x2="8"  y2="6" />
     <line x1="3"  y1="10" x2="21" y2="10" />
+  </svg>
+)
+
+const EmptyCalendarIllustration = () => (
+  <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Фоновый круг */}
+    <circle cx="70" cy="75" r="52" fill="var(--tg-button)" opacity="0.08"/>
+    {/* Тело календаря */}
+    <rect x="18" y="28" width="104" height="90" rx="14" fill="var(--tg-bg)" stroke="var(--tg-button)" strokeWidth="3.5"/>
+    {/* Шапка */}
+    <rect x="18" y="28" width="104" height="32" rx="14" fill="var(--tg-button)" opacity="0.18"/>
+    <rect x="18" y="46" width="104" height="14" fill="var(--tg-button)" opacity="0.18"/>
+    {/* Крючки */}
+    <line x1="44" y1="14" x2="44" y2="38" stroke="var(--tg-button)" strokeWidth="4.5" strokeLinecap="round"/>
+    <line x1="96" y1="14" x2="96" y2="38" stroke="var(--tg-button)" strokeWidth="4.5" strokeLinecap="round"/>
+    {/* Крестик внутри */}
+    <circle cx="70" cy="86" r="20" fill="var(--tg-button)" opacity="0.1"/>
+    <line x1="60" y1="76" x2="80" y2="96" stroke="var(--tg-button)" strokeWidth="4" strokeLinecap="round"/>
+    <line x1="80" y1="76" x2="60" y2="96" stroke="var(--tg-button)" strokeWidth="4" strokeLinecap="round"/>
   </svg>
 )
 
