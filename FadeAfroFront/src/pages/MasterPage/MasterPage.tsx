@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyMasterProfile, getMasterPhotoUrl, type MasterProfile } from '../../api/masters'
 import { getUnreadNotificationsCount } from '../../api/notifications'
-import { getMasterSchedules, normalizeDayOfWeek, type MasterScheduleItem } from '../../api/schedule'
+import {
+  getMasterSchedules,
+  getMasterUnavailabilities,
+  normalizeDayOfWeek,
+  type MasterScheduleItem,
+  type MasterUnavailabilityItem,
+} from '../../api/schedule'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './MasterPage.module.css'
@@ -77,15 +83,70 @@ const ScheduleCard = ({
   )
 }
 
+// ── Утилита: форматирование даты ───────────────────────────────────────────
+
+const MONTHS_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек']
+
+const formatDate = (iso: string) => {
+  const d = new Date(iso)
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`
+}
+
+// ── Карточка отсутствий ────────────────────────────────────────────────────
+
+const UnavailabilityCard = ({
+  unavailabilities,
+  onClick,
+}: {
+  unavailabilities: MasterUnavailabilityItem[]
+  onClick: () => void
+}) => {
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+
+  const upcoming = unavailabilities
+    .filter(u => new Date(u.date.slice(0, 10)) >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+
+  return (
+    <div className={styles.unavailCard} onClick={onClick}>
+
+      <div className={styles.scheduleHeader}>
+        <div className={styles.scheduleTitleRow}>
+          <CalendarOffIcon />
+          <span className={styles.scheduleTitle}>Дни отсутствия</span>
+        </div>
+        <ChevronRightIcon />
+      </div>
+
+      {upcoming.length === 0 ? (
+        <span className={styles.scheduleHint}>Нет отмеченных дней</span>
+      ) : (
+        <div className={styles.unavailChips}>
+          {upcoming.slice(0, 4).map(u => (
+            <span key={u.id} className={styles.unavailChip}>
+              {formatDate(u.date)}
+            </span>
+          ))}
+          {upcoming.length > 4 && (
+            <span className={styles.unavailChipMore}>+{upcoming.length - 4}</span>
+          )}
+        </div>
+      )}
+
+    </div>
+  )
+}
+
 // ── Страница ───────────────────────────────────────────────────────────────
 
 const MasterPage = () => {
   const navigate = useNavigate()
   const [user,          setUser]          = useState<UserResponse | null>(null)
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null)
-  const [schedules,     setSchedules]     = useState<MasterScheduleItem[]>([])
-  const [unreadCount,   setUnreadCount]   = useState(0)
-  const [loading,       setLoading]       = useState(true)
+  const [schedules,       setSchedules]       = useState<MasterScheduleItem[]>([])
+  const [unavailabilities, setUnavailabilities] = useState<MasterUnavailabilityItem[]>([])
+  const [unreadCount,     setUnreadCount]     = useState(0)
+  const [loading,         setLoading]         = useState(true)
 
   useEffect(() => {
     ;(async () => {
@@ -96,8 +157,12 @@ const MasterPage = () => {
         setUser(userData)
         setMasterProfile(profileData)
         setUnreadCount(unreadCountData)
-        const schedulesData = await getMasterSchedules(profileData.id)
+        const [schedulesData, unavailData] = await Promise.all([
+          getMasterSchedules(profileData.id),
+          getMasterUnavailabilities(profileData.id),
+        ])
         setSchedules(schedulesData)
+        setUnavailabilities(unavailData)
       } catch {
         navigate('/error')
       } finally {
@@ -138,6 +203,12 @@ const MasterPage = () => {
         onClick={() => navigate('/master/schedule')}
       />
 
+      {/* Дни отсутствия */}
+      <UnavailabilityCard
+        unavailabilities={unavailabilities}
+        onClick={() => navigate('/master/unavailability')}
+      />
+
     </div>
   )
 }
@@ -156,6 +227,18 @@ const ChevronRightIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="9 18 15 12 9 6" />
+  </svg>
+)
+
+const CalendarOffIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+    <line x1="9" y1="14" x2="15" y2="20" />
+    <line x1="15" y1="14" x2="9" y2="20" />
   </svg>
 )
 

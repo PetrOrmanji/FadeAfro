@@ -84,6 +84,47 @@
   color: var(--tg-button-text);
 }
 
+/* ── Карточка отсутствий ──────────────────────────────────────────────────── */
+.unavailCard {
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.unavailCard:active {
+  opacity: 0.7;
+}
+
+.unavailChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.unavailChip {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: rgba(255, 149, 0, 0.12);
+  color: #FF9500;
+}
+
+.unavailChipMore {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--tg-secondary-bg);
+  color: var(--tg-hint);
+}
+
 /* ── Подпись ──────────────────────────────────────────────────────────────── */
 .scheduleFooter {
   display: flex;
