@@ -7,6 +7,8 @@ interface Props {
   unreadCount: number
   onSettingsClick: () => void
   onNotificationsClick: () => void
+  overridePhotoUrl?: string | null  // если передан — показываем вместо Telegram-фото
+  avatarShape?: 'circle' | 'rect'   // по умолчанию circle
 }
 
 const getInitials = (firstName: string, lastName: string | null) => {
@@ -15,7 +17,7 @@ const getInitials = (firstName: string, lastName: string | null) => {
   return first + last
 }
 
-const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick }: Props) => {
+const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick, overridePhotoUrl, avatarShape = 'circle' }: Props) => {
   const launchParams = useLaunchParams()
   const tgUser = launchParams.tgWebAppData?.user
 
@@ -24,13 +26,14 @@ const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick
     : user.firstName
 
   const username = tgUser?.username ? `@${tgUser.username}` : null
-  const photoUrl = typeof tgUser?.photoUrl === 'string' ? tgUser.photoUrl : null
+  const tgPhotoUrl = typeof tgUser?.photoUrl === 'string' ? tgUser.photoUrl : null
+  const photoUrl = overridePhotoUrl !== undefined ? overridePhotoUrl : tgPhotoUrl
   const initials = getInitials(user.firstName, user.lastName)
 
   return (
     <div className={styles.card}>
       <div className={styles.left}>
-        <div className={styles.avatar}>
+        <div className={`${styles.avatar} ${avatarShape === 'rect' ? styles.avatarRect : ''}`}>
           {photoUrl
             ? <img src={photoUrl} alt={fullName} className={styles.avatarImg} />
             : <span className={styles.initials}>{initials}</span>
