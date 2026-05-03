@@ -70,8 +70,9 @@ const ConfirmPage = () => {
       navigate('/client/booking-success', {
         state: { master, selectedServices, selectedDate, selectedTime, totalPrice },
       })
-    } catch {
-      setError('Не удалось создать запись. Попробуйте ещё раз.')
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
+      setError(msg ?? 'Не удалось создать запись. Попробуйте ещё раз.')
     } finally {
       setSubmitting(false)
     }
