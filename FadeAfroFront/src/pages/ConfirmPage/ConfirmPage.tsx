@@ -45,6 +45,7 @@ const ConfirmPage = () => {
 
   const [comment,    setComment]    = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [success,    setSuccess]    = useState(false)
   const [error,      setError]      = useState<string | null>(null)
 
   // Статистика
@@ -59,7 +60,7 @@ const ConfirmPage = () => {
   const initials = (master?.firstName?.charAt(0) ?? '') + (master?.lastName?.charAt(0) ?? '')
 
   const handleBook = async () => {
-    if (!masterProfileId || !selectedDate || !selectedTime) return
+    if (!masterProfileId || !selectedDate || !selectedTime || submitting || success) return
     setSubmitting(true)
     setError(null)
     try {
@@ -69,9 +70,13 @@ const ConfirmPage = () => {
         startTime: selectedTime,
         comment: comment.trim() || undefined,
       })
-      navigate('/client/booking-success', {
-        state: { master, selectedServices, selectedDate, selectedTime, totalPrice },
-      })
+      setSubmitting(false)
+      setSuccess(true)
+      setTimeout(() => {
+        navigate('/client/booking-success', {
+          state: { master, selectedServices, selectedDate, selectedTime, totalPrice },
+        })
+      }, 800)
     } catch (e: unknown) {
       const status = (e as { response?: { status?: number } })?.response?.status
       if (!status || status >= 500) {
@@ -80,7 +85,6 @@ const ConfirmPage = () => {
       }
       const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
       setError(msg ?? 'Не удалось создать запись. Попробуйте ещё раз.')
-    } finally {
       setSubmitting(false)
     }
   }
@@ -165,16 +169,36 @@ const ConfirmPage = () => {
       {/* Нижняя панель */}
       <div className={styles.bottomPanel}>
         <button
-          className={styles.submitBtn}
+          className={`${styles.submitBtn} ${success ? styles.submitBtnSuccess : ''}`}
           onClick={handleBook}
-          disabled={submitting}
+          disabled={submitting || success}
         >
-          {submitting ? 'Запись...' : 'Подтвердить запись'}
+          {success
+            ? <SuccessCheckIcon />
+            : submitting
+              ? <DotsLoader />
+              : 'Подтвердить запись'
+          }
         </button>
       </div>
     </>
   )
 }
+
+// ── Анимации кнопки ────────────────────────────────────────────────────────
+
+const DotsLoader = () => (
+  <span className={styles.dotsLoader}>
+    <span /><span /><span />
+  </span>
+)
+
+const SuccessCheckIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+)
 
 // ── Иконки ─────────────────────────────────────────────────────────────────
 

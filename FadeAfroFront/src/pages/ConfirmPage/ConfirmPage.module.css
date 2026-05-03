@@ -1,3 +1,14 @@
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+@keyframes checkPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.2); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
 @keyframes pageSlideIn {
   from { transform: translateX(40px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
@@ -221,4 +232,34 @@
 
 .submitBtn:hover:not(:disabled) { opacity: 0.85; }
 .submitBtn:active:not(:disabled) { opacity: 0.7; }
-.submitBtn:disabled { opacity: 0.5; }
+.submitBtn:disabled { opacity: 1; }
+
+.submitBtnSuccess {
+  background-color: #34c759;
+  transition: background-color 0.3s ease, opacity 0.15s ease;
+}
+
+/* ── Лоадер с точками ─────────────────────────────────────────────────────── */
+.dotsLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 20px;
+}
+
+.dotsLoader span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--tg-button-text);
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.dotsLoader span:nth-child(2) { animation-delay: 0.15s; }
+.dotsLoader span:nth-child(3) { animation-delay: 0.3s; }
+
+/* Галочка */
+.submitBtnSuccess svg {
+  animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
