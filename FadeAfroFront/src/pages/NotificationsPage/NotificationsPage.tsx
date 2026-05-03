@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { NotificationDto } from '../../api/notifications'
 import { getMyNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '../../api/notifications'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -95,9 +95,31 @@ const NotificationCard = ({
   removing: boolean
   onRead: (id: string) => void
 }) => {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!removing || !ref.current) return
+    const el = ref.current
+    const height = el.offsetHeight
+    el.style.height = `${height}px`
+    el.style.overflow = 'hidden'
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = 'height 0.3s ease, padding 0.3s ease, margin 0.3s ease, opacity 0.2s ease, transform 0.2s ease'
+        el.style.height = '0'
+        el.style.paddingTop = '0'
+        el.style.paddingBottom = '0'
+        el.style.marginBottom = '0'
+        el.style.opacity = '0'
+        el.style.transform = 'translateX(50px)'
+      })
+    })
+  }, [removing])
+
   return (
     <div
-      className={`${styles.card} ${removing ? styles.cardRemoving : ''}`}
+      ref={ref}
+      className={styles.card}
       onClick={() => { if (!removing) onRead(notification.id) }}
     >
       <div className={styles.unreadDot} />
