@@ -61,14 +61,12 @@ const UserCard = ({
         <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
       </div>
       <div className={styles.cardInfo}>
-        <div className={styles.cardNameRow}>
-          <span className={styles.cardName}>{fullName}</span>
-          {isMe && <span className={styles.meTag}>Вы</span>}
-        </div>
+        <span className={styles.cardName}>{fullName}</span>
         {user.username && (
           <span className={styles.cardUsername}>@{user.username}</span>
         )}
         <div className={styles.chipRow}>
+          {isMe && <span className={`${styles.chip} ${styles.chipMe}`}>Вы</span>}
           {user.roles.map(r => <RoleChip key={r} role={r} />)}
         </div>
       </div>
@@ -94,8 +92,8 @@ const OwnerUsersPage = () => {
   useBackButton()
   const navigate = useNavigate()
 
-  const [users,       setUsers]       = useState<UserItem[]>([])
   const [myId,        setMyId]        = useState<string | null>(null)
+  const [users,       setUsers]       = useState<UserItem[]>([])
   const [search,      setSearch]      = useState('')
   const [page,        setPage]        = useState(1)
   const [totalPages,  setTotalPages]  = useState(1)
