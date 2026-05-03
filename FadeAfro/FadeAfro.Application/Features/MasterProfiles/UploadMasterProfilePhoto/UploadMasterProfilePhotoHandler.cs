@@ -30,7 +30,7 @@ public class UploadMasterProfilePhotoHandler : IRequestHandler<UploadMasterProfi
         if (command.FileSize > MaxFileSizeBytes)
             throw new InvalidFileException("Размер файла не должен превышать 5 МБ.");
 
-        var masterProfile = await _masterProfileRepository.GetByIdAsync(command.MasterId);
+        var masterProfile = await _masterProfileRepository.GetByMasterIdAsync(command.MasterId);
 
         if (masterProfile is null)
             throw new MasterProfileNotFoundException();
