@@ -193,7 +193,7 @@ const MasterSchedulePage = () => {
           <div className={styles.logoWrap}>
             <div className={styles.logoPlaceholder}>✂</div>
           </div>
-          <h1 className={styles.title}>График</h1>
+          <h1 className={styles.title}>График работы</h1>
         </div>
 
         {/* Список дней — скроллится */}
