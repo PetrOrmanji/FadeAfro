@@ -78,7 +78,8 @@
 }
 
 .iconBtn:hover {
-  opacity: 0.75;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
 }
 
 .iconBtn:active {
