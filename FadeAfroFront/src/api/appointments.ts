@@ -22,6 +22,29 @@ export interface ClientAppointment {
   master: AppointmentMaster | null
 }
 
+export interface AppointmentClient {
+  firstName: string
+  lastName: string | null
+}
+
+export interface MasterAppointment {
+  id: string
+  startTime: string
+  endTime: string
+  comment: string | null
+  services: AppointmentService[]
+  client: AppointmentClient | null
+}
+
+export const getMasterAppointments = async (): Promise<MasterAppointment[]> => {
+  const res = await apiClient.get('/appointments/master/get/me/appointments')
+  return res.data.appointments
+}
+
+export const cancelMasterAppointment = async (appointmentId: string): Promise<void> => {
+  await apiClient.patch(`/appointments/master/cancel/me/${appointmentId}`)
+}
+
 export const bookAppointment = async (params: {
   masterProfileId: string
   serviceIds: string[]
