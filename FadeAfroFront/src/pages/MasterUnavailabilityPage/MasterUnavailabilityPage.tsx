@@ -6,7 +6,6 @@ import {
   addMyUnavailability,
   deleteMyUnavailability,
   normalizeDayOfWeek,
-  type MasterUnavailabilityItem,
 } from '../../api/schedule'
 import { getMyMasterProfile } from '../../api/masters'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -56,6 +55,13 @@ const MasterUnavailabilityPage = () => {
   const [saving,      setSaving]      = useState(false)
   const [loading,     setLoading]     = useState(true)
 
+  const [masterId, setMasterId] = useState<string | null>(null)
+
+  const reloadUnavailabilities = async (id: string) => {
+    const unavails = await getMasterUnavailabilities(id)
+    setUnavailMap(new Map(unavails.map(u => [u.date.slice(0, 10), u.id])))
+  }
+
   useEffect(() => {
     ;(async () => {
       try {
@@ -64,8 +70,9 @@ const MasterUnavailabilityPage = () => {
           getMasterSchedules(profile.id),
           getMasterUnavailabilities(profile.id),
         ])
+        setMasterId(profile.id)
         setWorkingDows(new Set(schedules.map(s => normalizeDayOfWeek(s.dayOfWeek))))
-        setUnavailMap(new Map(unavails.map(u => [u.date, u.id])))
+        setUnavailMap(new Map(unavails.map(u => [u.date.slice(0, 10), u.id])))
       } catch {
         navigate('/error', { replace: true })
       } finally {
@@ -131,17 +138,16 @@ const MasterUnavailabilityPage = () => {
   const selectedIsUnavail = selectedISO ? unavailMap.has(selectedISO) : false
 
   const handleConfirm = async () => {
-    if (!selectedISO || saving) return
+    if (!selectedISO || saving || !masterId) return
     setSaving(true)
     try {
       if (selectedIsUnavail) {
         const id = unavailMap.get(selectedISO)!
         await deleteMyUnavailability(id)
-        setUnavailMap(prev => { const m = new Map(prev); m.delete(selectedISO); return m })
       } else {
-        const item: MasterUnavailabilityItem = await addMyUnavailability(selectedISO)
-        setUnavailMap(prev => new Map(prev).set(selectedISO, item.id))
+        await addMyUnavailability(selectedISO)
       }
+      await reloadUnavailabilities(masterId)
       setSelectedISO(null)
     } catch (e: unknown) {
       const status = (e as { response?: { status?: number } })?.response?.status
