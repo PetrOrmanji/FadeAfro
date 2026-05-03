@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import type { MasterProfile } from '../../api/masters'
 import type { MasterService } from '../../api/services'
 import { getMasterSchedules, getMasterUnavailabilities, normalizeDayOfWeek } from '../../api/schedule'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './SelectDatePage.module.css'
 
 // ── Константы ──────────────────────────────────────────────────────────────
@@ -139,7 +140,7 @@ const SelectDatePage = () => {
     })
   }
 
-  if (loading) return <div className={styles.loading}>Загрузка...</div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>

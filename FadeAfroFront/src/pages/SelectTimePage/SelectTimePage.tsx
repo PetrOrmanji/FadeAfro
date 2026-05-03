@@ -5,6 +5,7 @@ import type { MasterService } from '../../api/services'
 import type { TimeSlot } from '../../api/availability'
 import { getDayAvailability } from '../../api/availability'
 import { durationToMinutes } from '../../utils/duration'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './SelectTimePage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ const SelectTimePage = () => {
     })
   }
 
-  if (loading) return <div className={styles.loading}>Загрузка...</div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>

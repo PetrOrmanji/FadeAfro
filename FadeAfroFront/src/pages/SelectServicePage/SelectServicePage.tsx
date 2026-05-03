@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getMasterServices, type MasterService } from '../../api/services'
 import { getMasterPhotoUrl, type MasterProfile } from '../../api/masters'
 import { formatDuration, durationToMinutes, minutesToFormatted } from '../../utils/duration'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './SelectServicePage.module.css'
 
 // ── Карточка мастера ───────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ const SelectServicePage = () => {
     })
   }
 
-  if (loading) return <div className={styles.loading}>Загрузка...</div>
+  if (loading) return <LoadingScreen />
 
   return (
     <>

@@ -1,5 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { hasRole, useAuth } from '../context/AuthContext'
+import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
 import ClientPage from '../pages/ClientPage/ClientPage'
 import SettingsPage from '../pages/SettingsPage/SettingsPage'
 import SelectServicePage from '../pages/SelectServicePage/SelectServicePage'
@@ -11,9 +12,6 @@ import ErrorPage from '../pages/ErrorPage/ErrorPage'
 import MyAppointmentsPage from '../pages/MyAppointmentsPage/MyAppointmentsPage'
 import MasterPage from '../pages/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
-
-// Показываем пока идёт загрузка
-const Loading = () => <div>Загрузка...</div>
 
 // Куда редиректить в зависимости от ролей
 const RootRedirect = () => {
@@ -27,7 +25,7 @@ const RootRedirect = () => {
 const AppRouter = () => {
   const { isLoading, isAuthenticated } = useAuth()
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <LoadingScreen />
   if (!isAuthenticated) return (
     <HashRouter>
       <Routes>

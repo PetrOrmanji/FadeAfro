@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './MyAppointmentsPage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -149,7 +150,7 @@ const MyAppointmentsPage = () => {
     setAppointments(prev => prev.filter(a => a.id !== id))
   }
 
-  if (loading) return <div className={styles.loading}>Загрузка...</div>
+  if (loading) return <LoadingScreen />
 
   return (
     <div className={styles.page}>

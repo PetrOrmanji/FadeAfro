@@ -4,6 +4,7 @@ import { getAllMasters, type MasterProfile } from '../../api/masters'
 import { getMe, type UserResponse } from '../../api/user'
 import MasterCard from '../../components/MasterCard/MasterCard'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './ClientPage.module.css'
 
 // Пока нет логотипа — показываем плейсхолдер.
@@ -39,7 +40,7 @@ const ClientPage = () => {
   }
 
   if (loading) {
-    return <div className={styles.loading}>Загрузка...</div>
+    return <LoadingScreen />
   }
 
   return (
