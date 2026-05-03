@@ -279,6 +279,47 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Экран подтверждения ──────────────────────────────────────────────────── */
+.panelWarningIcon {
+  font-size: 36px;
+  text-align: center;
+  margin: 4px 0 2px;
+}
+
+.panelWarningTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--tg-text);
+  text-align: center;
+}
+
+.panelWarningList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+}
+
+.panelWarningItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--tg-text);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.panelWarningDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+  flex-shrink: 0;
+}
+
 /* ── Загрузить ещё ────────────────────────────────────────────────────────── */
 .loadMoreBtn {
   width: 100%;

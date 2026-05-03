@@ -75,16 +75,25 @@ const UserActionPanel = ({
   onDismiss: (id: string) => Promise<void>
   onClose: () => void
 }) => {
-  const [pending, setPending] = useState(false)
+  const [pending,      setPending]      = useState(false)
+  const [confirmMode,  setConfirmMode]  = useState(false)
   const isMaster = user.roles.includes('Master')
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
 
-  const handleAction = async () => {
-    if (pending) return
+  const handleAssign = async () => {
     setPending(true)
     try {
-      if (isMaster) await onDismiss(user.id)
-      else          await onAssign(user.id)
+      await onAssign(user.id)
+      onClose()
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const handleDismissConfirmed = async () => {
+    setPending(true)
+    try {
+      await onDismiss(user.id)
       onClose()
     } finally {
       setPending(false)
@@ -96,27 +105,72 @@ const UserActionPanel = ({
       <div className={styles.overlay} onClick={onClose} />
       <div className={styles.bottomPanel}>
         <div className={styles.panelHandle} />
-        <div className={styles.panelUser}>
-          <div className={styles.panelAvatar}>
-            <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
-          </div>
-          <div>
-            <div className={styles.panelName}>{fullName}</div>
-            {user.username && (
-              <div className={styles.panelUsername}>@{user.username}</div>
+
+        {confirmMode ? (
+          /* ── Экран подтверждения увольнения ── */
+          <>
+            <div className={styles.panelWarningIcon}>⚠️</div>
+            <div className={styles.panelWarningTitle}>Уволить {fullName}?</div>
+            <div className={styles.panelWarningList}>
+              <div className={styles.panelWarningItem}>
+                <span className={styles.panelWarningDot} />
+                Все активные записи будут отменены
+              </div>
+              <div className={styles.panelWarningItem}>
+                <span className={styles.panelWarningDot} />
+                Клиенты получат уведомления об отмене
+              </div>
+              <div className={styles.panelWarningItem}>
+                <span className={styles.panelWarningDot} />
+                Пользователь станет обычным клиентом
+              </div>
+            </div>
+            <button
+              className={`${styles.panelBtn} ${styles.panelBtnDismiss}`}
+              onClick={handleDismissConfirmed}
+              disabled={pending}
+            >
+              {pending ? 'Выполняется...' : 'Подтвердить'}
+            </button>
+            <button className={styles.panelBtnCancel} onClick={() => setConfirmMode(false)}>
+              Назад
+            </button>
+          </>
+        ) : (
+          /* ── Главный экран панели ── */
+          <>
+            <div className={styles.panelUser}>
+              <div className={styles.panelAvatar}>
+                <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
+              </div>
+              <div>
+                <div className={styles.panelName}>{fullName}</div>
+                {user.username && (
+                  <div className={styles.panelUsername}>@{user.username}</div>
+                )}
+              </div>
+            </div>
+            {isMaster ? (
+              <button
+                className={`${styles.panelBtn} ${styles.panelBtnDismiss}`}
+                onClick={() => setConfirmMode(true)}
+              >
+                Уволить мастера
+              </button>
+            ) : (
+              <button
+                className={styles.panelBtn}
+                onClick={handleAssign}
+                disabled={pending}
+              >
+                {pending ? '...' : 'Назначить мастером'}
+              </button>
             )}
-          </div>
-        </div>
-        <button
-          className={`${styles.panelBtn} ${isMaster ? styles.panelBtnDismiss : ''}`}
-          onClick={handleAction}
-          disabled={pending}
-        >
-          {pending ? '...' : isMaster ? 'Уволить мастера' : 'Назначить мастером'}
-        </button>
-        <button className={styles.panelBtnCancel} onClick={onClose}>
-          Отмена
-        </button>
+            <button className={styles.panelBtnCancel} onClick={onClose}>
+              Отмена
+            </button>
+          </>
+        )}
       </div>
     </>
   )
