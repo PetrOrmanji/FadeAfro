@@ -54,7 +54,7 @@ public class CancelAppointmentByClientHandler : IRequestHandler<CancelAppointmen
         var localTime = TimeZoneInfo.ConvertTimeFromUtc(appointment.StartTime, _timeZone);
 
         var notificationText =
-            $"❌ Клиент {clientInfo} отменил запись на " +
+            $"Клиент {clientInfo} отменил запись на " +
             $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
         
         return notificationText;

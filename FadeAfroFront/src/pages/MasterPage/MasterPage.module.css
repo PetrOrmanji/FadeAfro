@@ -99,7 +99,7 @@
 
 .appointmentClient {
   font-size: 13px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -155,7 +155,7 @@
 
 .scheduleHint {
   font-size: 13px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
 }
 
 .scheduleTime {

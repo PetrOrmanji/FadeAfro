@@ -104,7 +104,7 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
 
         var localTime = TimeZoneInfo.ConvertTimeFromUtc(startTime, _timeZone);
 
-        return $"📅 {clientInfo} записался на " +
+        return $"{clientInfo} записался на " +
                $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
     }
 }
