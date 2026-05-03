@@ -138,30 +138,72 @@
   color: var(--tg-link);
 }
 
-.cardRoles {
-  font-size: 12px;
-  color: var(--tg-text);
+.cardNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meTag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tg-button);
+  background-color: color-mix(in srgb, var(--tg-button) 12%, transparent);
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+/* ── Чипы ролей ───────────────────────────────────────────────────────────── */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.chip {
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.chipOwner {
+  color: #b8860b;
+  background-color: rgba(255, 200, 0, 0.15);
+}
+
+.chipMaster {
+  color: var(--tg-button);
+  background-color: color-mix(in srgb, var(--tg-button) 12%, transparent);
+}
+
+.chipClient {
+  color: var(--tg-hint);
+  background-color: var(--tg-secondary-bg);
 }
 
 /* ── Кнопка действия ──────────────────────────────────────────────────────── */
 .actionBtn {
   flex-shrink: 0;
-  padding: 7px 14px;
+  padding: 7px 11px;
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   background-color: var(--tg-button);
   color: var(--tg-button-text);
   -webkit-tap-highlight-color: transparent;
   transition: opacity 0.15s;
+  white-space: nowrap;
 }
 
 .actionBtn:disabled { opacity: 0.5; }
 
 .actionBtnDismiss {
-  background-color: transparent;
-  color: #ff3b30;
-  border: 1.5px solid #ff3b30;
+  background-color: #ff3b30;
+  color: #ffffff;
+  border: none;
 }
 
 /* ── Загрузить ещё ────────────────────────────────────────────────────────── */

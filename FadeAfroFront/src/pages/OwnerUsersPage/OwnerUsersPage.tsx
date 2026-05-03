@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  getAllUsers, assignMaster, dismissMaster,
+  getAllUsers, assignMaster, dismissMaster, getMe,
   type UserItem,
 } from '../../api/user'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -10,23 +10,31 @@ import styles from './OwnerUsersPage.module.css'
 
 const PAGE_SIZE = 20
 
-const ROLE_LABELS: Record<string, string> = {
-  Client: 'Клиент',
-  Master: 'Мастер',
-  Owner:  'Владелец',
-}
-
 const getInitials = (firstName: string, lastName: string | null) =>
   (firstName.charAt(0) + (lastName?.charAt(0) ?? '')).toUpperCase()
+
+// ── Чипы ролей ────────────────────────────────────────────────────────────
+
+const RoleChip = ({ role }: { role: string }) => {
+  const map: Record<string, { label: string; cls: string }> = {
+    Owner:  { label: 'Владелец', cls: styles.chipOwner },
+    Master: { label: 'Мастер',   cls: styles.chipMaster },
+    Client: { label: 'Клиент',   cls: styles.chipClient },
+  }
+  const { label, cls } = map[role] ?? { label: role, cls: '' }
+  return <span className={`${styles.chip} ${cls}`}>{label}</span>
+}
 
 // ── Карточка пользователя ──────────────────────────────────────────────────
 
 const UserCard = ({
   user,
+  isMe,
   onAssign,
   onDismiss,
 }: {
   user: UserItem
+  isMe: boolean
   onAssign: (id: string) => void
   onDismiss: (id: string) => void
 }) => {
@@ -35,7 +43,6 @@ const UserCard = ({
   const isOwner  = user.roles.includes('Owner')
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
-  const roleLabels = user.roles.map(r => ROLE_LABELS[r] ?? r).join(', ')
 
   const handleAction = async () => {
     if (pending) return
@@ -49,18 +56,23 @@ const UserCard = ({
   }
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${isMe ? styles.cardMe : ''}`}>
       <div className={styles.cardAvatar}>
         <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
       </div>
       <div className={styles.cardInfo}>
-        <span className={styles.cardName}>{fullName}</span>
+        <div className={styles.cardNameRow}>
+          <span className={styles.cardName}>{fullName}</span>
+          {isMe && <span className={styles.meTag}>Вы</span>}
+        </div>
         {user.username && (
           <span className={styles.cardUsername}>@{user.username}</span>
         )}
-        <span className={styles.cardRoles}>{roleLabels}</span>
+        <div className={styles.chipRow}>
+          {user.roles.map(r => <RoleChip key={r} role={r} />)}
+        </div>
       </div>
-      {!isOwner && (
+      {!isOwner && !isMe && (
         <button
           className={`${styles.actionBtn} ${isMaster ? styles.actionBtnDismiss : ''}`}
           onClick={handleAction}
@@ -68,7 +80,7 @@ const UserCard = ({
         >
           {pending
             ? '...'
-            : isMaster ? 'Уволить' : 'Мастер'
+            : isMaster ? 'Уволить мастера' : 'Назначить мастером'
           }
         </button>
       )}
@@ -83,6 +95,7 @@ const OwnerUsersPage = () => {
   const navigate = useNavigate()
 
   const [users,       setUsers]       = useState<UserItem[]>([])
+  const [myId,        setMyId]        = useState<string | null>(null)
   const [search,      setSearch]      = useState('')
   const [page,        setPage]        = useState(1)
   const [totalPages,  setTotalPages]  = useState(1)
@@ -104,7 +117,10 @@ const OwnerUsersPage = () => {
   // Начальная загрузка
   useEffect(() => {
     setLoading(true)
-    fetchUsers(1, '', true).finally(() => setLoading(false))
+    Promise.all([
+      fetchUsers(1, '', true),
+      getMe().then(me => setMyId(me.id)).catch(() => {}),
+    ]).finally(() => setLoading(false))
   }, [])
 
   // Поиск с дебаунсом
@@ -170,6 +186,7 @@ const OwnerUsersPage = () => {
               <UserCard
                 key={u.id}
                 user={u}
+                isMe={u.id === myId}
                 onAssign={handleAssign}
                 onDismiss={handleDismiss}
               />
