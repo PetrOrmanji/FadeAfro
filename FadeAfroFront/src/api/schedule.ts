@@ -47,3 +47,12 @@ export const getMasterUnavailabilities = async (
   const res = await apiClient.get(`/master-unavailabilities/get/${masterProfileId}`)
   return res.data.unavailabilities
 }
+
+export const addMyUnavailability = async (date: string): Promise<MasterUnavailabilityItem> => {
+  const res = await apiClient.post('/master-unavailabilities/add/me', { date })
+  return res.data
+}
+
+export const deleteMyUnavailability = async (id: string): Promise<void> => {
+  await apiClient.delete(`/master-unavailabilities/delete/me/${id}`)
+}
