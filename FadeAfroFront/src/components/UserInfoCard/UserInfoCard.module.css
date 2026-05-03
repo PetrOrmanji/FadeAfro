@@ -52,7 +52,7 @@
 
 .username {
   font-size: 13px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
 }
 
 .settingsBtn {

@@ -43,6 +43,61 @@
   user-select: none;
 }
 
+/* ── Ближайшая запись ─────────────────────────────────────────────────────── */
+.upcomingCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+}
+
+.upcomingLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.upcomingDateRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tg-button);
+}
+
+.upcomingDate {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tg-button);
+}
+
+.upcomingInfo {
+  font-size: 13px;
+  color: var(--tg-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.allAppointmentsBtn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  color: var(--tg-button);
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.allAppointmentsBtn:active { opacity: 0.6; }
+
 .mastersSection {
   display: flex;
   flex-direction: column;
