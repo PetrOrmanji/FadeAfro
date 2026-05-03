@@ -1,0 +1,184 @@
+@keyframes pageSlideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ── Шапка — не скроллится ────────────────────────────────────────────────── */
+.header {
+  flex-shrink: 0;
+  padding: 16px 16px 12px;
+}
+
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 48px;
+}
+
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: #ffffff;
+  user-select: none;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tg-text);
+}
+
+/* ── Список дней — скроллится ────────────────────────────────────────────── */
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listWithPanel {
+  padding-bottom: 96px;
+}
+
+/* ── Карточка дня ────────────────────────────────────────────────────────── */
+.card {
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dayLabel {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tg-hint);
+  transition: color 0.2s ease;
+}
+
+.dayLabelActive {
+  color: var(--tg-text);
+  font-weight: 600;
+}
+
+/* ── Тоггл ───────────────────────────────────────────────────────────────── */
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background-color: var(--tg-secondary-bg);
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggleOn {
+  background-color: var(--tg-button);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(20px);
+}
+
+/* ── Время ───────────────────────────────────────────────────────────────── */
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.timeLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--tg-hint);
+  text-transform: uppercase;
+}
+
+.timeInput {
+  background-color: var(--tg-secondary-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tg-text);
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.timeSep {
+  font-size: 18px;
+  color: var(--tg-hint);
+  padding-top: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Нижняя панель ───────────────────────────────────────────────────────── */
+.bottomPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px 28px;
+  background-color: var(--tg-secondary-bg);
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.saveBtn:hover   { opacity: 0.85; }
+.saveBtn:active  { opacity: 0.7;  }
+.saveBtn:disabled { opacity: 0.5; cursor: default; }
