@@ -1,0 +1,131 @@
+@keyframes pageSlideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  min-height: 100%;
+  animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ── Логотип ──────────────────────────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 48px;
+}
+
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* ── Заголовок ────────────────────────────────────────────────────────────── */
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tg-text);
+  margin: 0;
+}
+
+.markAllBtn {
+  background: none;
+  color: var(--tg-button);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 0;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.markAllBtn:active   { opacity: 0.6; }
+.markAllBtn:disabled { opacity: 0.4; }
+
+/* ── Список ───────────────────────────────────────────────────────────────── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Карточка ─────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 14px 16px 14px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: opacity 0.15s;
+  cursor: default;
+}
+
+.cardUnread {
+  background-color: var(--tg-bg);
+  cursor: pointer;
+}
+
+.cardUnread:active { opacity: 0.7; }
+
+.cardRead {
+  background-color: var(--tg-secondary-bg);
+}
+
+/* Точка непрочитанного */
+.unreadDot {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  flex-shrink: 0;
+}
+
+.cardText {
+  font-size: 15px;
+  color: var(--tg-text);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.cardRead .cardText {
+  color: var(--tg-hint);
+}
+
+/* ── Пусто ────────────────────────────────────────────────────────────────── */
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.emptyText {
+  font-size: 15px;
+  color: var(--tg-hint);
+  text-align: center;
+}
