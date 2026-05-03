@@ -15,9 +15,6 @@ public class MasterProfileConfiguration : IEntityTypeConfiguration<MasterProfile
         builder.Property(mp => mp.PhotoUrl)
             .HasMaxLength(500);
 
-        builder.Property(mp => mp.Description)
-            .HasMaxLength(1000);
-
         builder.Property(mp => mp.CreatedAt)
             .IsRequired();
 

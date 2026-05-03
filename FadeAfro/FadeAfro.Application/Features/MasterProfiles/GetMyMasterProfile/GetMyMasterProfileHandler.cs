@@ -26,7 +26,6 @@ public class GetMyMasterProfileHandler : IRequestHandler<GetMyMasterProfileQuery
             masterProfile.MasterId,
             masterProfile.Master.FirstName,
             masterProfile.Master.LastName,
-            masterProfile.PhotoUrl,
-            masterProfile.Description);
+            masterProfile.PhotoUrl);
     }
 }

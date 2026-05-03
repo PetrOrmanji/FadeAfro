@@ -31,7 +31,6 @@ public class GetClientActiveAppointmentsHandler : IRequestHandler<GetClientActiv
             var appointmentMasterDto = new AppointmentMasterDto(
                 appointment.MasterProfile.Master.FirstName,
                 appointment.MasterProfile.Master.LastName,
-                appointment.MasterProfile.Description,
                 appointment.MasterProfile.PhotoUrl);
 
             var appointmentDto = new AppointmentDto(

@@ -5,7 +5,6 @@ using FadeAfro.Application.Features.MasterProfiles.GetMasterProfileDayAvailabili
 using FadeAfro.Application.Features.MasterProfiles.GetMasterProfilePhoto;
 using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
-using FadeAfro.Application.Features.MasterProfiles.UpdateMasterProfileDescription;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterProfilePhoto;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;
@@ -86,19 +85,6 @@ public class MasterProfilesController : ControllerBase
         
         var response = await _mediator.Send(getMasterProfileDayAvailabilityQuery);
         return Ok(response);
-    }
-    
-    [HttpPut("update/me/description")]
-    [Authorize(Roles = Roles.Master)]
-    [SwaggerOperation(Summary = "Update my master profile description")]
-    public async Task<IActionResult> UpdateMyMasterProfile([FromBody] UpdateMasterProfileDescriptionRequest request)
-    {
-        var updateMasterProfileDescriptionCommand = new UpdateMasterProfileDescriptionCommand(
-            User.GetUserId(),
-            request.Description);
-        
-        await _mediator.Send(updateMasterProfileDescriptionCommand);
-        return NoContent();
     }
     
     [HttpPost("upload/me/photo")]

@@ -5,5 +5,4 @@ public record GetMasterProfileResponse(
     Guid MasterId,
     string FirstName,
     string? LastName,
-    string? PhotoUrl,
-    string? Description);
+    string? PhotoUrl);

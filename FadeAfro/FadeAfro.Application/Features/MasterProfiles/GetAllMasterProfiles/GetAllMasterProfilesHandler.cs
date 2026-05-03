@@ -25,8 +25,7 @@ public class GetAllMasterProfilesHandler : IRequestHandler<GetAllMasterProfilesQ
                 masterProfile.Id,
                 masterProfile.Master.FirstName,
                 masterProfile.Master.LastName,
-                masterProfile.PhotoUrl,
-                masterProfile.Description);
+                masterProfile.PhotoUrl);
             
             masterProfileDtos.Add(masterProfileDto);
         }
