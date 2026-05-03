@@ -17,9 +17,15 @@ const NotificationsPage = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleMarkOne = async (id: string) => {
-    await markNotificationAsRead(id)
-    setNotifications(prev => prev.filter(n => n.id !== id))
+  const [removingIds, setRemovingIds] = useState<Set<string>>(new Set())
+
+  const handleMarkOne = (id: string) => {
+    setRemovingIds(prev => new Set(prev).add(id))
+    markNotificationAsRead(id)
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id))
+      setRemovingIds(prev => { const s = new Set(prev); s.delete(id); return s })
+    }, 350)
   }
 
   const handleMarkAll = async () => {
@@ -67,6 +73,7 @@ const NotificationsPage = () => {
             <NotificationCard
               key={n.id}
               notification={n}
+              removing={removingIds.has(n.id)}
               onRead={handleMarkOne}
             />
           ))}
@@ -81,13 +88,18 @@ const NotificationsPage = () => {
 
 const NotificationCard = ({
   notification,
+  removing,
   onRead,
 }: {
   notification: NotificationDto
+  removing: boolean
   onRead: (id: string) => void
 }) => {
   return (
-    <div className={styles.card} onClick={() => onRead(notification.id)}>
+    <div
+      className={`${styles.card} ${removing ? styles.cardRemoving : ''}`}
+      onClick={() => { if (!removing) onRead(notification.id) }}
+    >
       <div className={styles.unreadDot} />
       <p className={styles.cardText}>{notification.text}</p>
     </div>

@@ -1,3 +1,9 @@
+@keyframes cardRemove {
+  0%   { opacity: 1; transform: translateX(0);     max-height: 200px; margin-bottom: 0; }
+  40%  { opacity: 0; transform: translateX(60px);  max-height: 200px; }
+  100% { opacity: 0; transform: translateX(60px);  max-height: 0;     padding: 0; }
+}
+
 @keyframes pageSlideIn {
   from { transform: translateX(40px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
@@ -86,12 +92,19 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  transition: opacity 0.15s;
   cursor: pointer;
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .card:active { opacity: 0.7; }
+
+.cardRemoving {
+  animation: cardRemove 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+  overflow: hidden;
+}
 
 .unreadDot {
   position: absolute;

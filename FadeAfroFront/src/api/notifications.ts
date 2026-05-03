@@ -6,7 +6,7 @@ export interface NotificationDto {
 }
 
 export const getMyNotifications = async (): Promise<NotificationDto[]> => {
-  const res = await apiClient.get<{ notifications: NotificationDto[] }>('/notifications/get/me/all')
+  const res = await apiClient.get<{ notifications: NotificationDto[] }>('/notifications/get/me/unread')
   return res.data.notifications
 }
 
