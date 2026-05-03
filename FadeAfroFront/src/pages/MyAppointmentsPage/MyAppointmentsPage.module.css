@@ -21,33 +21,31 @@
   font-size: 15px;
 }
 
-/* ── Шапка ────────────────────────────────────────────────────────────────── */
-.header {
+/* ── Логотип ──────────────────────────────────────────────────────────────── */
+.logoWrap {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 0 4px;
+  justify-content: center;
+  padding: 8px 0 28px;
 }
 
-.backBtn {
-  background: none;
-  color: var(--tg-button);
+.logoPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 30px;
   display: flex;
   align-items: center;
-  padding: 4px;
-  margin-left: -4px;
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.15s;
-  flex-shrink: 0;
+  justify-content: center;
+  user-select: none;
 }
-
-.backBtn:active { opacity: 0.6; }
 
 .title {
   font-size: 22px;
   font-weight: 700;
   color: var(--tg-text);
-  margin: 0;
+  margin: 0 0 4px;
 }
 
 /* ── Список ───────────────────────────────────────────────────────────────── */

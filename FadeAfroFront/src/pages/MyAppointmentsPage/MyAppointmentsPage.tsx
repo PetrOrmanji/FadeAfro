@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
@@ -137,7 +136,6 @@ const AppointmentCard = ({
 // ── Страница ───────────────────────────────────────────────────────────────
 
 const MyAppointmentsPage = () => {
-  const navigate = useNavigate()
   useBackButton()
   const [appointments, setAppointments] = useState<ClientAppointment[]>([])
   const [loading, setLoading] = useState(true)
@@ -157,12 +155,11 @@ const MyAppointmentsPage = () => {
   return (
     <div className={styles.page}>
 
-      <div className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
-          <ChevronLeftIcon />
-        </button>
-        <h1 className={styles.title}>Мои записи</h1>
+      <div className={styles.logoWrap}>
+        <div className={styles.logoPlaceholder}>✂</div>
       </div>
+
+      <h1 className={styles.title}>Мои записи</h1>
 
       {appointments.length === 0 ? (
         <div className={styles.empty}>
@@ -200,13 +197,6 @@ const CalendarIcon = () => (
     <line x1="16" y1="2" x2="16" y2="6" />
     <line x1="8"  y1="2" x2="8"  y2="6" />
     <line x1="3"  y1="10" x2="21" y2="10" />
-  </svg>
-)
-
-const ChevronLeftIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="15 18 9 12 15 6" />
   </svg>
 )
 
