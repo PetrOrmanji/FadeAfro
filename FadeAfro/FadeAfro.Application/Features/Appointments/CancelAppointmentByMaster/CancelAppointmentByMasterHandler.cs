@@ -55,14 +55,10 @@ public class CancelAppointmentByMasterHandler : IRequestHandler<CancelAppointmen
     private string PrepareNotificationText(Appointment appointment)
     {
         var masterName = appointment.MasterProfile.Master.GetFullName();
-        var masterInfo = string.IsNullOrWhiteSpace(appointment.MasterProfile.Master.Username)
-            ? masterName
-            : $"{masterName} (@{appointment.MasterProfile.Master.Username})";
-
         var localTime = TimeZoneInfo.ConvertTimeFromUtc(appointment.StartTime, _timeZone);
 
         var notificationText =
-            $"❌Мастер {masterInfo} отменил вашу запись на " +
+            $"❌ Мастер {masterName} отменил вашу запись на " +
             $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
         
         return notificationText;
