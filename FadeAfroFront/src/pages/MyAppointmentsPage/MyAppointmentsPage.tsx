@@ -158,12 +158,15 @@ const MyAppointmentsPage = () => {
   return (
     <div className={styles.page}>
 
-      <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+      {/* Шапка — не прокручивается */}
+      <div className={styles.header}>
+        <div className={styles.logoWrap}>
+          <div className={styles.logoPlaceholder}>✂</div>
+        </div>
+        <h1 className={styles.title}>Мои записи</h1>
       </div>
 
-      <h1 className={styles.title}>Мои записи</h1>
-
+      {/* Контент — прокручивается */}
       {appointments.length === 0 ? (
         <div className={styles.emptyCard}>
           <EmptyCalendarIllustration />

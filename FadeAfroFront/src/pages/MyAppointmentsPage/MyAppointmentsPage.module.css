@@ -6,10 +6,17 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  min-height: 100vh;
+  height: 100vh;
   animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ── Шапка (не прокручивается) ────────────────────────────────────────────── */
+.header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 12px;
+  gap: 12px;
 }
 
 .loading {
@@ -48,11 +55,14 @@
   margin: 0 0 4px;
 }
 
-/* ── Список ───────────────────────────────────────────────────────────────── */
+/* ── Список (прокручивается) ──────────────────────────────────────────────── */
 .list {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 4px 16px 24px;
 }
 
 /* ── Карточка ─────────────────────────────────────────────────────────────── */
@@ -62,6 +72,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 /* ── Секция (мастер / услуги / дата) ─────────────────────────────────────── */
@@ -196,6 +207,7 @@
   align-items: center;
   justify-content: center;
   padding: 32px;
+  margin: 0 16px 16px;
   min-height: 0;
 }
 
