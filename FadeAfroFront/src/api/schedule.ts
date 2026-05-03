@@ -29,6 +29,18 @@ export const getMasterSchedules = async (
   return res.data.schedules
 }
 
+export const setMySchedule = async (
+  dayOfWeek: number,
+  startTime: string,
+  endTime: string,
+): Promise<void> => {
+  await apiClient.post('/master-schedules/set/me', { dayOfWeek, startTime, endTime })
+}
+
+export const deleteMySchedule = async (scheduleId: string): Promise<void> => {
+  await apiClient.delete(`/master-schedules/delete/me/${scheduleId}`)
+}
+
 export const getMasterUnavailabilities = async (
   masterProfileId: string,
 ): Promise<MasterUnavailabilityItem[]> => {

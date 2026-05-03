@@ -13,6 +13,7 @@ import MyAppointmentsPage from '../pages/MyAppointmentsPage/MyAppointmentsPage'
 import NotificationsPage from '../pages/NotificationsPage/NotificationsPage'
 import MasterPage from '../pages/MasterPage/MasterPage'
 import MasterSettingsPage from '../pages/MasterSettingsPage/MasterSettingsPage'
+import MasterSchedulePage from '../pages/MasterSchedulePage/MasterSchedulePage'
 import OwnerPage from '../pages/OwnerPage'
 
 // Куда редиректить в зависимости от ролей
@@ -53,6 +54,7 @@ const AppRouter = () => {
         <Route path="/master" element={<MasterPage />} />
         <Route path="/master/settings" element={<MasterSettingsPage />} />
         <Route path="/master/notifications" element={<NotificationsPage />} />
+        <Route path="/master/schedule"      element={<MasterSchedulePage />} />
         <Route path="/owner"  element={<OwnerPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
