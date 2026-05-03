@@ -1,0 +1,3 @@
+namespace FadeAfro.Application.Features.Notifications.GetMyUnreadNotificationsCount;
+
+public record GetMyUnreadNotificationsCountResponse(int Count);

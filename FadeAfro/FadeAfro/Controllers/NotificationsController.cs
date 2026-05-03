@@ -1,4 +1,5 @@
 using FadeAfro.Application.Features.Notifications.GetMyNotifications;
+using FadeAfro.Application.Features.Notifications.GetMyUnreadNotificationsCount;
 using FadeAfro.Application.Features.Notifications.MarkMyNotificationAsRead;
 using FadeAfro.Application.Features.Notifications.MarkMyNotificationsAsRead;
 using FadeAfro.Extensions;
@@ -19,6 +20,18 @@ public class NotificationsController : ControllerBase
     public NotificationsController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+    
+    [HttpGet("get/me/count/unread")]
+    [Authorize]
+    [SwaggerOperation(Summary = "Get count of my unread notifications")]
+    public async Task<IActionResult> GetCountOfMyUnreadNotifications()
+    {
+        var getMyUnreadNotificationsCountQuery = new GetMyUnreadNotificationsCountQuery(
+            User.GetUserId());
+        
+        var response = await _mediator.Send(getMyUnreadNotificationsCountQuery);
+        return Ok(response);
     }
 
     [HttpGet("get/me/all")]

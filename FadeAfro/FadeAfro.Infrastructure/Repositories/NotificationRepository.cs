@@ -14,6 +14,11 @@ public class NotificationRepository : INotificationRepository
         _context = context;
     }
     
+    public async Task<int> GetUnreadNotificationsCountByUserId(Guid userId)
+    {
+        return await _context.Notifications.CountAsync(x => x.UserId == userId && x.IsRead == false);
+    }
+    
     public async Task<List<Notification>> GetNotificationsByUserId(Guid userId)
     {
         return await _context.Notifications.Where(x => x.UserId == userId).ToListAsync();
