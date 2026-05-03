@@ -54,6 +54,7 @@ const MasterUnavailabilityPage = () => {
   const [selectedISO, setSelectedISO] = useState<string | null>(null)
   const [saving,      setSaving]      = useState(false)
   const [loading,     setLoading]     = useState(true)
+  const [errorMsg,    setErrorMsg]    = useState<string | null>(null)
 
   const [masterId, setMasterId] = useState<string | null>(null)
 
@@ -132,6 +133,7 @@ const MasterUnavailabilityPage = () => {
   const handleDayClick = (d: Date) => {
     if (!isSelectable(d)) return
     const iso = toISO(d)
+    setErrorMsg(null)
     setSelectedISO(prev => prev === iso ? null : iso)
   }
 
@@ -150,8 +152,12 @@ const MasterUnavailabilityPage = () => {
       await reloadUnavailabilities(masterId)
       setSelectedISO(null)
     } catch (e: unknown) {
-      const status = (e as { response?: { status?: number } })?.response?.status
-      if (!status || status >= 500) navigate('/error', { replace: true })
+      const res = (e as { response?: { status?: number; data?: { error?: string } } })?.response
+      if (!res || (res.status ?? 0) >= 500) {
+        navigate('/error', { replace: true })
+      } else {
+        setErrorMsg(res.data?.error ?? 'Ошибка. Попробуйте ещё раз.')
+      }
     } finally {
       setSaving(false)
     }
@@ -212,6 +218,9 @@ const MasterUnavailabilityPage = () => {
               <span className={styles.legendText}>Отсутствие</span>
             </div>
           </div>
+
+          {/* Ошибка */}
+          {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
         </div>
       </div>
