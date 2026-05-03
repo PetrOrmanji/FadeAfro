@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
@@ -137,14 +138,16 @@ const AppointmentCard = ({
 
 const MyAppointmentsPage = () => {
   useBackButton()
+  const navigate = useNavigate()
   const [appointments, setAppointments] = useState<ClientAppointment[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getMyAppointments()
       .then(setAppointments)
+      .catch(() => navigate('/error'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [navigate])
 
   const handleCancel = (id: string) => {
     setAppointments(prev => prev.filter(a => a.id !== id))

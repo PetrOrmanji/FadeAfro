@@ -1,8 +1,6 @@
-import { useNavigate } from 'react-router-dom'
 import styles from './ErrorPage.module.css'
 
 const ErrorPage = () => {
-  const navigate = useNavigate()
 
   return (
     <div className={styles.page}>
@@ -24,7 +22,7 @@ const ErrorPage = () => {
       </div>
 
       <div className={styles.bottomPanel}>
-        <button className={styles.retryBtn} onClick={() => navigate('/')}>
+        <button className={styles.retryBtn} onClick={() => window.location.reload()}>
           Обновить
         </button>
       </div>

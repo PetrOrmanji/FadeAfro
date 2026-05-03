@@ -79,6 +79,7 @@ const ClientPage = () => {
         setAppointments(appointmentsData)
         setUnreadCount(unreadCountData)
       })
+      .catch(() => navigate('/error'))
       .finally(() => setLoading(false))
   }, [])
 

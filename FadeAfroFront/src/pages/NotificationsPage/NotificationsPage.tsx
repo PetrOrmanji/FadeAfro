@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { NotificationDto } from '../../api/notifications'
 import { getMyNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '../../api/notifications'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -7,6 +8,7 @@ import styles from './NotificationsPage.module.css'
 
 const NotificationsPage = () => {
   useBackButton()
+  const navigate = useNavigate()
   const [notifications, setNotifications] = useState<NotificationDto[]>([])
   const [loading, setLoading] = useState(true)
   const [markingAll, setMarkingAll] = useState(false)
@@ -14,8 +16,9 @@ const NotificationsPage = () => {
   useEffect(() => {
     getMyNotifications()
       .then(setNotifications)
+      .catch(() => navigate('/error'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [navigate])
 
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set())
 
