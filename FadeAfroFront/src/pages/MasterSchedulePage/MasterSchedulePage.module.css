@@ -150,6 +150,11 @@
   cursor: pointer;
 }
 
+.errorText {
+  font-size: 13px;
+  color: #ff3b30;
+}
+
 .timeSep {
   font-size: 18px;
   color: var(--tg-hint);

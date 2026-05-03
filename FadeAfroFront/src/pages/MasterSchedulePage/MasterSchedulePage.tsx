@@ -31,10 +31,11 @@ const DEFAULT_END   = '18:00'
 
 interface DayState {
   enabled:   boolean
-  startTime: string   // "HH:MM"
-  endTime:   string   // "HH:MM"
-  savedId:   string | null  // id существующей записи на бэке
-  dirty:     boolean        // были ли изменения после загрузки
+  startTime: string        // "HH:MM"
+  endTime:   string        // "HH:MM"
+  savedId:   string | null // id существующей записи на бэке
+  dirty:     boolean       // были ли изменения после загрузки
+  error:     string | null // inline-ошибка от бэка
 }
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -51,7 +52,7 @@ const MasterSchedulePage = () => {
   const [dayStates, setDayStates] = useState<Record<number, DayState>>(() =>
     Object.fromEntries(DAYS.map(d => [d.dow, {
       enabled: false, startTime: DEFAULT_START, endTime: DEFAULT_END,
-      savedId: null, dirty: false,
+      savedId: null, dirty: false, error: null,
     }]))
   )
   const [loading,  setLoading]  = useState(true)
@@ -74,6 +75,7 @@ const MasterSchedulePage = () => {
               endTime:   trimSeconds(s.endTime),
               savedId:   s.id,
               dirty:     false,
+              error:     null,
             }
           })
           return next
@@ -91,7 +93,7 @@ const MasterSchedulePage = () => {
   const update = (dow: number, patch: Partial<DayState>) =>
     setDayStates(prev => ({
       ...prev,
-      [dow]: { ...prev[dow], ...patch, dirty: true },
+      [dow]: { ...prev[dow], ...patch, dirty: true, error: null },
     }))
 
   const handleToggle = (dow: number) => {
@@ -102,45 +104,73 @@ const MasterSchedulePage = () => {
   const handleSave = async () => {
     if (saving) return
     setSaving(true)
-    try {
-      await Promise.all(
-        DAYS.map(async ({ dow }) => {
-          const d = dayStates[dow]
-          if (!d.dirty) return
 
+    // Сбрасываем старые ошибки
+    setDayStates(prev => {
+      const next = { ...prev }
+      DAYS.forEach(({ dow }) => { next[dow] = { ...next[dow], error: null } })
+      return next
+    })
+
+    // Сохраняем результат каждого дня независимо
+    const results = await Promise.all(
+      DAYS.map(async ({ dow }) => {
+        const d = dayStates[dow]
+        if (!d.dirty) return { dow, ok: true }
+        try {
           if (d.enabled) {
-            // Если уже была запись — удаляем и создаём заново (бэк не имеет PUT)
-            if (d.savedId) await deleteMySchedule(d.savedId)
             await setMySchedule(dow, d.startTime + ':00', d.endTime + ':00')
           } else {
             if (d.savedId) await deleteMySchedule(d.savedId)
           }
+          return { dow, ok: true }
+        } catch (e: unknown) {
+          const status = (e as { response?: { status?: number } })?.response?.status
+          if (!status || status >= 500) return { dow, ok: false, fatal: true }
+          const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
+          return { dow, ok: false, fatal: false, msg: msg ?? 'Ошибка' }
+        }
+      })
+    )
+
+    // Если есть фатальная ошибка — на страницу ошибки
+    if (results.some(r => !r.ok && r.fatal)) {
+      navigate('/error', { replace: true })
+      return
+    }
+
+    // Показываем inline-ошибки
+    const hasInlineErrors = results.some(r => !r.ok && !r.fatal)
+    if (hasInlineErrors) {
+      setDayStates(prev => {
+        const next = { ...prev }
+        results.forEach(r => {
+          if (!r.ok && !r.fatal) next[r.dow] = { ...next[r.dow], error: r.msg ?? 'Ошибка', dirty: true }
         })
-      )
-      // Перезагружаем чтобы получить новые id
+        return next
+      })
+    }
+
+    // Перезагружаем расписание с бэка
+    try {
       const profile = await getMyMasterProfile()
       const schedules = await getMasterSchedules(profile.id)
       setDayStates(prev => {
         const next = Object.fromEntries(
           DAYS.map(d => [d.dow, {
             enabled: false, startTime: DEFAULT_START, endTime: DEFAULT_END,
-            savedId: null, dirty: false,
+            savedId: null, dirty: false, error: prev[d.dow].error,
           }])
         )
         schedules.forEach((s: MasterScheduleItem) => {
           const dow = normalizeDayOfWeek(s.dayOfWeek)
           next[dow] = {
-            enabled: true,
+            enabled:   true,
             startTime: trimSeconds(s.startTime),
-            endTime: trimSeconds(s.endTime),
-            savedId: s.id,
-            dirty: false,
-          }
-        })
-        // Дни, которые выключены — тоже обновляем dirty:false
-        DAYS.forEach(({ dow }) => {
-          if (!next[dow].enabled) {
-            next[dow] = { ...prev[dow], enabled: false, savedId: null, dirty: false }
+            endTime:   trimSeconds(s.endTime),
+            savedId:   s.id,
+            dirty:     !!prev[dow].error, // оставляем dirty если была ошибка
+            error:     prev[dow].error,
           }
         })
         return next
@@ -210,6 +240,11 @@ const MasterSchedulePage = () => {
                       />
                     </div>
                   </div>
+                )}
+
+                {/* Inline-ошибка */}
+                {d.error && (
+                  <p className={styles.errorText}>{d.error}</p>
                 )}
               </div>
             )
