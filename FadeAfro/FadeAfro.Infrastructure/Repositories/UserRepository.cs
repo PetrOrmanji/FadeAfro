@@ -1,4 +1,5 @@
 using FadeAfro.Domain.Entities;
+using FadeAfro.Domain.Enums;
 using FadeAfro.Domain.Repositories;
 using FadeAfro.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,11 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<IList<User>> GetByRoleAsync(Role role)
+    {
+        return await _context.Users.Where(u => u.Roles.Contains(role)).ToListAsync();
+    }
+
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -24,7 +30,7 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
     }
 
-    public async Task<IReadOnlyList<User>> GetAllAsync(int page, int pageSize, string? search)
+    public async Task<IList<User>> GetAllAsync(int page, int pageSize, string? search)
     {
         var query = _context.Users.AsQueryable();
 

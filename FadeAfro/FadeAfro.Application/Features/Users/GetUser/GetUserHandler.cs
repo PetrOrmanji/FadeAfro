@@ -1,3 +1,4 @@
+using FadeAfro.Application.Features.Users.Common;
 using FadeAfro.Domain.Exceptions.User;
 using FadeAfro.Domain.Repositories;
 using MediatR;
@@ -19,7 +20,15 @@ public class GetUserHandler : IRequestHandler<GetUserQuery, GetUserResponse>
 
         if (user is null)
             throw new UserNotFoundException();
+        
+        var userDto = new UserDto(
+            user.Id, 
+            user.TelegramId,
+            user.FirstName,
+            user.LastName, 
+            user.Username,
+            user.Roles);
 
-        return new GetUserResponse(user.Id, user.FirstName, user.LastName);
+        return new GetUserResponse(userDto);
     }
 }

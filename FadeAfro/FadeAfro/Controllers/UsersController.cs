@@ -1,5 +1,7 @@
-using FadeAfro.Application.Features.Users.GetAllUsers;
+using FadeAfro.Application.Features.Users.GetMasters;
+using FadeAfro.Application.Features.Users.GetOwners;
 using FadeAfro.Application.Features.Users.GetUser;
+using FadeAfro.Application.Features.Users.GetUsers;
 using FadeAfro.Application.Features.Users.UpdateUserFullName;
 using FadeAfro.Domain.Constants;
 using FadeAfro.Extensions;
@@ -25,9 +27,31 @@ public class UsersController : ControllerBase
     [HttpGet("get/all")]
     [Authorize(Roles = Roles.Owner)]
     [SwaggerOperation(Summary = "Get all users (paged)")]
-    public async Task<IActionResult> GetAll([FromQuery] GetAllUsersQuery query)
+    public async Task<IActionResult> GetAll([FromQuery] GetUsersQuery query)
     {
         var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+    
+    [HttpGet("get/masters")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Get all masters")]
+    public async Task<IActionResult> GetMasters()
+    {
+        var getMastersQuery = new GetMastersQuery();
+        
+        var result = await _mediator.Send(getMastersQuery);
+        return Ok(result);
+    }
+    
+    [HttpGet("get/owners")]
+    [Authorize(Roles = Roles.Owner)]
+    [SwaggerOperation(Summary = "Get all owners")]
+    public async Task<IActionResult> GetOwners()
+    {
+        var getOwnersQuery = new GetOwnersQuery();
+        
+        var result = await _mediator.Send(getOwnersQuery);
         return Ok(result);
     }
 

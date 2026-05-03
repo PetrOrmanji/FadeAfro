@@ -1,8 +1,8 @@
 using FadeAfro.Domain.Enums;
 
-namespace FadeAfro.Application.Features.Users.GetAllUsers;
+namespace FadeAfro.Application.Features.Users.Common;
 
-public record GetAllUsersResponse(
+public record UserDto(
     Guid Id,
     long TelegramId,
     string FirstName,
