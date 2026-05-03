@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLaunchParams } from '@tma.js/sdk-react'
 import { getMe, type UserResponse } from '../../api/user'
 import { useAuth, type Role } from '../../context/AuthContext'
@@ -19,6 +20,7 @@ const getInitials = (firstName: string, lastName: string | null) => {
 
 const SettingsPage = () => {
   useBackButton()
+  const navigate = useNavigate()
   const { roles } = useAuth()
   const launchParams = useLaunchParams()
   const tgUser = launchParams.tgWebAppData?.user
@@ -26,8 +28,10 @@ const SettingsPage = () => {
   const [user, setUser] = useState<UserResponse | null>(null)
 
   useEffect(() => {
-    getMe().then(setUser)
-  }, [])
+    getMe()
+      .then(setUser)
+      .catch(() => navigate('/error', { replace: true }))
+  }, [navigate])
 
   const fullName = user
     ? [user.firstName, user.lastName].filter(Boolean).join(' ')

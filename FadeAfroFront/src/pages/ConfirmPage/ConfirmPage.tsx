@@ -43,9 +43,9 @@ const ConfirmPage = () => {
   const state = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices, selectedDate, selectedTime } = state
 
-  const [comment,   setComment]   = useState('')
+  const [comment,    setComment]    = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [error,     setError]     = useState<string | null>(null)
+  const [error,      setError]      = useState<string | null>(null)
 
   // Статистика
   const totalPrice = selectedServices?.reduce((s, svc) => s + svc.price, 0) ?? 0
@@ -73,6 +73,11 @@ const ConfirmPage = () => {
         state: { master, selectedServices, selectedDate, selectedTime, totalPrice },
       })
     } catch (e: unknown) {
+      const status = (e as { response?: { status?: number } })?.response?.status
+      if (!status || status >= 500) {
+        navigate('/error', { replace: true })
+        return
+      }
       const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
       setError(msg ?? 'Не удалось создать запись. Попробуйте ещё раз.')
     } finally {
@@ -95,7 +100,7 @@ const ConfirmPage = () => {
           <div className={styles.cardLeft}>
             <div className={styles.masterAvatar}>
               {master?.photoUrl
-                ? <img src={getMasterPhotoUrl(master.id)} alt={fullName} className={styles.avatarImg} />
+                ? <img src={getMasterPhotoUrl(master.id)} alt={fullName} className={styles.avatarImg} onError={() => navigate('/error', { replace: true })} />
                 : <span className={styles.avatarInitials}>{initials}</span>
               }
             </div>

@@ -117,10 +117,18 @@ const SelectTimePage = () => {
 
   useEffect(() => {
     if (!masterProfileId || !selectedDate) return
-    getDayAvailability(masterProfileId, selectedDate, serviceDuration)
-      .then(setSlots)
-      .finally(() => setLoading(false))
-  }, [masterProfileId, selectedDate, serviceDuration])
+    ;(async () => {
+      try {
+        const result = await getDayAvailability(masterProfileId, selectedDate, serviceDuration)
+        setSlots(result)
+      } catch {
+        navigate('/error', { replace: true })
+        return
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [masterProfileId, selectedDate, serviceDuration, navigate])
 
   const morningSlots   = slots.filter(s => getHour(s.time) < 12)
   const afternoonSlots = slots.filter(s => getHour(s.time) >= 12 && getHour(s.time) < 18)

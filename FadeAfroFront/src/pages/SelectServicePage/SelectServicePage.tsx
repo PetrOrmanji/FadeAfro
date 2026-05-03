@@ -112,10 +112,18 @@ const SelectServicePage = () => {
 
   useEffect(() => {
     if (!masterProfileId) return
-    getMasterServices(masterProfileId)
-      .then(setServices)
-      .finally(() => setLoading(false))
-  }, [masterProfileId])
+    ;(async () => {
+      try {
+        const result = await getMasterServices(masterProfileId)
+        setServices(result)
+      } catch {
+        navigate('/error', { replace: true })
+        return
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [masterProfileId, navigate])
 
   const toggleService = (id: string) => {
     setSelectedIds(prev => {

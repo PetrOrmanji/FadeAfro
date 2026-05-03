@@ -85,16 +85,22 @@ const SelectDatePage = () => {
   // Загрузка расписания и недоступностей
   useEffect(() => {
     if (!masterProfileId) return
-    Promise.all([
-      getMasterSchedules(masterProfileId),
-      getMasterUnavailabilities(masterProfileId),
-    ])
-      .then(([schedules, unavailabilities]) => {
+    ;(async () => {
+      try {
+        const [schedules, unavailabilities] = await Promise.all([
+          getMasterSchedules(masterProfileId),
+          getMasterUnavailabilities(masterProfileId),
+        ])
         setWorkingDays(new Set(schedules.map(s => normalizeDayOfWeek(s.dayOfWeek))))
         setUnavailableDates(new Set(unavailabilities.map(u => u.date)))
-      })
-      .finally(() => setLoading(false))
-  }, [masterProfileId])
+      } catch {
+        navigate('/error', { replace: true })
+        return
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [masterProfileId, navigate])
 
   // Навигация по месяцам
   const goToPrev = () => {

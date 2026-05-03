@@ -22,7 +22,7 @@ const ErrorPage = () => {
       </div>
 
       <div className={styles.bottomPanel}>
-        <button className={styles.retryBtn} onClick={() => window.location.reload()}>
+        <button className={styles.retryBtn} onClick={() => { window.location.href = '/' }}>
           Обновить
         </button>
       </div>
