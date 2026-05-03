@@ -84,6 +84,27 @@
   color: var(--tg-button-text);
 }
 
+/* ── Ближайшая запись (внутри scheduleCard) ───────────────────────────────── */
+.appointmentNearest {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.appointmentDate {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tg-button);
+}
+
+.appointmentClient {
+  font-size: 13px;
+  color: var(--tg-hint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Карточка отсутствий ──────────────────────────────────────────────────── */
 .unavailCard {
   background-color: var(--tg-bg);

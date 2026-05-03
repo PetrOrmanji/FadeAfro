@@ -10,6 +10,7 @@ import {
   type MasterScheduleItem,
   type MasterUnavailabilityItem,
 } from '../../api/schedule'
+import { getMasterAppointments, type MasterAppointment } from '../../api/appointments'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './MasterPage.module.css'
@@ -137,6 +138,56 @@ const UnavailabilityCard = ({
   )
 }
 
+// ── Карточка записей ───────────────────────────────────────────────────────
+
+const MONTHS_RU = [
+  'января','февраля','марта','апреля','мая','июня',
+  'июля','августа','сентября','октября','ноября','декабря',
+]
+
+const formatDateTime = (isoUtc: string) => {
+  const d = new Date(isoUtc)
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${d.getDate()} ${MONTHS_RU[d.getMonth()]} в ${hh}:${mm}`
+}
+
+const AppointmentsCard = ({
+  nearest,
+  onClick,
+}: {
+  nearest: MasterAppointment | null
+  onClick: () => void
+}) => {
+  const clientName = nearest?.client
+    ? [nearest.client.firstName, nearest.client.lastName].filter(Boolean).join(' ')
+    : null
+  const serviceNames = nearest?.services.map(s => s.serviceName).join(', ')
+
+  return (
+    <div className={styles.scheduleCard} onClick={onClick}>
+
+      <div className={styles.scheduleHeader}>
+        <div className={styles.scheduleTitleRow}>
+          <AppointmentsIcon />
+          <span className={styles.scheduleTitle}>Записи</span>
+        </div>
+        <ChevronRightIcon />
+      </div>
+
+      {nearest ? (
+        <div className={styles.appointmentNearest}>
+          <span className={styles.appointmentDate}>{formatDateTime(nearest.startTime)}</span>
+          <span className={styles.appointmentClient}>{clientName} · {serviceNames}</span>
+        </div>
+      ) : (
+        <span className={styles.scheduleHint}>Нет активных записей</span>
+      )}
+
+    </div>
+  )
+}
+
 // ── Страница ───────────────────────────────────────────────────────────────
 
 const MasterPage = () => {
@@ -144,9 +195,10 @@ const MasterPage = () => {
   const [user,          setUser]          = useState<UserResponse | null>(null)
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null)
   const [schedules,       setSchedules]       = useState<MasterScheduleItem[]>([])
-  const [unavailabilities, setUnavailabilities] = useState<MasterUnavailabilityItem[]>([])
-  const [unreadCount,     setUnreadCount]     = useState(0)
-  const [loading,         setLoading]         = useState(true)
+  const [unavailabilities,  setUnavailabilities]  = useState<MasterUnavailabilityItem[]>([])
+  const [appointments,      setAppointments]      = useState<MasterAppointment[]>([])
+  const [unreadCount,       setUnreadCount]       = useState(0)
+  const [loading,           setLoading]           = useState(true)
 
   useEffect(() => {
     ;(async () => {
@@ -157,12 +209,14 @@ const MasterPage = () => {
         setUser(userData)
         setMasterProfile(profileData)
         setUnreadCount(unreadCountData)
-        const [schedulesData, unavailData] = await Promise.all([
+        const [schedulesData, unavailData, appointmentsData] = await Promise.all([
           getMasterSchedules(profileData.id),
           getMasterUnavailabilities(profileData.id),
+          getMasterAppointments(),
         ])
         setSchedules(schedulesData)
         setUnavailabilities(unavailData)
+        setAppointments(appointmentsData)
       } catch {
         navigate('/error')
       } finally {
@@ -174,6 +228,10 @@ const MasterPage = () => {
   const masterPhotoUrl = masterProfile?.photoUrl
     ? getMasterPhotoUrl(masterProfile.id)
     : null
+
+  const nearest = appointments
+    .slice()
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0] ?? null
 
   if (loading) return <LoadingScreen />
 
@@ -210,15 +268,10 @@ const MasterPage = () => {
       />
 
       {/* Записи */}
-      <div className={styles.scheduleCard} onClick={() => navigate('/master/appointments')}>
-        <div className={styles.scheduleHeader}>
-          <div className={styles.scheduleTitleRow}>
-            <AppointmentsIcon />
-            <span className={styles.scheduleTitle}>Записи</span>
-          </div>
-          <ChevronRightIcon />
-        </div>
-      </div>
+      <AppointmentsCard
+        nearest={nearest}
+        onClick={() => navigate('/master/appointments')}
+      />
 
     </div>
   )
