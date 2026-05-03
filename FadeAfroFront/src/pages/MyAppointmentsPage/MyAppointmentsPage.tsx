@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
@@ -29,13 +29,15 @@ const formatTime = (isoUtc: string) => {
 const AppointmentCard = ({
   appointment,
   onCancel,
+  navigate,
 }: {
   appointment: ClientAppointment
   onCancel: (id: string) => void
+  navigate: NavigateFunction
 }) => {
   const [photoError, setPhotoError] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const cancellingRef = useRef(false)
 
   const masterName = appointment.master
     ? [appointment.master.firstName, appointment.master.lastName].filter(Boolean).join(' ')
@@ -50,11 +52,19 @@ const AppointmentCard = ({
   const totalMinutes  = appointment.services.reduce((s, svc) => s + durationToMinutes(svc.duration), 0)
   const totalDuration = minutesToFormatted(totalMinutes)
 
-  const handleCancel = () => {
-    if (!ref.current || cancellingRef.current) return
-    cancellingRef.current = true
+  const handleCancel = async () => {
+    if (!ref.current || cancelling) return
+    setCancelling(true)
 
-    // Анимация запускается мгновенно — без ре-рендера
+    try {
+      await cancelMyAppointment(appointment.id)
+    } catch {
+      setCancelling(false)
+      navigate('/error', { replace: true })
+      return
+    }
+
+    // API успешен — запускаем анимацию
     const el = ref.current
     el.style.height = `${el.offsetHeight}px`
     requestAnimationFrame(() => {
@@ -68,8 +78,6 @@ const AppointmentCard = ({
       })
     })
 
-    // API и удаление из стейта параллельно
-    cancelMyAppointment(appointment.id)
     setTimeout(() => onCancel(appointment.id), 350)
   }
 
@@ -139,8 +147,9 @@ const AppointmentCard = ({
       <button
         className={styles.cancelBtn}
         onClick={handleCancel}
+        disabled={cancelling}
       >
-        Отменить запись
+        {cancelling ? 'Отмена...' : 'Отменить запись'}
       </button>
 
     </div>
@@ -194,7 +203,7 @@ const MyAppointmentsPage = () => {
       ) : (
         <div className={styles.list}>
           {appointments.map(a => (
-            <AppointmentCard key={a.id} appointment={a} onCancel={handleCancel} />
+            <AppointmentCard key={a.id} appointment={a} onCancel={handleCancel} navigate={navigate} />
           ))}
         </div>
       )}

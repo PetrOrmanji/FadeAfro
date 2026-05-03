@@ -21,10 +21,22 @@ const NotificationsPage = () => {
   }, [navigate])
 
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set())
+  const [pendingIds,  setPendingIds]  = useState<Set<string>>(new Set())
 
-  const handleMarkOne = (id: string) => {
+  const handleMarkOne = async (id: string) => {
+    setPendingIds(prev => new Set(prev).add(id))
+
+    try {
+      await markNotificationAsRead(id)
+    } catch {
+      setPendingIds(prev => { const s = new Set(prev); s.delete(id); return s })
+      navigate('/error', { replace: true })
+      return
+    }
+
+    // API успешен — запускаем анимацию
+    setPendingIds(prev => { const s = new Set(prev); s.delete(id); return s })
     setRemovingIds(prev => new Set(prev).add(id))
-    markNotificationAsRead(id)
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id))
       setRemovingIds(prev => { const s = new Set(prev); s.delete(id); return s })
@@ -33,9 +45,16 @@ const NotificationsPage = () => {
 
   const handleMarkAll = async () => {
     setMarkingAll(true)
-    markAllNotificationsAsRead()
 
-    // запускаем анимацию на каждой карточке с задержкой
+    try {
+      await markAllNotificationsAsRead()
+    } catch {
+      setMarkingAll(false)
+      navigate('/error', { replace: true })
+      return
+    }
+
+    // API успешен — запускаем стаггер-анимацию
     const ids = notifications.map(n => n.id)
     ids.forEach((id, i) => {
       setTimeout(() => {
@@ -43,7 +62,6 @@ const NotificationsPage = () => {
       }, i * 60)
     })
 
-    // убираем из стейта после завершения всех анимаций
     setTimeout(() => {
       setNotifications([])
       setRemovingIds(new Set())
@@ -89,6 +107,7 @@ const NotificationsPage = () => {
               key={n.id}
               notification={n}
               removing={removingIds.has(n.id)}
+              pending={pendingIds.has(n.id)}
               onRead={handleMarkOne}
             />
           ))}
@@ -104,10 +123,12 @@ const NotificationsPage = () => {
 const NotificationCard = ({
   notification,
   removing,
+  pending,
   onRead,
 }: {
   notification: NotificationDto
   removing: boolean
+  pending: boolean
   onRead: (id: string) => void
 }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -135,7 +156,7 @@ const NotificationCard = ({
     <div
       ref={ref}
       className={styles.card}
-      onClick={() => { if (!removing) onRead(notification.id) }}
+      onClick={() => { if (!removing && !pending) onRead(notification.id) }}
     >
       <div className={styles.unreadDot} />
       <p className={styles.cardText}>{notification.text}</p>
