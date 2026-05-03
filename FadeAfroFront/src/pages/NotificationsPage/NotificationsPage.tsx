@@ -13,31 +13,24 @@ const NotificationsPage = () => {
 
   useEffect(() => {
     getMyNotifications()
-      .then(data => {
-        const sorted = [...data].sort((a, b) => Number(a.isRead) - Number(b.isRead))
-        setNotifications(sorted)
-      })
+      .then(setNotifications)
       .finally(() => setLoading(false))
   }, [])
 
   const handleMarkOne = async (id: string) => {
     await markNotificationAsRead(id)
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-    )
+    setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
   const handleMarkAll = async () => {
     setMarkingAll(true)
     try {
       await markAllNotificationsAsRead()
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+      setNotifications([])
     } finally {
       setMarkingAll(false)
     }
   }
-
-  const hasUnread = notifications.some(n => !n.isRead)
 
   if (loading) return <LoadingScreen />
 
@@ -51,7 +44,7 @@ const NotificationsPage = () => {
         </div>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>Уведомления</h1>
-          {hasUnread && (
+          {notifications.length > 0 && (
             <button
               className={styles.markAllBtn}
               onClick={handleMarkAll}
@@ -66,7 +59,7 @@ const NotificationsPage = () => {
       {/* Список — листается */}
       {notifications.length === 0 ? (
         <div className={styles.empty}>
-          <p className={styles.emptyText}>У вас нет уведомлений</p>
+          <p className={styles.emptyText}>Нет новых уведомлений</p>
         </div>
       ) : (
         <div className={styles.list}>
@@ -94,11 +87,8 @@ const NotificationCard = ({
   onRead: (id: string) => void
 }) => {
   return (
-    <div
-      className={`${styles.card} ${notification.isRead ? styles.cardRead : styles.cardUnread}`}
-      onClick={() => { if (!notification.isRead) onRead(notification.id) }}
-    >
-      {!notification.isRead && <div className={styles.unreadDot} />}
+    <div className={styles.card} onClick={() => onRead(notification.id)}>
+      <div className={styles.unreadDot} />
       <p className={styles.cardText}>{notification.text}</p>
     </div>
   )

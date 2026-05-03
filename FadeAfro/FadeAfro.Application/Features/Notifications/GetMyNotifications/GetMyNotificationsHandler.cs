@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FadeAfro.Application.Features.Notifications.GetMyNotifications;
 
-public class GetMyNotificationsHandler : IRequestHandler<GetMyNotificationsQuery, GetMyNotificationsResponse>
+public class GetMyNotificationsHandler : IRequestHandler<GetMyUnreadNotificationsQuery, GetMyUnreadNotificationsResponse>
 {
     private readonly INotificationRepository _notificationRepository;
     
@@ -13,10 +13,10 @@ public class GetMyNotificationsHandler : IRequestHandler<GetMyNotificationsQuery
         _notificationRepository = notificationRepository;
     }
 
-    public async Task<GetMyNotificationsResponse> Handle(GetMyNotificationsQuery request, CancellationToken cancellationToken)
+    public async Task<GetMyUnreadNotificationsResponse> Handle(GetMyUnreadNotificationsQuery request, CancellationToken cancellationToken)
     {
         var notifications = 
-            await _notificationRepository.GetNotificationsByUserId(request.UserId);
+            await _notificationRepository.GetUnreadNotificationsByUserId(request.UserId);
 
         var notificationDtos = new List<NotificationDto>();
 
@@ -24,12 +24,11 @@ public class GetMyNotificationsHandler : IRequestHandler<GetMyNotificationsQuery
         {
             var notificationDto = new NotificationDto(
                 notification.Id,
-                notification.Text,
-                notification.IsRead);
+                notification.Text);
             
             notificationDtos.Add(notificationDto);
         }
 
-        return new GetMyNotificationsResponse(notificationDtos);
+        return new GetMyUnreadNotificationsResponse(notificationDtos);
     }
 }

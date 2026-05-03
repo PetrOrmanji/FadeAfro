@@ -19,9 +19,9 @@ public class NotificationRepository : INotificationRepository
         return await _context.Notifications.CountAsync(x => x.UserId == userId && x.IsRead == false);
     }
     
-    public async Task<List<Notification>> GetNotificationsByUserId(Guid userId)
+    public async Task<List<Notification>> GetUnreadNotificationsByUserId(Guid userId)
     {
-        return await _context.Notifications.Where(x => x.UserId == userId).ToListAsync();
+        return await _context.Notifications.Where(x => x.UserId == userId && x.IsRead == false).ToListAsync();
     }
     
     public async Task<Notification?> GetNotificationByIdAndUserId(Guid id, Guid userId)

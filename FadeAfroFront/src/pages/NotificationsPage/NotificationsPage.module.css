@@ -80,31 +80,22 @@
 /* ── Карточка ─────────────────────────────────────────────────────────────── */
 .card {
   position: relative;
+  background-color: var(--tg-bg);
   border-radius: var(--radius-lg);
-  padding: 14px 16px 14px 20px;
+  padding: 14px 16px 14px 28px;
   display: flex;
   align-items: flex-start;
   gap: 10px;
   transition: opacity 0.15s;
-  cursor: default;
+  cursor: pointer;
   flex-shrink: 0;
 }
 
-.cardUnread {
-  background-color: var(--tg-bg);
-  cursor: pointer;
-}
+.card:active { opacity: 0.7; }
 
-.cardUnread:active { opacity: 0.7; }
-
-.cardRead {
-  background-color: var(--tg-secondary-bg);
-}
-
-/* Точка непрочитанного */
 .unreadDot {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   width: 6px;
@@ -119,10 +110,6 @@
   color: var(--tg-text);
   line-height: 1.45;
   margin: 0;
-}
-
-.cardRead .cardText {
-  color: var(--tg-hint);
 }
 
 /* ── Пусто ────────────────────────────────────────────────────────────────── */

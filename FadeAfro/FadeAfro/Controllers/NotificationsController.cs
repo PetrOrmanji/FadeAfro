@@ -34,15 +34,15 @@ public class NotificationsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("get/me/all")]
+    [HttpGet("get/me/unread")]
     [Authorize]
-    [SwaggerOperation(Summary = "Get my notifications")]
-    public async Task<IActionResult> GetMyNotifications()
+    [SwaggerOperation(Summary = "Get my unread notifications")]
+    public async Task<IActionResult> GetMyUnreadNotifications()
     {
-        var getMyNotificationsQuery = new GetMyNotificationsQuery(
+        var getMyUnreadNotificationsQuery = new GetMyUnreadNotificationsQuery(
             User.GetUserId());
         
-        var response = await _mediator.Send(getMyNotificationsQuery);
+        var response = await _mediator.Send(getMyUnreadNotificationsQuery);
         return Ok(response);
     }
     

@@ -3,7 +3,6 @@ import apiClient from './client'
 export interface NotificationDto {
   id: string
   text: string
-  isRead: boolean
 }
 
 export const getMyNotifications = async (): Promise<NotificationDto[]> => {

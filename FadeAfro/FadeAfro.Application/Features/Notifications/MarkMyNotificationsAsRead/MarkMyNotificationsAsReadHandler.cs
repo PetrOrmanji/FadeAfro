@@ -16,7 +16,7 @@ public class MarkMyNotificationsAsReadHandler : IRequestHandler<MarkMyNotificati
     public async Task Handle(MarkMyNotificationsAsReadCommand request, CancellationToken cancellationToken)
     {
         var notifications = 
-            await _notificationRepository.GetNotificationsByUserId(request.UserId);
+            await _notificationRepository.GetUnreadNotificationsByUserId(request.UserId);
 
         foreach (var notification in notifications)
         {
