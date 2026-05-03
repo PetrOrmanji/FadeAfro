@@ -1,4 +1,5 @@
 using FadeAfro.Application.Services;
+using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.MasterProfile;
@@ -10,6 +11,7 @@ namespace FadeAfro.Application.Features.Appointments.CreateClientAppointment;
 
 public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppointmentCommand>
 {
+    private readonly TimeZoneInfo _timeZone;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IServiceRepository _serviceRepository;
@@ -17,12 +19,14 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
     private readonly INotificationService _notificationService;
 
     public CreateClientAppointmentHandler(
+        ITimeSettings timeSettings,
         IAppointmentRepository appointmentRepository,
         IMasterProfileRepository masterProfileRepository,
         IServiceRepository serviceRepository,
         IUserRepository userRepository,
         INotificationService notificationService)
     {
+        _timeZone = timeSettings.TimeZone;
         _appointmentRepository = appointmentRepository;
         _masterProfileRepository = masterProfileRepository;
         _serviceRepository = serviceRepository;
@@ -98,7 +102,9 @@ public class CreateClientAppointmentHandler : IRequestHandler<CreateClientAppoin
             ? clientName
             : $"{clientName} (@{client.Username})";
 
+        var localTime = TimeZoneInfo.ConvertTimeFromUtc(startTime, _timeZone);
+
         return $"📅 {clientInfo} записался на " +
-               $"{startTime:dd.MM.yyyy} в {startTime:HH:mm}.";
+               $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
     }
 }
