@@ -28,8 +28,9 @@ public class MasterUnavailabilityRepository : IMasterUnavailabilityRepository
 
     public async Task<IReadOnlyList<MasterUnavailability>> GetByMasterProfileIdAsync(Guid masterProfileId)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
         return await _context.MasterUnavailabilities
-            .Where(mu => mu.MasterProfileId == masterProfileId)
+            .Where(mu => mu.MasterProfileId == masterProfileId && mu.Date >= today)
             .ToListAsync();
     }
 
