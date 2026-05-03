@@ -131,7 +131,7 @@
   user-select: none;
 }
 
-.day:not(.dayOff):not(.dayPast):not(.dayOther):not(.dayUnavail):hover {
+.day:not(.dayOff):not(.dayPast):not(.dayOther):not(.dayUnavail):not(.daySelected):not(.daySelectedUnavail):hover {
   background-color: rgba(36, 129, 204, 0.1);
 }
 
