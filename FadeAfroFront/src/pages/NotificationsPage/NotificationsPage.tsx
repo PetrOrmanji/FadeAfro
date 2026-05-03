@@ -30,12 +30,22 @@ const NotificationsPage = () => {
 
   const handleMarkAll = async () => {
     setMarkingAll(true)
-    try {
-      await markAllNotificationsAsRead()
+    markAllNotificationsAsRead()
+
+    // запускаем анимацию на каждой карточке с задержкой
+    const ids = notifications.map(n => n.id)
+    ids.forEach((id, i) => {
+      setTimeout(() => {
+        setRemovingIds(prev => new Set(prev).add(id))
+      }, i * 60)
+    })
+
+    // убираем из стейта после завершения всех анимаций
+    setTimeout(() => {
       setNotifications([])
-    } finally {
+      setRemovingIds(new Set())
       setMarkingAll(false)
-    }
+    }, ids.length * 60 + 350)
   }
 
   if (loading) return <LoadingScreen />
