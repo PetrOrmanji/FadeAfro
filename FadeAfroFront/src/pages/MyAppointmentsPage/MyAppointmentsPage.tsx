@@ -4,6 +4,7 @@ import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './MyAppointmentsPage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -137,6 +138,7 @@ const AppointmentCard = ({
 
 const MyAppointmentsPage = () => {
   const navigate = useNavigate()
+  useBackButton()
   const [appointments, setAppointments] = useState<ClientAppointment[]>([])
   const [loading, setLoading] = useState(true)
 

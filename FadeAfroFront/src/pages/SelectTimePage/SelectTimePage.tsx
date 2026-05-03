@@ -6,6 +6,7 @@ import type { TimeSlot } from '../../api/availability'
 import { getDayAvailability } from '../../api/availability'
 import { durationToMinutes } from '../../utils/duration'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './SelectTimePage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -99,6 +100,7 @@ const SlotGroup = ({
 const SelectTimePage = () => {
   const { masterProfileId } = useParams<{ masterProfileId: string }>()
   const navigate = useNavigate()
+  useBackButton()
   const state = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices, selectedDate } = state
 

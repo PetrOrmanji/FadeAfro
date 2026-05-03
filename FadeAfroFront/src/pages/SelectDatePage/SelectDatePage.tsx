@@ -4,6 +4,7 @@ import type { MasterProfile } from '../../api/masters'
 import type { MasterService } from '../../api/services'
 import { getMasterSchedules, getMasterUnavailabilities, normalizeDayOfWeek } from '../../api/schedule'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './SelectDatePage.module.css'
 
 // ── Константы ──────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ interface LocationState {
 const SelectDatePage = () => {
   const { masterProfileId } = useParams<{ masterProfileId: string }>()
   const navigate  = useNavigate()
+  useBackButton()
   const state     = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices } = state
 

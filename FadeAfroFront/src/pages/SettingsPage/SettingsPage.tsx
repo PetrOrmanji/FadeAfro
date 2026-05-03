@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLaunchParams } from '@tma.js/sdk-react'
 import { getMe, type UserResponse } from '../../api/user'
 import { useAuth, type Role } from '../../context/AuthContext'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './SettingsPage.module.css'
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -17,6 +18,7 @@ const getInitials = (firstName: string, lastName: string | null) => {
 }
 
 const SettingsPage = () => {
+  useBackButton()
   const { roles } = useAuth()
   const launchParams = useLaunchParams()
   const tgUser = launchParams.tgWebAppData?.user

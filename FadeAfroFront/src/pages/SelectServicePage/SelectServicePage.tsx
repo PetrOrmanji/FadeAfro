@@ -4,6 +4,7 @@ import { getMasterServices, type MasterService } from '../../api/services'
 import { getMasterPhotoUrl, type MasterProfile } from '../../api/masters'
 import { formatDuration, durationToMinutes, minutesToFormatted } from '../../utils/duration'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './SelectServicePage.module.css'
 
 // ── Карточка мастера ───────────────────────────────────────────────────────
@@ -102,6 +103,7 @@ interface LocationState {
 const SelectServicePage = () => {
   const { masterProfileId } = useParams<{ masterProfileId: string }>()
   const navigate = useNavigate()
+  useBackButton()
   const master = (history.state?.usr as LocationState)?.master
 
   const [services, setServices] = useState<MasterService[]>([])

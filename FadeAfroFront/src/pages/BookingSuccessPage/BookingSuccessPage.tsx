@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import type { MasterProfile } from '../../api/masters'
 import type { MasterService } from '../../api/services'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './BookingSuccessPage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -34,6 +35,7 @@ interface LocationState {
 
 const BookingSuccessPage = () => {
   const navigate = useNavigate()
+  useBackButton()
   const state = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices, selectedDate, selectedTime, totalPrice } = state
 

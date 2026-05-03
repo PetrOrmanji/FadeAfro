@@ -5,6 +5,7 @@ import { getMasterPhotoUrl } from '../../api/masters'
 import type { MasterService } from '../../api/services'
 import { bookAppointment } from '../../api/appointments'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
+import useBackButton from '../../hooks/useBackButton'
 import styles from './ConfirmPage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ interface LocationState {
 const ConfirmPage = () => {
   const { masterProfileId } = useParams<{ masterProfileId: string }>()
   const navigate = useNavigate()
+  useBackButton()
   const state = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices, selectedDate, selectedTime } = state
 
