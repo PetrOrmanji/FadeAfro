@@ -24,3 +24,80 @@
   color: #ffffff;
   user-select: none;
 }
+
+/* ── Карточка графика ─────────────────────────────────────────────────────── */
+.scheduleCard {
+  background-color: var(--tg-bg);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.scheduleCard:active {
+  opacity: 0.7;
+}
+
+.scheduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scheduleTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tg-text);
+}
+
+.scheduleTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-text);
+}
+
+/* ── Дни недели ───────────────────────────────────────────────────────────── */
+.daysRow {
+  display: flex;
+  gap: 6px;
+}
+
+.dayChip {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--tg-secondary-bg);
+  color: var(--tg-hint);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dayChipActive {
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+}
+
+/* ── Подпись ──────────────────────────────────────────────────────────────── */
+.scheduleFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scheduleHint {
+  font-size: 13px;
+  color: var(--tg-hint);
+}
+
+.scheduleTime {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tg-button);
+}
