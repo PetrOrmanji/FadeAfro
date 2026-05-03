@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyMasterProfile, getMasterPhotoUrl, type MasterProfile } from '../../api/masters'
 import { getUnreadNotificationsCount } from '../../api/notifications'
@@ -182,7 +182,9 @@ const AppointmentsCard = ({
 // ── Страница ───────────────────────────────────────────────────────────────
 
 const MasterPage = () => {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const fromOwner = (location.state as { from?: string } | null)?.from === 'owner'
   const [user,          setUser]          = useState<UserResponse | null>(null)
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null)
   const [schedules,       setSchedules]       = useState<MasterScheduleItem[]>([])
@@ -228,6 +230,21 @@ const MasterPage = () => {
 
   return (
     <div className={styles.page}>
+
+      {/* Таб-свитчер — только если пришли из OwnerPage */}
+      {fromOwner && (
+        <div className={styles.tabSwitcher}>
+          <button
+            className={styles.tabBtn}
+            onClick={() => navigate('/owner')}
+          >
+            Владелец
+          </button>
+          <button className={`${styles.tabBtn} ${styles.tabBtnActive}`}>
+            Мастер
+          </button>
+        </div>
+      )}
 
       {/* Логотип */}
       <div className={styles.logoWrap}>

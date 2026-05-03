@@ -16,7 +16,7 @@ import MasterSettingsPage from '../pages/MasterSettingsPage/MasterSettingsPage'
 import MasterSchedulePage from '../pages/MasterSchedulePage/MasterSchedulePage'
 import MasterUnavailabilityPage from '../pages/MasterUnavailabilityPage/MasterUnavailabilityPage'
 import MasterAppointmentsPage from '../pages/MasterAppointmentsPage/MasterAppointmentsPage'
-import OwnerPage from '../pages/OwnerPage'
+import OwnerPage from '../pages/OwnerPage/OwnerPage'
 
 // Куда редиректить в зависимости от ролей
 const RootRedirect = () => {
@@ -59,7 +59,8 @@ const AppRouter = () => {
         <Route path="/master/schedule"      element={<MasterSchedulePage />} />
         <Route path="/master/unavailability" element={<MasterUnavailabilityPage />} />
         <Route path="/master/appointments"  element={<MasterAppointmentsPage />} />
-        <Route path="/owner"  element={<OwnerPage />} />
+        <Route path="/owner"          element={<OwnerPage />} />
+        <Route path="/owner/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>

@@ -4,9 +4,9 @@ import styles from './UserInfoCard.module.css'
 
 interface Props {
   user: UserResponse
-  unreadCount: number
+  unreadCount?: number
   onSettingsClick: () => void
-  onNotificationsClick: () => void
+  onNotificationsClick?: () => void
   overridePhotoUrl?: string | null  // если передан — показываем вместо Telegram-фото
   avatarShape?: 'circle' | 'rect'   // по умолчанию circle
 }
@@ -45,14 +45,16 @@ const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick
         </div>
       </div>
       <div className={styles.actions}>
-        <button className={styles.iconBtn} onClick={onNotificationsClick} aria-label="Уведомления">
-          <BellIcon />
-          {unreadCount > 0 && (
-            <span className={styles.badge}>
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </button>
+        {onNotificationsClick && (
+          <button className={styles.iconBtn} onClick={onNotificationsClick} aria-label="Уведомления">
+            <BellIcon />
+            {(unreadCount ?? 0) > 0 && (
+              <span className={styles.badge}>
+                {(unreadCount ?? 0) > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+        )}
         <button className={styles.iconBtn} onClick={onSettingsClick} aria-label="Настройки">
           <SettingsIcon />
         </button>

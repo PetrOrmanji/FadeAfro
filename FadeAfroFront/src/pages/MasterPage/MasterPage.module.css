@@ -1,3 +1,30 @@
+/* ── Таб-свитчер ──────────────────────────────────────────────────────────── */
+.tabSwitcher {
+  display: flex;
+  background-color: var(--tg-secondary-bg);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  gap: 4px;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--tg-hint);
+  background: none;
+  transition: background-color 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabBtnActive {
+  background-color: var(--tg-bg);
+  color: var(--tg-text);
+  font-weight: 600;
+}
+
 .page {
   display: flex;
   flex-direction: column;
