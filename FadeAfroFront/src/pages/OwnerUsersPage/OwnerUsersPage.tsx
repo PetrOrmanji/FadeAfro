@@ -30,33 +30,21 @@ const RoleChip = ({ role }: { role: string }) => {
 const UserCard = ({
   user,
   isMe,
-  onAssign,
-  onDismiss,
+  onClick,
 }: {
   user: UserItem
   isMe: boolean
-  onAssign: (id: string) => void
-  onDismiss: (id: string) => void
+  onClick: () => void
 }) => {
-  const [pending, setPending] = useState(false)
-  const isMaster = user.roles.includes('Master')
-  const isOwner  = user.roles.includes('Owner')
-
+  const isOwner = user.roles.includes('Owner')
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
 
-  const handleAction = async () => {
-    if (pending) return
-    setPending(true)
-    try {
-      if (isMaster) await onDismiss(user.id)
-      else          await onAssign(user.id)
-    } finally {
-      setPending(false)
-    }
-  }
-
   return (
-    <div className={`${styles.card} ${isMe ? styles.cardMe : ''}`}>
+    <div
+      className={styles.card}
+      onClick={!isOwner && !isMe ? onClick : undefined}
+      style={!isOwner && !isMe ? { cursor: 'pointer' } : undefined}
+    >
       <div className={styles.cardAvatar}>
         <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
       </div>
@@ -70,19 +58,67 @@ const UserCard = ({
           {user.roles.map(r => <RoleChip key={r} role={r} />)}
         </div>
       </div>
-      {!isOwner && !isMe && (
+    </div>
+  )
+}
+
+// ── Нижняя панель ──────────────────────────────────────────────────────────
+
+const UserActionPanel = ({
+  user,
+  onAssign,
+  onDismiss,
+  onClose,
+}: {
+  user: UserItem
+  onAssign: (id: string) => Promise<void>
+  onDismiss: (id: string) => Promise<void>
+  onClose: () => void
+}) => {
+  const [pending, setPending] = useState(false)
+  const isMaster = user.roles.includes('Master')
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
+
+  const handleAction = async () => {
+    if (pending) return
+    setPending(true)
+    try {
+      if (isMaster) await onDismiss(user.id)
+      else          await onAssign(user.id)
+      onClose()
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <>
+      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.bottomPanel}>
+        <div className={styles.panelHandle} />
+        <div className={styles.panelUser}>
+          <div className={styles.panelAvatar}>
+            <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
+          </div>
+          <div>
+            <div className={styles.panelName}>{fullName}</div>
+            {user.username && (
+              <div className={styles.panelUsername}>@{user.username}</div>
+            )}
+          </div>
+        </div>
         <button
-          className={`${styles.actionBtn} ${isMaster ? styles.actionBtnDismiss : ''}`}
+          className={`${styles.panelBtn} ${isMaster ? styles.panelBtnDismiss : ''}`}
           onClick={handleAction}
           disabled={pending}
         >
-          {pending
-            ? '...'
-            : isMaster ? 'Уволить мастера' : 'Назначить мастером'
-          }
+          {pending ? '...' : isMaster ? 'Уволить мастера' : 'Назначить мастером'}
         </button>
-      )}
-    </div>
+        <button className={styles.panelBtnCancel} onClick={onClose}>
+          Отмена
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -92,13 +128,14 @@ const OwnerUsersPage = () => {
   useBackButton()
   const navigate = useNavigate()
 
-  const [myId,        setMyId]        = useState<string | null>(null)
-  const [users,       setUsers]       = useState<UserItem[]>([])
-  const [search,      setSearch]      = useState('')
-  const [page,        setPage]        = useState(1)
-  const [totalPages,  setTotalPages]  = useState(1)
-  const [loading,     setLoading]     = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
+  const [myId,         setMyId]         = useState<string | null>(null)
+  const [users,        setUsers]        = useState<UserItem[]>([])
+  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
+  const [search,       setSearch]       = useState('')
+  const [page,         setPage]         = useState(1)
+  const [totalPages,   setTotalPages]   = useState(1)
+  const [loading,      setLoading]      = useState(true)
+  const [loadingMore,  setLoadingMore]  = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const fetchUsers = async (p: number, q: string, replace: boolean) => {
@@ -112,7 +149,6 @@ const OwnerUsersPage = () => {
     }
   }
 
-  // Начальная загрузка
   useEffect(() => {
     setLoading(true)
     Promise.all([
@@ -121,7 +157,6 @@ const OwnerUsersPage = () => {
     ]).finally(() => setLoading(false))
   }, [])
 
-  // Поиск с дебаунсом
   const handleSearch = (val: string) => {
     setSearch(val)
     if (searchTimer.current) clearTimeout(searchTimer.current)
@@ -160,7 +195,6 @@ const OwnerUsersPage = () => {
         </div>
         <h1 className={styles.title}>Пользователи</h1>
 
-        {/* Поиск */}
         <div className={styles.searchWrap}>
           <SearchIcon />
           <input
@@ -185,8 +219,7 @@ const OwnerUsersPage = () => {
                 key={u.id}
                 user={u}
                 isMe={u.id === myId}
-                onAssign={handleAssign}
-                onDismiss={handleDismiss}
+                onClick={() => setSelectedUser(u)}
               />
             ))}
             {page < totalPages && (
@@ -201,6 +234,15 @@ const OwnerUsersPage = () => {
           </>
         )}
       </div>
+
+      {selectedUser && (
+        <UserActionPanel
+          user={selectedUser}
+          onAssign={handleAssign}
+          onDismiss={handleDismiss}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
 
     </div>
   )
