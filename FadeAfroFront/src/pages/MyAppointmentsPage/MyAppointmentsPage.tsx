@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
@@ -33,8 +33,9 @@ const AppointmentCard = ({
   appointment: ClientAppointment
   onCancel: (id: string) => void
 }) => {
-  const [cancelling, setCancelling] = useState(false)
   const [photoError, setPhotoError] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const cancellingRef = useRef(false)
 
   const masterName = appointment.master
     ? [appointment.master.firstName, appointment.master.lastName].filter(Boolean).join(' ')
@@ -49,18 +50,31 @@ const AppointmentCard = ({
   const totalMinutes  = appointment.services.reduce((s, svc) => s + durationToMinutes(svc.duration), 0)
   const totalDuration = minutesToFormatted(totalMinutes)
 
-  const handleCancel = async () => {
-    setCancelling(true)
-    try {
-      await cancelMyAppointment(appointment.id)
-      onCancel(appointment.id)
-    } finally {
-      setCancelling(false)
-    }
+  const handleCancel = () => {
+    if (!ref.current || cancellingRef.current) return
+    cancellingRef.current = true
+
+    // Анимация запускается мгновенно — без ре-рендера
+    const el = ref.current
+    el.style.height = `${el.offsetHeight}px`
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = 'height 0.3s ease, margin 0.3s ease, opacity 0.2s ease, transform 0.2s ease'
+        el.style.height = '0'
+        el.style.marginBottom = '0'
+        el.style.opacity = '0'
+        el.style.transform = 'translateX(50px)'
+        el.style.overflow = 'hidden'
+      })
+    })
+
+    // API и удаление из стейта параллельно
+    cancelMyAppointment(appointment.id)
+    setTimeout(() => onCancel(appointment.id), 350)
   }
 
   return (
-    <div className={styles.card}>
+    <div ref={ref} className={styles.card}>
 
       {/* Мастер */}
       <div className={styles.section}>
@@ -125,9 +139,8 @@ const AppointmentCard = ({
       <button
         className={styles.cancelBtn}
         onClick={handleCancel}
-        disabled={cancelling}
       >
-        {cancelling ? 'Отмена...' : 'Отменить запись'}
+        Отменить запись
       </button>
 
     </div>
@@ -144,7 +157,12 @@ const MyAppointmentsPage = () => {
 
   useEffect(() => {
     getMyAppointments()
-      .then(setAppointments)
+      .then(data => {
+        const sorted = [...data].sort((a, b) =>
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        )
+        setAppointments(sorted)
+      })
       .catch(() => navigate('/error'))
       .finally(() => setLoading(false))
   }, [navigate])
