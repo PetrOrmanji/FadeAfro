@@ -41,26 +41,26 @@ const NotificationsPage = () => {
   return (
     <div className={styles.page}>
 
-      {/* Логотип */}
-      <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+      {/* Шапка — не листается */}
+      <div className={styles.header}>
+        <div className={styles.logoWrap}>
+          <div className={styles.logoPlaceholder}>✂</div>
+        </div>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>Уведомления</h1>
+          {hasUnread && (
+            <button
+              className={styles.markAllBtn}
+              onClick={handleMarkAll}
+              disabled={markingAll}
+            >
+              {markingAll ? 'Читаем...' : 'Прочитать все'}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Заголовок + кнопка */}
-      <div className={styles.titleRow}>
-        <h1 className={styles.title}>Уведомления</h1>
-        {hasUnread && (
-          <button
-            className={styles.markAllBtn}
-            onClick={handleMarkAll}
-            disabled={markingAll}
-          >
-            {markingAll ? 'Читаем...' : 'Прочитать все'}
-          </button>
-        )}
-      </div>
-
-      {/* Список */}
+      {/* Список — листается */}
       {notifications.length === 0 ? (
         <div className={styles.empty}>
           <p className={styles.emptyText}>У вас нет уведомлений</p>
