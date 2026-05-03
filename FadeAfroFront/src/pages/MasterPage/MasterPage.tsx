@@ -41,10 +41,6 @@ const ScheduleCard = ({
   const workingDows = new Set(schedules.map(s => normalizeDayOfWeek(s.dayOfWeek)))
 
   // Определяем общее время (если у всех дней одинаковое — показываем одно)
-  const times = schedules.map(s => `${trimSeconds(s.startTime)}–${trimSeconds(s.endTime)}`)
-  const uniqueTimes = [...new Set(times)]
-  const timeLabel = uniqueTimes.length === 1 ? uniqueTimes[0] : null
-
   const workCount = workingDows.size
 
   return (
@@ -71,14 +67,9 @@ const ScheduleCard = ({
         ))}
       </div>
 
-      {/* Подпись */}
-      <div className={styles.scheduleFooter}>
-        {workCount === 0 ? (
-          <span className={styles.scheduleHint}>График не настроен</span>
-        ) : timeLabel ? (
-          <span className={styles.scheduleTime}>{timeLabel}</span>
-        ) : null}
-      </div>
+      {workCount === 0 && (
+        <span className={styles.scheduleHint}>График не настроен</span>
+      )}
 
     </div>
   )
