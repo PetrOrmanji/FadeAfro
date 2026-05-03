@@ -11,7 +11,7 @@ import BookingSuccessPage from '../pages/BookingSuccessPage/BookingSuccessPage'
 import ErrorPage from '../pages/ErrorPage/ErrorPage'
 import MyAppointmentsPage from '../pages/MyAppointmentsPage/MyAppointmentsPage'
 import NotificationsPage from '../pages/NotificationsPage/NotificationsPage'
-import MasterPage from '../pages/MasterPage'
+import MasterPage from '../pages/MasterPage/MasterPage'
 import OwnerPage from '../pages/OwnerPage'
 
 // Куда редиректить в зависимости от ролей

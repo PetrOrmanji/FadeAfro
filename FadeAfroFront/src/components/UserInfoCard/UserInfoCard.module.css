@@ -77,6 +77,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.iconBtn:hover {
+  opacity: 0.75;
+}
+
 .iconBtn:active {
   opacity: 0.6;
 }
