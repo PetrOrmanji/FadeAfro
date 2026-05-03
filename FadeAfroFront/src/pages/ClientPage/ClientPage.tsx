@@ -95,7 +95,11 @@ const ClientPage = () => {
 
       {/* Карточка пользователя */}
       {user && (
-        <UserInfoCard user={user} onSettingsClick={() => navigate('/client/settings')} />
+        <UserInfoCard
+          user={user}
+          onSettingsClick={() => navigate('/client/settings')}
+          onNotificationsClick={() => navigate('/client/notifications')}
+        />
       )}
 
       {/* Ближайшая запись */}

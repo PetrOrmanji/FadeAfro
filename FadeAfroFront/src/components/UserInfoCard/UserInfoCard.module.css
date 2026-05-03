@@ -55,7 +55,14 @@
   color: var(--tg-text);
 }
 
-.settingsBtn {
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
   background-color: var(--tg-secondary-bg);
   color: var(--tg-text);
   display: flex;
@@ -66,9 +73,9 @@
   border-radius: var(--radius-sm);
   flex-shrink: 0;
   transition: opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.settingsBtn:hover {
-  background-color: var(--tg-button);
-  color: var(--tg-button-text);
+.iconBtn:active {
+  opacity: 0.6;
 }

@@ -5,6 +5,7 @@ import styles from './UserInfoCard.module.css'
 interface Props {
   user: UserResponse
   onSettingsClick: () => void
+  onNotificationsClick: () => void
 }
 
 const getInitials = (firstName: string, lastName: string | null) => {
@@ -13,7 +14,7 @@ const getInitials = (firstName: string, lastName: string | null) => {
   return first + last
 }
 
-const UserInfoCard = ({ user, onSettingsClick }: Props) => {
+const UserInfoCard = ({ user, onSettingsClick, onNotificationsClick }: Props) => {
   const launchParams = useLaunchParams()
   const tgUser = launchParams.tgWebAppData?.user
 
@@ -39,12 +40,25 @@ const UserInfoCard = ({ user, onSettingsClick }: Props) => {
           {username && <span className={styles.username}>{username}</span>}
         </div>
       </div>
-      <button className={styles.settingsBtn} onClick={onSettingsClick} aria-label="Настройки">
-        <SettingsIcon />
-      </button>
+      <div className={styles.actions}>
+        <button className={styles.iconBtn} onClick={onNotificationsClick} aria-label="Уведомления">
+          <BellIcon />
+        </button>
+        <button className={styles.iconBtn} onClick={onSettingsClick} aria-label="Настройки">
+          <SettingsIcon />
+        </button>
+      </div>
     </div>
   )
 }
+
+const BellIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+)
 
 const SettingsIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
