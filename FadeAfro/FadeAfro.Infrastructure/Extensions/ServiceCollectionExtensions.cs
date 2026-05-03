@@ -98,6 +98,18 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddTimeSettings(this IServiceCollection services)
+    {
+        services.AddOptions<TimeOptions>()
+            .BindConfiguration("Time")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<ITimeSettings, TimeSettings>();
+
+        return services;
+    }
+
     public static IServiceCollection AddFileStorage(this IServiceCollection services)
     {
         services.AddScoped<IFileStorageService, LocalFileStorageService>();

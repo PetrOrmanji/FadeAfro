@@ -11,6 +11,7 @@ builder.Services.AddApplication();
 builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
 builder.Services.AddTelegram();
+builder.Services.AddTimeSettings();
 builder.Services.AddCorsPolicy(builder.Configuration, builder.Environment);
 builder.Services.AddNotifications();
 builder.Services.AddFileStorage();

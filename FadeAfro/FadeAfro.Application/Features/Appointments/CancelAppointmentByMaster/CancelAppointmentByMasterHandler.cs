@@ -1,4 +1,5 @@
 using FadeAfro.Application.Services;
+using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Exceptions.MasterProfile;
@@ -9,15 +10,18 @@ namespace FadeAfro.Application.Features.Appointments.CancelAppointmentByMaster;
 
 public class CancelAppointmentByMasterHandler : IRequestHandler<CancelAppointmentByMasterCommand>
 {
+    private readonly TimeZoneInfo _timeZone;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly INotificationService _notificationService;
 
     public CancelAppointmentByMasterHandler(
+        ITimeSettings timeSettings,
         IAppointmentRepository appointmentRepository,
         IMasterProfileRepository masterProfileRepository,
         INotificationService notificationService)
     {
+        _timeZone = timeSettings.TimeZone;
         _appointmentRepository = appointmentRepository;
         _masterProfileRepository = masterProfileRepository;
         _notificationService = notificationService;
@@ -55,9 +59,11 @@ public class CancelAppointmentByMasterHandler : IRequestHandler<CancelAppointmen
             ? masterName
             : $"{masterName} (@{appointment.MasterProfile.Master.Username})";
 
-        var notificationText = 
+        var localTime = TimeZoneInfo.ConvertTimeFromUtc(appointment.StartTime, _timeZone);
+
+        var notificationText =
             $"❌Мастер {masterInfo} отменил вашу запись на " +
-            $"{appointment.StartTime:dd.MM.yyyy} в {appointment.StartTime:HH:mm}.";
+            $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
         
         return notificationText;
     }

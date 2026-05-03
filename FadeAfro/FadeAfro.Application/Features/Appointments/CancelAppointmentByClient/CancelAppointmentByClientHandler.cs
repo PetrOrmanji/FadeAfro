@@ -1,4 +1,5 @@
 using FadeAfro.Application.Services;
+using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.Appointment;
 using FadeAfro.Domain.Repositories;
@@ -8,13 +9,16 @@ namespace FadeAfro.Application.Features.Appointments.CancelAppointmentByClient;
 
 public class CancelAppointmentByClientHandler : IRequestHandler<CancelAppointmentByClientCommand>
 {
+    private readonly TimeZoneInfo _timeZone;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly INotificationService _notificationService;
 
     public CancelAppointmentByClientHandler(
+        ITimeSettings timeSettings,
         IAppointmentRepository appointmentRepository,
         INotificationService notificationService)
     {
+        _timeZone = timeSettings.TimeZone;
         _appointmentRepository = appointmentRepository;
         _notificationService = notificationService;
     }
@@ -47,9 +51,11 @@ public class CancelAppointmentByClientHandler : IRequestHandler<CancelAppointmen
             ? clientName
             : $"{clientName} (@{appointment.Client.Username})";
 
-        var notificationText = 
+        var localTime = TimeZoneInfo.ConvertTimeFromUtc(appointment.StartTime, _timeZone);
+
+        var notificationText =
             $"❌Клиент {clientInfo} отменил запись на " +
-            $"{appointment.StartTime:dd.MM.yyyy} в {appointment.StartTime:HH:mm}.";
+            $"{localTime:dd.MM.yyyy} в {localTime:HH:mm}.";
         
         return notificationText;
     }
