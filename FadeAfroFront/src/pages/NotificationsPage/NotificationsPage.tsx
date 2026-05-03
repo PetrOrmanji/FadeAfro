@@ -13,7 +13,10 @@ const NotificationsPage = () => {
 
   useEffect(() => {
     getMyNotifications()
-      .then(setNotifications)
+      .then(data => {
+        const sorted = [...data].sort((a, b) => Number(a.isRead) - Number(b.isRead))
+        setNotifications(sorted)
+      })
       .finally(() => setLoading(false))
   }, [])
 

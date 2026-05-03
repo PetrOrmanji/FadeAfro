@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getAllMasters, type MasterProfile } from '../../api/masters'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyAppointments, type ClientAppointment } from '../../api/appointments'
+import { getUnreadNotificationsCount } from '../../api/notifications'
 import MasterCard from '../../components/MasterCard/MasterCard'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -64,17 +65,19 @@ const UpcomingAppointment = ({
 
 const ClientPage = () => {
   const navigate = useNavigate()
-  const [user,         setUser]         = useState<UserResponse | null>(null)
-  const [masters,      setMasters]      = useState<MasterProfile[]>([])
-  const [appointments, setAppointments] = useState<ClientAppointment[]>([])
-  const [loading,      setLoading]      = useState(true)
+  const [user,           setUser]           = useState<UserResponse | null>(null)
+  const [masters,        setMasters]        = useState<MasterProfile[]>([])
+  const [appointments,   setAppointments]   = useState<ClientAppointment[]>([])
+  const [unreadCount,    setUnreadCount]    = useState(0)
+  const [loading,        setLoading]        = useState(true)
 
   useEffect(() => {
-    Promise.all([getMe(), getAllMasters(), getMyAppointments()])
-      .then(([userData, mastersData, appointmentsData]) => {
+    Promise.all([getMe(), getAllMasters(), getMyAppointments(), getUnreadNotificationsCount()])
+      .then(([userData, mastersData, appointmentsData, unreadCountData]) => {
         setUser(userData)
         setMasters(mastersData)
         setAppointments(appointmentsData)
+        setUnreadCount(unreadCountData)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -97,6 +100,7 @@ const ClientPage = () => {
       {user && (
         <UserInfoCard
           user={user}
+          unreadCount={unreadCount}
           onSettingsClick={() => navigate('/client/settings')}
           onNotificationsClick={() => navigate('/client/notifications')}
         />

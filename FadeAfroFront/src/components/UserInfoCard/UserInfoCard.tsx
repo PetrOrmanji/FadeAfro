@@ -4,6 +4,7 @@ import styles from './UserInfoCard.module.css'
 
 interface Props {
   user: UserResponse
+  unreadCount: number
   onSettingsClick: () => void
   onNotificationsClick: () => void
 }
@@ -14,7 +15,7 @@ const getInitials = (firstName: string, lastName: string | null) => {
   return first + last
 }
 
-const UserInfoCard = ({ user, onSettingsClick, onNotificationsClick }: Props) => {
+const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick }: Props) => {
   const launchParams = useLaunchParams()
   const tgUser = launchParams.tgWebAppData?.user
 
@@ -43,6 +44,11 @@ const UserInfoCard = ({ user, onSettingsClick, onNotificationsClick }: Props) =>
       <div className={styles.actions}>
         <button className={styles.iconBtn} onClick={onNotificationsClick} aria-label="Уведомления">
           <BellIcon />
+          {unreadCount > 0 && (
+            <span className={styles.badge}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </button>
         <button className={styles.iconBtn} onClick={onSettingsClick} aria-label="Настройки">
           <SettingsIcon />

@@ -11,6 +11,11 @@ export const getMyNotifications = async (): Promise<NotificationDto[]> => {
   return res.data.notifications
 }
 
+export const getUnreadNotificationsCount = async (): Promise<number> => {
+  const res = await apiClient.get<{ count: number }>('/notifications/get/me/count/unread')
+  return res.data.count
+}
+
 export const markAllNotificationsAsRead = async (): Promise<void> => {
   await apiClient.put('/notifications/read/me/all')
 }
