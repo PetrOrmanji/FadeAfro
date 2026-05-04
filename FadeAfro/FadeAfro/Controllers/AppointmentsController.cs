@@ -4,6 +4,7 @@ using FadeAfro.Application.Features.Appointments.CreateClientAppointment;
 using FadeAfro.Application.Features.Appointments.GetClientActiveAppointments;
 using FadeAfro.Application.Features.Appointments.GetMasterActiveAppointments;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Constants;
 using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

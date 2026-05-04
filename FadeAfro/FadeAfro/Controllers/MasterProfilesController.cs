@@ -7,6 +7,7 @@ using FadeAfro.Application.Features.MasterProfiles.GetMyMasterProfile;
 using FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
 using FadeAfro.Application.Features.MasterProfiles.UploadMasterProfilePhoto;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Constants;
 using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

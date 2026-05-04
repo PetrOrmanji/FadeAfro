@@ -1,4 +1,4 @@
-namespace FadeAfro.Extensions;
+namespace FadeAfro.Constants;
 
 public static class RateLimitingPolicies
 {

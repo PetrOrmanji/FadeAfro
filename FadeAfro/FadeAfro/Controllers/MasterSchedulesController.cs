@@ -2,6 +2,7 @@ using FadeAfro.Application.Features.MasterSchedules.DeleteMasterSchedule;
 using FadeAfro.Application.Features.MasterSchedules.GetMasterSchedule;
 using FadeAfro.Application.Features.MasterSchedules.SetMasterSchedule;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Constants;
 using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

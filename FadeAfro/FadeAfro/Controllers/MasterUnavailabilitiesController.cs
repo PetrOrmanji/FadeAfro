@@ -2,6 +2,7 @@ using FadeAfro.Application.Features.MasterUnavailabilities.AddMasterUnavailabili
 using FadeAfro.Application.Features.MasterUnavailabilities.DeleteMasteUnavailability;
 using FadeAfro.Application.Features.MasterUnavailabilities.GetMasterUnavailabilities;
 using FadeAfro.Domain.Constants;
+using FadeAfro.Constants;
 using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
