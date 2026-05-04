@@ -17,6 +17,7 @@ builder.Services.AddNotifications();
 builder.Services.AddFileStorage();
 builder.Services.AddControllersWithOptions();
 builder.Services.AddAuthorization();
+builder.Services.AddRateLimiting();
 builder.Services.AddSwagger();
 
 var app = builder.Build();
@@ -24,6 +25,7 @@ var app = builder.Build();
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
 app.UseCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
