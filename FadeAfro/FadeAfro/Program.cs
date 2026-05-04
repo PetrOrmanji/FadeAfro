@@ -7,6 +7,8 @@ SetCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.AddSerilog();
+
 builder.Services.AddApplication();
 builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddJwt();
