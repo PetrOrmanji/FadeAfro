@@ -119,21 +119,49 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.6px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
   text-transform: uppercase;
   padding: 0 4px;
 }
 
-.rolesCard {
-  background-color: var(--tg-bg);
-  border-radius: var(--radius-lg);
-  padding: 12px 16px;
+.rolesChips {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.roleItem {
-  font-size: 16px;
+.roleChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.roleChip::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.roleChip_Owner {
+  background-color: rgba(255, 200, 0, 0.15);
+  color: #996600;
+}
+.roleChip_Owner::before { background-color: #d4a000; }
+
+.roleChip_Master {
+  background-color: color-mix(in srgb, var(--tg-button) 12%, transparent);
+  color: var(--tg-button);
+}
+.roleChip_Master::before { background-color: var(--tg-button); }
+
+.roleChip_Client {
+  background-color: var(--tg-bg);
   color: var(--tg-text);
 }
+.roleChip_Client::before { background-color: var(--tg-hint); }

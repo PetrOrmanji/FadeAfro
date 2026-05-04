@@ -73,9 +73,9 @@ const SettingsPage = () => {
       {/* Роли */}
       <section className={styles.section}>
         <span className={styles.sectionLabel}>РОЛИ</span>
-        <div className={styles.rolesCard}>
+        <div className={styles.rolesChips}>
           {roles.map(role => (
-            <span key={role} className={styles.roleItem}>
+            <span key={role} className={`${styles.roleChip} ${styles[`roleChip_${role}`]}`}>
               {ROLE_LABELS[role]}
             </span>
           ))}

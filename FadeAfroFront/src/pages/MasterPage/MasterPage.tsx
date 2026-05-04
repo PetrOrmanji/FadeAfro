@@ -231,21 +231,6 @@ const MasterPage = () => {
   return (
     <div className={styles.page}>
 
-      {/* Таб-свитчер — только если пришли из OwnerPage */}
-      {fromOwner && (
-        <div className={styles.tabSwitcher}>
-          <button
-            className={styles.tabBtn}
-            onClick={() => navigate('/owner')}
-          >
-            Владелец
-          </button>
-          <button className={`${styles.tabBtn} ${styles.tabBtnActive}`}>
-            Мастер
-          </button>
-        </div>
-      )}
-
       {/* Логотип */}
       <div className={styles.logoWrap}>
         <div className={styles.logoPlaceholder}>✂</div>
@@ -261,6 +246,21 @@ const MasterPage = () => {
           onSettingsClick={() => navigate('/master/settings')}
           onNotificationsClick={() => navigate('/master/notifications')}
         />
+      )}
+
+      {/* Таб-свитчер — только если пришли из OwnerPage */}
+      {fromOwner && (
+        <div className={styles.tabSwitcher}>
+          <button
+            className={styles.tabBtn}
+            onClick={() => navigate('/owner')}
+          >
+            Владелец
+          </button>
+          <button className={`${styles.tabBtn} ${styles.tabBtnActive}`}>
+            Мастер
+          </button>
+        </div>
       )}
 
       {/* График */}
