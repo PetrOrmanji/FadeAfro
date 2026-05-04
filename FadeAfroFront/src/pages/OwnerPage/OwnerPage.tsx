@@ -76,13 +76,6 @@ const OwnerPage = () => {
           </div>
           <ChevronRightIcon />
         </div>
-        <div className={styles.card} onClick={() => navigate('/owner/masters')}>
-          <div className={styles.cardLeft}>
-            <MastersIcon />
-            <span className={styles.cardLabel}>Мастера</span>
-          </div>
-          <ChevronRightIcon />
-        </div>
       </div>
 
     </div>

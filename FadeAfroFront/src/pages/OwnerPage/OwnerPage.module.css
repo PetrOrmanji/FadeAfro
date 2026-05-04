@@ -69,7 +69,7 @@
 .sectionTitle {
   font-size: 13px;
   font-weight: 500;
-  color: var(--tg-hint);
+  color: var(--tg-text);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 0 4px;
