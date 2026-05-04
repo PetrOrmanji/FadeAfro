@@ -40,8 +40,8 @@ public class RequestLoggingMiddleware
 
         _logger.LogInformation(
             "HTTP {Method} {Path} → {StatusCode} in {ElapsedMs}ms | {RequestBody} | {ResponseBody}",
-            requestMethodLogString, requestPathLogString, responseStatusCode, requestDurationMs,
-            requestBodyLogString, responseBodyLogString);
+            requestMethodLogString, requestPathLogString, responseStatusCode, 
+            requestDurationMs, requestBodyLogString, responseBodyLogString);
     }
 
     private async Task<long> ProcessRequestAndGetDurationAsync(HttpContext context)
@@ -73,18 +73,24 @@ public class RequestLoggingMiddleware
 
     private static async Task<string> GetResponseBodyLogStringAsync(HttpContext context)
     {
-        var isFileDownload =
-            context.Response.ContentType?.StartsWith("multipart/", StringComparison.OrdinalIgnoreCase) == true;
+        if (IsBinaryResponse(context.Response))
+            return string.Empty;
 
-        var responseBody = isFileDownload
-            ? "(file download — skipped)"
-            : await ReadResponseBodyAsync(context.Response);
+        var responseBody = await ReadResponseBodyAsync(context.Response);
 
-        var responseBodyLogString = string.IsNullOrWhiteSpace(responseBody)
+        return string.IsNullOrWhiteSpace(responseBody)
             ? "ResponseBody: not exists"
             : $"ResponseBody: {responseBody}";
+    }
 
-        return responseBodyLogString;
+    private static bool IsBinaryResponse(HttpResponse response)
+    {
+        var contentType = response.ContentType;
+        if (string.IsNullOrEmpty(contentType)) return false;
+
+        return contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)                ||
+               contentType.StartsWith("multipart/", StringComparison.OrdinalIgnoreCase)             ||
+               contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task<string> ReadRequestBodyAsync(HttpRequest request)
