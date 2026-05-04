@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getMe, type UserResponse } from '../../api/user'
@@ -233,7 +234,7 @@ const MasterPage = () => {
 
       {/* Логотип */}
       <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+        <img src={logo} className={styles.logo} alt="FadeAfro" />
       </div>
 
       {/* Карточка пользователя */}

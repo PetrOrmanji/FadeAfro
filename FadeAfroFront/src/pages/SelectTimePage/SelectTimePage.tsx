@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { MasterProfile } from '../../api/masters'
@@ -150,7 +151,7 @@ const SelectTimePage = () => {
         {/* Лого + дата — единый верхний блок */}
         <div className={styles.pageTop}>
           <div className={styles.logoWrap}>
-            <div className={styles.logoPlaceholder}>✂</div>
+            <img src={logo} className={styles.logo} alt="FadeAfro" />
           </div>
           <div className={styles.dateRow}>
             <CalendarIcon />

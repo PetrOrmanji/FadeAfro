@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -304,7 +305,7 @@ const OwnerUsersPage = () => {
 
       <div className={styles.header}>
         <div className={styles.logoWrap}>
-          <div className={styles.logoPlaceholder}>✂</div>
+          <img src={logo} className={styles.logo} alt="FadeAfro" />
         </div>
         <h1 className={styles.title}>Пользователи</h1>
 

@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLaunchParams } from '@tma.js/sdk-react'
@@ -47,7 +48,7 @@ const SettingsPage = () => {
 
       {/* Логотип */}
       <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+        <img src={logo} className={styles.logo} alt="FadeAfro" />
       </div>
 
       {/* Заголовок */}

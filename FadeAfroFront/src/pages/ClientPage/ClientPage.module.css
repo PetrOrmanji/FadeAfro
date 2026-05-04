@@ -23,10 +23,11 @@
 
 /* Реальный логотип — когда появится файл */
 .logo {
-  width: 72px;
-  height: 72px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
 }
 
 /* Плейсхолдер до появления логотипа */

@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { MasterProfile } from '../../api/masters'
@@ -156,7 +157,7 @@ const SelectDatePage = () => {
 
       {/* Логотип */}
       <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+        <img src={logo} className={styles.logo} alt="FadeAfro" />
       </div>
 
       {/* Заголовок */}

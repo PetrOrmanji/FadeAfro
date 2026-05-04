@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import styles from './ErrorPage.module.css'
 
 const ErrorPage = () => {
@@ -5,7 +6,7 @@ const ErrorPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+        <img src={logo} className={styles.logo} alt="FadeAfro" />
       </div>
 
       <div className={styles.content}>

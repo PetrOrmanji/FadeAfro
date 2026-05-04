@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
@@ -188,7 +189,7 @@ const MyAppointmentsPage = () => {
       {/* Шапка — не прокручивается */}
       <div className={styles.header}>
         <div className={styles.logoWrap}>
-          <div className={styles.logoPlaceholder}>✂</div>
+          <img src={logo} className={styles.logo} alt="FadeAfro" />
         </div>
         <h1 className={styles.title}>Мои записи</h1>
       </div>

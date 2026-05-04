@@ -38,17 +38,12 @@
   padding: 8px 0 32px;
 }
 
-.logoPlaceholder {
-  width: 72px;
-  height: 72px;
+.logo {
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background-color: var(--tg-button);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  color: #ffffff;
-  user-select: none;
+  object-fit: cover;
+  display: block;
 }
 
 .title {

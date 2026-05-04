@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { NotificationDto } from '../../api/notifications'
@@ -77,7 +78,7 @@ const NotificationsPage = () => {
       {/* Шапка — не листается */}
       <div className={styles.header}>
         <div className={styles.logoWrap}>
-          <div className={styles.logoPlaceholder}>✂</div>
+          <img src={logo} className={styles.logo} alt="FadeAfro" />
         </div>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>Уведомления</h1>

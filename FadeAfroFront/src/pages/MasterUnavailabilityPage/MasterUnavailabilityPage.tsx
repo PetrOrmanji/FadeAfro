@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -172,7 +173,7 @@ const MasterUnavailabilityPage = () => {
         {/* Шапка */}
         <div className={styles.header}>
           <div className={styles.logoWrap}>
-            <div className={styles.logoPlaceholder}>✂</div>
+            <img src={logo} className={styles.logo} alt="FadeAfro" />
           </div>
           <h1 className={styles.title}>Дни отсутствия</h1>
         </div>

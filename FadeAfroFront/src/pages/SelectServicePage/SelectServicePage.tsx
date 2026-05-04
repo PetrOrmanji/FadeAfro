@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMasterServices, type MasterService } from '../../api/services'
@@ -149,7 +150,7 @@ const SelectServicePage = () => {
 
       {/* Логотип */}
       <div className={styles.logoWrap}>
-        <div className={styles.logoPlaceholder}>✂</div>
+        <img src={logo} className={styles.logo} alt="FadeAfro" />
       </div>
 
       {/* Заголовок */}
