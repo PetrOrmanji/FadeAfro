@@ -1,5 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { hasRole, useAuth } from '../context/AuthContext'
+import type { UserRole } from '../api/user'
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
 import ClientPage from '../pages/ClientPage/ClientPage'
 import SettingsPage from '../pages/SettingsPage/SettingsPage'
@@ -19,14 +20,24 @@ import MasterAppointmentsPage from '../pages/MasterAppointmentsPage/MasterAppoin
 import OwnerPage from '../pages/OwnerPage/OwnerPage'
 import OwnerUsersPage from '../pages/OwnerUsersPage/OwnerUsersPage'
 
-// Куда редиректить в зависимости от ролей
+// ── Редирект на домашнюю страницу по роли ─────────────────────────────────
+
 const RootRedirect = () => {
   const { roles } = useAuth()
-
   if (hasRole(roles, 'Owner'))  return <Navigate to="/owner"  replace />
   if (hasRole(roles, 'Master')) return <Navigate to="/master" replace />
   return <Navigate to="/client" replace />
 }
+
+// ── Защита маршрутов по роли ───────────────────────────────────────────────
+
+const RequireRole = ({ role, children }: { role: UserRole; children: React.ReactNode }) => {
+  const { roles } = useAuth()
+  if (!hasRole(roles, role)) return <Navigate to="/" replace />
+  return <>{children}</>
+}
+
+// ── Роутер ─────────────────────────────────────────────────────────────────
 
 const AppRouter = () => {
   const { isLoading, isAuthenticated } = useAuth()
@@ -44,25 +55,32 @@ const AppRouter = () => {
     <HashRouter>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
-        <Route path="/client" element={<ClientPage />} />
-        <Route path="/client/settings" element={<SettingsPage />} />
-        <Route path="/client/master/:masterProfileId/services" element={<SelectServicePage />} />
-        <Route path="/client/master/:masterProfileId/date"     element={<SelectDatePage />} />
-        <Route path="/client/master/:masterProfileId/time"     element={<SelectTimePage />} />
-        <Route path="/client/master/:masterProfileId/confirm"  element={<ConfirmPage />} />
-        <Route path="/client/booking-success" element={<BookingSuccessPage />} />
+
+        {/* ── Клиент ── */}
+        <Route path="/client" element={<RequireRole role="Client"><ClientPage /></RequireRole>} />
+        <Route path="/client/settings" element={<RequireRole role="Client"><SettingsPage /></RequireRole>} />
+        <Route path="/client/appointments" element={<RequireRole role="Client"><MyAppointmentsPage /></RequireRole>} />
+        <Route path="/client/notifications" element={<RequireRole role="Client"><NotificationsPage /></RequireRole>} />
+        <Route path="/client/master/:masterProfileId/services" element={<RequireRole role="Client"><SelectServicePage /></RequireRole>} />
+        <Route path="/client/master/:masterProfileId/date"     element={<RequireRole role="Client"><SelectDatePage /></RequireRole>} />
+        <Route path="/client/master/:masterProfileId/time"     element={<RequireRole role="Client"><SelectTimePage /></RequireRole>} />
+        <Route path="/client/master/:masterProfileId/confirm"  element={<RequireRole role="Client"><ConfirmPage /></RequireRole>} />
+        <Route path="/client/booking-success" element={<RequireRole role="Client"><BookingSuccessPage /></RequireRole>} />
+
+        {/* ── Мастер ── */}
+        <Route path="/master" element={<RequireRole role="Master"><MasterPage /></RequireRole>} />
+        <Route path="/master/settings" element={<RequireRole role="Master"><MasterSettingsPage /></RequireRole>} />
+        <Route path="/master/notifications" element={<RequireRole role="Master"><NotificationsPage /></RequireRole>} />
+        <Route path="/master/schedule"      element={<RequireRole role="Master"><MasterSchedulePage /></RequireRole>} />
+        <Route path="/master/unavailability" element={<RequireRole role="Master"><MasterUnavailabilityPage /></RequireRole>} />
+        <Route path="/master/appointments"  element={<RequireRole role="Master"><MasterAppointmentsPage /></RequireRole>} />
+
+        {/* ── Владелец ── */}
+        <Route path="/owner" element={<RequireRole role="Owner"><OwnerPage /></RequireRole>} />
+        <Route path="/owner/settings" element={<RequireRole role="Owner"><SettingsPage /></RequireRole>} />
+        <Route path="/owner/users"    element={<RequireRole role="Owner"><OwnerUsersPage /></RequireRole>} />
+
         <Route path="/error" element={<ErrorPage />} />
-        <Route path="/client/appointments" element={<MyAppointmentsPage />} />
-        <Route path="/client/notifications" element={<NotificationsPage />} />
-        <Route path="/master" element={<MasterPage />} />
-        <Route path="/master/settings" element={<MasterSettingsPage />} />
-        <Route path="/master/notifications" element={<NotificationsPage />} />
-        <Route path="/master/schedule"      element={<MasterSchedulePage />} />
-        <Route path="/master/unavailability" element={<MasterUnavailabilityPage />} />
-        <Route path="/master/appointments"  element={<MasterAppointmentsPage />} />
-        <Route path="/owner"          element={<OwnerPage />} />
-        <Route path="/owner/settings" element={<SettingsPage />} />
-        <Route path="/owner/users"    element={<OwnerUsersPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
