@@ -99,6 +99,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.searchSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--tg-hint);
+  border-top-color: transparent;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: spin 0.7s linear infinite;
+}
+
 /* ── Список ───────────────────────────────────────────────────────────────── */
 .list {
   flex: 1;

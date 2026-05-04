@@ -195,6 +195,7 @@ const OwnerUsersPage = () => {
   const [page,         setPage]         = useState(1)
   const [totalPages,   setTotalPages]   = useState(1)
   const [loading,      setLoading]      = useState(true)
+  const [searching,    setSearching]    = useState(false)
   const [loadingMore,  setLoadingMore]  = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -246,9 +247,9 @@ const OwnerUsersPage = () => {
     setSearch(val)
     if (searchTimer.current) clearTimeout(searchTimer.current)
     searchTimer.current = setTimeout(async () => {
-      setLoading(true)
+      setSearching(true)
       await fetchUsers(1, val, true)
-      setLoading(false)
+      setSearching(false)
     }, 400)
   }
 
@@ -302,13 +303,14 @@ const OwnerUsersPage = () => {
             <SearchIcon />
             <input
               className={styles.searchInput}
-              placeholder="Имя или username..."
+              placeholder="Имя, фамилия или @username..."
               value={search}
               onChange={e => handleSearch(e.target.value)}
             />
-            {search && (
-              <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
-            )}
+            {searching
+              ? <span className={styles.searchSpinner} />
+              : search && <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
+            }
           </div>
         )}
       </div>
