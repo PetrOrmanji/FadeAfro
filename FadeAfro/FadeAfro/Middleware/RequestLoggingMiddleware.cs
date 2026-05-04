@@ -22,6 +22,10 @@ public class RequestLoggingMiddleware
     {
         using var disposableHandler =
             LogContext.PushProperty(RequestIdLogPropertyName, context.TraceIdentifier);
+        
+        var originalResponseBody = context.Response.Body;
+        using var responseBuffer = new MemoryStream();
+        context.Response.Body = responseBuffer;
 
         var requestMethodLogString = context.Request.Method;
         var requestPathLogString = context.Request.Path.HasValue ? context.Request.Path.Value : string.Empty;
@@ -29,6 +33,10 @@ public class RequestLoggingMiddleware
         var requestDurationMs = await ProcessRequestAndGetDurationAsync(context);
         var responseStatusCode = context.Response.StatusCode;
         var responseBodyLogString = await GetResponseBodyLogStringAsync(context);
+        
+        responseBuffer.Position = 0;
+        await responseBuffer.CopyToAsync(originalResponseBody);
+        context.Response.Body = originalResponseBody;
 
         _logger.LogInformation(
             "HTTP {Method} {Path} → {StatusCode} in {ElapsedMs}ms | Req: {RequestBody} | Res: {ResponseBody}",
