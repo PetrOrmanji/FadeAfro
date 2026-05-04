@@ -39,7 +39,7 @@ public class RequestLoggingMiddleware
         context.Response.Body = originalResponseBody;
 
         _logger.LogInformation(
-            "HTTP {Method} {Path} → {StatusCode} in {ElapsedMs}ms | Req: {RequestBody} | Res: {ResponseBody}",
+            "HTTP {Method} {Path} → {StatusCode} in {ElapsedMs}ms | {RequestBody} | {ResponseBody}",
             requestMethodLogString, requestPathLogString, responseStatusCode, requestDurationMs,
             requestBodyLogString, responseBodyLogString);
     }
@@ -65,7 +65,7 @@ public class RequestLoggingMiddleware
             : await ReadRequestBodyAsync(context.Request);
 
         var requestBodyLogString = string.IsNullOrWhiteSpace(requestBody)
-            ? string.Empty
+            ? "RequestBody: not exists"
             : $"RequestBody: {requestBody}";
 
         return requestBodyLogString;
@@ -81,7 +81,7 @@ public class RequestLoggingMiddleware
             : await ReadResponseBodyAsync(context.Response);
 
         var responseBodyLogString = string.IsNullOrWhiteSpace(responseBody)
-            ? string.Empty
+            ? "ResponseBody: not exists"
             : $"ResponseBody: {responseBody}";
 
         return responseBodyLogString;
