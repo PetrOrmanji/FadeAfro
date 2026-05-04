@@ -36,14 +36,13 @@ const UserCard = ({
   isMe: boolean
   onClick: () => void
 }) => {
-  const isOwner = user.roles.includes('Owner')
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
 
   return (
     <div
       className={styles.card}
-      onClick={!isOwner && !isMe ? onClick : undefined}
-      style={!isOwner && !isMe ? { cursor: 'pointer' } : undefined}
+      onClick={onClick}
+      style={{ cursor: 'pointer' }}
     >
       <div className={styles.cardAvatar}>
         <span className={styles.cardInitials}>{getInitials(user.firstName, user.lastName)}</span>
@@ -66,11 +65,13 @@ const UserCard = ({
 
 const UserActionPanel = ({
   user,
+  isMe,
   onAssign,
   onDismiss,
   onClose,
 }: {
   user: UserItem
+  isMe: boolean
   onAssign: (id: string) => Promise<void>
   onDismiss: (id: string) => Promise<void>
   onClose: () => void
@@ -110,7 +111,9 @@ const UserActionPanel = ({
           /* ── Экран подтверждения увольнения ── */
           <>
             <div className={styles.panelWarningIcon}>⚠️</div>
-            <div className={styles.panelWarningTitle}>Уволить {fullName}?</div>
+            <div className={styles.panelWarningTitle}>
+              {isMe ? 'Снять роль мастера?' : `Уволить ${fullName}?`}
+            </div>
             <div className={styles.panelWarningList}>
               <div className={styles.panelWarningItem}>
                 <span className={styles.panelWarningDot} />
@@ -122,7 +125,7 @@ const UserActionPanel = ({
               </div>
               <div className={styles.panelWarningItem}>
                 <span className={styles.panelWarningDot} />
-                Пользователь станет обычным клиентом
+                {isMe ? 'Вы потеряете роль мастера' : 'Пользователь станет обычным клиентом'}
               </div>
             </div>
             <button
@@ -155,7 +158,7 @@ const UserActionPanel = ({
                 className={`${styles.panelBtn} ${styles.panelBtnDismiss}`}
                 onClick={() => setConfirmMode(true)}
               >
-                Уволить мастера
+                {isMe ? 'Снять роль мастера' : 'Уволить мастера'}
               </button>
             ) : (
               <button
@@ -292,6 +295,7 @@ const OwnerUsersPage = () => {
       {selectedUser && (
         <UserActionPanel
           user={selectedUser}
+          isMe={selectedUser.id === myId}
           onAssign={handleAssign}
           onDismiss={handleDismiss}
           onClose={() => setSelectedUser(null)}
