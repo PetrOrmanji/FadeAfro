@@ -189,6 +189,7 @@ const OwnerUsersPage = () => {
 
   const [myId,         setMyId]         = useState<string | null>(null)
   const [users,        setUsers]        = useState<UserItem[]>([])
+  const [filteredUsers,setFilteredUsers]= useState<UserItem[]>([])
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
   const [filter,       setFilter]       = useState<Filter>(null)
   const [search,       setSearch]       = useState('')
@@ -202,7 +203,9 @@ const OwnerUsersPage = () => {
   const fetchUsers = async (p: number, q: string, replace: boolean) => {
     try {
       const res = await getAllUsers(p, PAGE_SIZE, q || undefined)
-      setUsers(prev => replace ? res.items : [...prev, ...res.items])
+      const next = replace ? res.items : [...users, ...res.items]
+      setUsers(next)
+      setFilteredUsers(next)
       setPage(res.page)
       setTotalPages(res.totalPages)
     } catch {
@@ -210,11 +213,22 @@ const OwnerUsersPage = () => {
     }
   }
 
-  const fetchByFilter = async (f: Filter) => {
+  const applyClientSearch = (items: UserItem[], q: string) => {
+    if (!q.trim()) return items
+    const term = q.toLowerCase().replace('@', '')
+    return items.filter(u =>
+      u.firstName.toLowerCase().includes(term) ||
+      (u.lastName?.toLowerCase().includes(term)) ||
+      (u.username?.toLowerCase().includes(term))
+    )
+  }
+
+  const fetchByFilter = async (f: Filter, q = '') => {
     if (!f) return
     try {
       const items = f === 'Master' ? await getMasters() : await getOwners()
       setUsers(items)
+      setFilteredUsers(applyClientSearch(items, q))
       setPage(1)
       setTotalPages(1)
     } catch {
@@ -236,15 +250,26 @@ const OwnerUsersPage = () => {
     setSearch('')
     setLoading(true)
     if (next) {
-      await fetchByFilter(next)
+      await fetchByFilter(next, '')
     } else {
-      await fetchUsers(1, '', true)
+      const res = await getAllUsers(1, PAGE_SIZE, undefined).catch(() => null)
+      if (res) {
+        setUsers(res.items)
+        setFilteredUsers(res.items)
+        setPage(res.page)
+        setTotalPages(res.totalPages)
+      }
     }
     setLoading(false)
   }
 
   const handleSearch = (val: string) => {
     setSearch(val)
+    if (filter) {
+      // Клиентская фильтрация по загруженным данным
+      setFilteredUsers(applyClientSearch(users, val))
+      return
+    }
     if (searchTimer.current) clearTimeout(searchTimer.current)
     searchTimer.current = setTimeout(async () => {
       setSearching(true)
@@ -283,6 +308,20 @@ const OwnerUsersPage = () => {
         </div>
         <h1 className={styles.title}>Пользователи</h1>
 
+        <div className={styles.searchWrap}>
+          <SearchIcon />
+          <input
+            className={styles.searchInput}
+            placeholder="Имя, фамилия или @username..."
+            value={search}
+            onChange={e => handleSearch(e.target.value)}
+          />
+          {searching
+            ? <span className={styles.searchSpinner} />
+            : search && <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
+          }
+        </div>
+
         <div className={styles.filterRow}>
           <button
             className={`${styles.filterChip} ${filter === 'Master' ? styles.filterChipActive : ''}`}
@@ -297,30 +336,14 @@ const OwnerUsersPage = () => {
             Владельцы
           </button>
         </div>
-
-        {!filter && (
-          <div className={styles.searchWrap}>
-            <SearchIcon />
-            <input
-              className={styles.searchInput}
-              placeholder="Имя, фамилия или @username..."
-              value={search}
-              onChange={e => handleSearch(e.target.value)}
-            />
-            {searching
-              ? <span className={styles.searchSpinner} />
-              : search && <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
-            }
-          </div>
-        )}
       </div>
 
       <div className={styles.list}>
-        {users.length === 0 ? (
+        {filteredUsers.length === 0 ? (
           <div className={styles.empty}>Пользователи не найдены</div>
         ) : (
           <>
-            {users.map(u => (
+            {filteredUsers.map(u => (
               <UserCard
                 key={u.id}
                 user={u}
