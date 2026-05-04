@@ -1,6 +1,6 @@
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace FadeAfro.Extensions;
 
@@ -38,6 +38,36 @@ public static class ServiceCollectionExtensions
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = 20,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                    }));
+
+            options.AddPolicy(RateLimitingPolicies.Booking, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                    }));
+
+            options.AddPolicy(RateLimitingPolicies.PhotoUpload, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 3,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                    }));
+
+            options.AddPolicy(RateLimitingPolicies.OwnerAction, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
                         Window = TimeSpan.FromMinutes(1),
                         QueueLimit = 0,
                     }));

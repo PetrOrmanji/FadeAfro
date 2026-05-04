@@ -92,6 +92,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpPost("upload/me/photo")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.PhotoUpload)]
     [SwaggerOperation(
         Summary = "Upload my master profile photo",
         Description = "Uploads a photo for the master profile. Allowed formats: JPEG, PNG, WebP. Max size: 5 MB.")]
@@ -109,6 +110,7 @@ public class MasterProfilesController : ControllerBase
 
     [HttpPost("assign/{userId:guid}")]
     [Authorize(Roles = Roles.Owner)]
+    [EnableRateLimiting(RateLimitingPolicies.OwnerAction)]
     [SwaggerOperation(
         Summary = "Assign master role to user",
         Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
@@ -122,6 +124,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpDelete("dismiss/{masterId:guid}")]
     [Authorize(Roles = Roles.Owner)]
+    [EnableRateLimiting(RateLimitingPolicies.OwnerAction)]
     [SwaggerOperation(
         Summary = "Dismiss master",
         Description = "Revokes the Master role and deletes the master profile.")]

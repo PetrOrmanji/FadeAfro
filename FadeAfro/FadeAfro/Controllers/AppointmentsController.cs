@@ -8,6 +8,7 @@ using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace FadeAfro.Controllers;
@@ -53,6 +54,7 @@ public class AppointmentsController : ControllerBase
 
     [HttpPost("client/me/book")]
     [Authorize(Roles = Roles.Client)]
+    [EnableRateLimiting(RateLimitingPolicies.Booking)]
     [SwaggerOperation(
         Summary = "Create an appointment", 
         Description = "Books a new appointment for the client with the specified master and service.")]
