@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FadeAfro.Extensions;
 using Serilog.Context;
 
 namespace FadeAfro.Middleware;
@@ -6,6 +7,7 @@ namespace FadeAfro.Middleware;
 public class RequestLoggingMiddleware
 {
     private const string RequestIdLogPropertyName = "RequestId";
+    private const string IpAddressLogPropertyName = "IPAddress";
     private const int RequestBodySizeLimit = 32 * 1024;
     private const int ResponseBodySizeLimit = 32 * 1024;
 
@@ -20,8 +22,11 @@ public class RequestLoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        using var disposableHandler =
+        using var requestIdHandler =
             LogContext.PushProperty(RequestIdLogPropertyName, context.TraceIdentifier);
+        
+        using var ipAddressHandler = 
+            LogContext.PushProperty(IpAddressLogPropertyName, context.Connection.RemoteIpAddress.ToIpV4AddressString());
         
         var originalResponseBody = context.Response.Body;
         using var responseBuffer = new MemoryStream();
@@ -88,8 +93,8 @@ public class RequestLoggingMiddleware
         var contentType = response.ContentType;
         if (string.IsNullOrEmpty(contentType)) return false;
 
-        return contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)                ||
-               contentType.StartsWith("multipart/", StringComparison.OrdinalIgnoreCase)             ||
+        return contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
+               contentType.StartsWith("multipart/", StringComparison.OrdinalIgnoreCase) ||
                contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase);
     }
 
