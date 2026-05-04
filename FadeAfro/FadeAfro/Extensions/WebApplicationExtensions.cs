@@ -1,4 +1,5 @@
 using FadeAfro.Middleware;
+using Serilog;
 
 namespace FadeAfro.Extensions;
 
@@ -18,6 +19,14 @@ public static class WebApplicationExtensions
     public static WebApplication UseExceptionHandling(this WebApplication app)
     {
         app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+        return app;
+    }
+
+    public static WebApplication UseRequestLogging(this WebApplication app)
+    {
+        app.UseMiddleware<RequestLoggingMiddleware>();
+        app.UseSerilogRequestLogging();
 
         return app;
     }

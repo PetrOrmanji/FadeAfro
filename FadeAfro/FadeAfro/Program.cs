@@ -24,6 +24,7 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 
+app.UseRequestLogging();
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
 app.UseCors();
