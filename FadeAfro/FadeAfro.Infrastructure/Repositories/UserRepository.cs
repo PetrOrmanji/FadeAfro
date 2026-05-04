@@ -17,7 +17,9 @@ public class UserRepository : IUserRepository
 
     public async Task<IList<User>> GetByRoleAsync(Role role)
     {
-        return await _context.Users.Where(u => u.Roles.Contains(role)).ToListAsync();
+        return await _context.Users
+            .FromSqlRaw("SELECT * FROM \"Users\" WHERE \"Roles\" LIKE {0}", $"%{role}%")
+            .ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(Guid id)

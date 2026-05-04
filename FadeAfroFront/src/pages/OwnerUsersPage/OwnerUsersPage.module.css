@@ -45,6 +45,28 @@
   margin: 0;
 }
 
+/* ── Фильтры ──────────────────────────────────────────────────────────────── */
+.filterRow {
+  display: flex;
+  gap: 8px;
+}
+
+.filterChip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: var(--tg-bg);
+  color: var(--tg-hint);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.filterChipActive {
+  background-color: var(--tg-button);
+  color: var(--tg-button-text);
+}
+
 /* ── Поиск ────────────────────────────────────────────────────────────────── */
 .searchWrap {
   display: flex;

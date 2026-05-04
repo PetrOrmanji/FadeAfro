@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  getAllUsers, assignMaster, dismissMaster, getMe,
+  getAllUsers, getMasters, getOwners, assignMaster, dismissMaster, getMe,
   type UserItem,
 } from '../../api/user'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
@@ -185,9 +185,12 @@ const OwnerUsersPage = () => {
   useBackButton()
   const navigate = useNavigate()
 
+  type Filter = 'Master' | 'Owner' | null
+
   const [myId,         setMyId]         = useState<string | null>(null)
   const [users,        setUsers]        = useState<UserItem[]>([])
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
+  const [filter,       setFilter]       = useState<Filter>(null)
   const [search,       setSearch]       = useState('')
   const [page,         setPage]         = useState(1)
   const [totalPages,   setTotalPages]   = useState(1)
@@ -206,6 +209,18 @@ const OwnerUsersPage = () => {
     }
   }
 
+  const fetchByFilter = async (f: Filter) => {
+    if (!f) return
+    try {
+      const items = f === 'Master' ? await getMasters() : await getOwners()
+      setUsers(items)
+      setPage(1)
+      setTotalPages(1)
+    } catch {
+      navigate('/error', { replace: true })
+    }
+  }
+
   useEffect(() => {
     setLoading(true)
     Promise.all([
@@ -213,6 +228,19 @@ const OwnerUsersPage = () => {
       getMe().then(me => setMyId(me.id)).catch(() => {}),
     ]).finally(() => setLoading(false))
   }, [])
+
+  const handleFilterToggle = async (f: 'Master' | 'Owner') => {
+    const next = filter === f ? null : f
+    setFilter(next)
+    setSearch('')
+    setLoading(true)
+    if (next) {
+      await fetchByFilter(next)
+    } else {
+      await fetchUsers(1, '', true)
+    }
+    setLoading(false)
+  }
 
   const handleSearch = (val: string) => {
     setSearch(val)
@@ -233,12 +261,14 @@ const OwnerUsersPage = () => {
 
   const handleAssign = async (userId: string) => {
     await assignMaster(userId)
-    await fetchUsers(1, search, true)
+    if (filter) await fetchByFilter(filter)
+    else await fetchUsers(1, search, true)
   }
 
   const handleDismiss = async (userId: string) => {
     await dismissMaster(userId)
-    await fetchUsers(1, search, true)
+    if (filter) await fetchByFilter(filter)
+    else await fetchUsers(1, search, true)
   }
 
   if (loading) return <LoadingScreen />
@@ -252,18 +282,35 @@ const OwnerUsersPage = () => {
         </div>
         <h1 className={styles.title}>Пользователи</h1>
 
-        <div className={styles.searchWrap}>
-          <SearchIcon />
-          <input
-            className={styles.searchInput}
-            placeholder="Имя или username..."
-            value={search}
-            onChange={e => handleSearch(e.target.value)}
-          />
-          {search && (
-            <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
-          )}
+        <div className={styles.filterRow}>
+          <button
+            className={`${styles.filterChip} ${filter === 'Master' ? styles.filterChipActive : ''}`}
+            onClick={() => handleFilterToggle('Master')}
+          >
+            Мастера
+          </button>
+          <button
+            className={`${styles.filterChip} ${filter === 'Owner' ? styles.filterChipActive : ''}`}
+            onClick={() => handleFilterToggle('Owner')}
+          >
+            Владельцы
+          </button>
         </div>
+
+        {!filter && (
+          <div className={styles.searchWrap}>
+            <SearchIcon />
+            <input
+              className={styles.searchInput}
+              placeholder="Имя или username..."
+              value={search}
+              onChange={e => handleSearch(e.target.value)}
+            />
+            {search && (
+              <button className={styles.searchClear} onClick={() => handleSearch('')}>✕</button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.list}>

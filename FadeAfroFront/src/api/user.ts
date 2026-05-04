@@ -44,6 +44,16 @@ export const getAllUsers = async (
   return data
 }
 
+export const getMasters = async (): Promise<UserItem[]> => {
+  const { data } = await apiClient.get<{ masters: UserItem[] }>('/users/get/masters')
+  return data.masters
+}
+
+export const getOwners = async (): Promise<UserItem[]> => {
+  const { data } = await apiClient.get<{ owners: UserItem[] }>('/users/get/owners')
+  return data.owners
+}
+
 export const assignMaster = async (userId: string): Promise<void> => {
   await apiClient.post(`/master-profiles/assign/${userId}`)
 }
