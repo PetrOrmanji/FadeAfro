@@ -6,6 +6,7 @@ using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace FadeAfro.Controllers;
@@ -35,6 +36,7 @@ public class MasterUnavailabilitiesController : ControllerBase
 
     [HttpPost("add/me")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.UnavailabilityAdd)]
     [SwaggerOperation(Summary = "Add my unavailability date")]
     public async Task<IActionResult> AddMyUnavailability([FromBody] AddMasterUnavailabilityRequest request)
     {
@@ -48,6 +50,7 @@ public class MasterUnavailabilitiesController : ControllerBase
 
     [HttpDelete("delete/me/{unavailabilityId:guid}")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.UnavailabilityDelete)]
     [SwaggerOperation(Summary = "Delete my unavailability date")]
     public async Task<IActionResult> DeleteMyUnavailability(Guid unavailabilityId)
     {

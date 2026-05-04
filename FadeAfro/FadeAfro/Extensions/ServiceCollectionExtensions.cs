@@ -8,69 +8,83 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRateLimiting(this IServiceCollection services)
     {
+        static RateLimitPartition<string> ByIp(HttpContext ctx, int permitLimit) =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = permitLimit,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                });
+
+        static RateLimitPartition<string> ByUser(HttpContext ctx, int permitLimit) =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ctx.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = permitLimit,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                });
+
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-            options.AddPolicy(RateLimitingPolicies.AuthLogin, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 10,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            // ── Anonymous (ключ: IP) ───────────────────────────────────────────
 
-            options.AddPolicy(RateLimitingPolicies.MasterPhoto, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 30,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            options.AddPolicy(RateLimitingPolicies.AuthLogin, ctx =>
+                ByIp(ctx, permitLimit: 10));
 
-            options.AddPolicy(RateLimitingPolicies.MasterAvailability, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 20,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            options.AddPolicy(RateLimitingPolicies.MasterPhoto, ctx =>
+                ByIp(ctx, permitLimit: 20));
 
-            options.AddPolicy(RateLimitingPolicies.Booking, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 5,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            options.AddPolicy(RateLimitingPolicies.MasterAvailability, ctx =>
+                ByIp(ctx, permitLimit: 20));
 
-            options.AddPolicy(RateLimitingPolicies.PhotoUpload, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 3,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            // ── Authenticated write — medium priority (ключ: userId) ──────────
 
-            options.AddPolicy(RateLimitingPolicies.OwnerAction, httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anon",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 10,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                    }));
+            options.AddPolicy(RateLimitingPolicies.Booking, ctx =>
+                ByUser(ctx, permitLimit: 5));
+
+            options.AddPolicy(RateLimitingPolicies.PhotoUpload, ctx =>
+                ByUser(ctx, permitLimit: 7));
+
+            options.AddPolicy(RateLimitingPolicies.OwnerAssignMaster, ctx =>
+                ByUser(ctx, permitLimit: 5));
+
+            options.AddPolicy(RateLimitingPolicies.OwnerDismissMaster, ctx =>
+                ByUser(ctx, permitLimit: 5));
+
+            // ── Authenticated write — low priority (ключ: userId) ────────────
+
+            options.AddPolicy(RateLimitingPolicies.AppointmentCancelClient, ctx =>
+                ByUser(ctx, permitLimit: 10));
+
+            options.AddPolicy(RateLimitingPolicies.AppointmentCancelMaster, ctx =>
+                ByUser(ctx, permitLimit: 10));
+
+            options.AddPolicy(RateLimitingPolicies.ScheduleSet, ctx =>
+                ByUser(ctx, permitLimit: 30));
+
+            options.AddPolicy(RateLimitingPolicies.ScheduleDelete, ctx =>
+                ByUser(ctx, permitLimit: 30));
+
+            options.AddPolicy(RateLimitingPolicies.UnavailabilityAdd, ctx =>
+                ByUser(ctx, permitLimit: 20));
+
+            options.AddPolicy(RateLimitingPolicies.UnavailabilityDelete, ctx =>
+                ByUser(ctx, permitLimit: 20));
+
+            options.AddPolicy(RateLimitingPolicies.ServiceAdd, ctx =>
+                ByUser(ctx, permitLimit: 20));
+
+            options.AddPolicy(RateLimitingPolicies.ServiceUpdate, ctx =>
+                ByUser(ctx, permitLimit: 20));
+
+            options.AddPolicy(RateLimitingPolicies.ServiceDelete, ctx =>
+                ByUser(ctx, permitLimit: 20));
         });
 
         return services;

@@ -73,6 +73,7 @@ public class AppointmentsController : ControllerBase
     
     [HttpPatch("client/cancel/me/{appointmentId:guid}")]
     [Authorize(Roles = Roles.Client)]
+    [EnableRateLimiting(RateLimitingPolicies.AppointmentCancelClient)]
     [SwaggerOperation(
         Summary = "Cancel an appointment by client", 
         Description = "Cancels the appointment on behalf of the client.")]
@@ -88,6 +89,7 @@ public class AppointmentsController : ControllerBase
 
     [HttpPatch("master/cancel/me/{appointmentId:guid}")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.AppointmentCancelMaster)]
     [SwaggerOperation(
         Summary = "Cancel an appointment by master", 
         Description = "Cancels the appointment on behalf of the master.")]

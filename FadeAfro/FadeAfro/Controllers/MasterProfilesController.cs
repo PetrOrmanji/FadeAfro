@@ -110,7 +110,7 @@ public class MasterProfilesController : ControllerBase
 
     [HttpPost("assign/{userId:guid}")]
     [Authorize(Roles = Roles.Owner)]
-    [EnableRateLimiting(RateLimitingPolicies.OwnerAction)]
+    [EnableRateLimiting(RateLimitingPolicies.OwnerAssignMaster)]
     [SwaggerOperation(
         Summary = "Assign master role to user",
         Description = "Assigns the Master role to an existing user and creates an associated master profile.")]
@@ -124,7 +124,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpDelete("dismiss/{masterId:guid}")]
     [Authorize(Roles = Roles.Owner)]
-    [EnableRateLimiting(RateLimitingPolicies.OwnerAction)]
+    [EnableRateLimiting(RateLimitingPolicies.OwnerDismissMaster)]
     [SwaggerOperation(
         Summary = "Dismiss master",
         Description = "Revokes the Master role and deletes the master profile.")]

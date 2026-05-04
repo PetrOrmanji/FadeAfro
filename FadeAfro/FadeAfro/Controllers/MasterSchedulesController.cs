@@ -6,6 +6,7 @@ using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace FadeAfro.Controllers;
@@ -35,6 +36,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpPost("set/me")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.ScheduleSet)]
     [SwaggerOperation(Summary = "Set my schedule for a day of week")]
     public async Task<IActionResult> SetMasterDaySchedule([FromBody] SetMasterScheduleRequest request)
     {
@@ -50,6 +52,7 @@ public class MasterSchedulesController : ControllerBase
 
     [HttpDelete("delete/me/{scheduleId:guid}")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.ScheduleDelete)]
     [SwaggerOperation(Summary = "Delete my master profile day schedule")]
     public async Task<IActionResult> DeleteMyDaySchedule(Guid scheduleId)
     {

@@ -7,6 +7,7 @@ using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace FadeAfro.Controllers;
@@ -36,6 +37,7 @@ public class MasterServicesController : ControllerBase
 
     [HttpPost("add/me")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.ServiceAdd)]
     [SwaggerOperation(Summary = "Add my master profile service")]
     public async Task<IActionResult> AddMyService([FromBody] AddMasterServiceRequest request)
     {
@@ -52,6 +54,7 @@ public class MasterServicesController : ControllerBase
 
     [HttpPut("update/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.ServiceUpdate)]
     [SwaggerOperation(Summary = "Update my master profile service")]
     public async Task<IActionResult> UpdateMyService(Guid serviceId, [FromBody] UpdateMasterServiceRequest request)
     {
@@ -69,6 +72,7 @@ public class MasterServicesController : ControllerBase
 
     [HttpDelete("delete/me/{serviceId:guid}")]
     [Authorize(Roles = Roles.Master)]
+    [EnableRateLimiting(RateLimitingPolicies.ServiceDelete)]
     [SwaggerOperation(Summary = "Delete my master profile service")]
     public async Task<IActionResult> DeleteMyService(Guid serviceId)
     {
