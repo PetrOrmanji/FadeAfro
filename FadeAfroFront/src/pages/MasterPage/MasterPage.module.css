@@ -1,3 +1,12 @@
+@keyframes pageSlideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Таб-свитчер ──────────────────────────────────────────────────────────── */
 .tabSwitcher {
   display: flex;
@@ -31,6 +40,22 @@
   gap: 16px;
   padding: 16px;
   min-height: 100%;
+  animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.contentLoader {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--tg-secondary-bg);
+  border-top-color: var(--tg-button);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .logoWrap {

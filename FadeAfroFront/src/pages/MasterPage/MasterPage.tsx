@@ -13,7 +13,6 @@ import {
 } from '../../api/schedule'
 import { getMasterAppointments, type MasterAppointment } from '../../api/appointments'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
-import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './MasterPage.module.css'
 
 // ── Константы ──────────────────────────────────────────────────────────────
@@ -225,8 +224,6 @@ const MasterPage = () => {
     .slice()
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0] ?? null
 
-  if (loading) return <LoadingScreen />
-
   return (
     <div className={styles.page}>
 
@@ -262,23 +259,32 @@ const MasterPage = () => {
         </div>
       )}
 
-      {/* График */}
-      <ScheduleCard
-        schedules={schedules}
-        onClick={() => navigate('/master/schedule')}
-      />
+      {/* Контент */}
+      {loading ? (
+        <div className={styles.contentLoader}>
+          <div className={styles.spinner} />
+        </div>
+      ) : (
+        <>
+          {/* График */}
+          <ScheduleCard
+            schedules={schedules}
+            onClick={() => navigate('/master/schedule')}
+          />
 
-      {/* Дни отсутствия */}
-      <UnavailabilityCard
-        unavailabilities={unavailabilities}
-        onClick={() => navigate('/master/unavailability')}
-      />
+          {/* Дни отсутствия */}
+          <UnavailabilityCard
+            unavailabilities={unavailabilities}
+            onClick={() => navigate('/master/unavailability')}
+          />
 
-      {/* Записи */}
-      <AppointmentsCard
-        nearest={nearest}
-        onClick={() => navigate('/master/appointments')}
-      />
+          {/* Записи */}
+          <AppointmentsCard
+            nearest={nearest}
+            onClick={() => navigate('/master/appointments')}
+          />
+        </>
+      )}
 
     </div>
   )
