@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { useRawInitData } from '@tma.js/sdk-react'
 import { login } from '../api/auth'
 import { getMockInitData } from '../mock/telegramMock'
+import { isRateLimitError, showRateLimitAlert } from '../api/errors'
 
 export type Role = 'Client' | 'Master' | 'Owner'
 
@@ -48,7 +49,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const roles: Role[] = (Array.isArray(rawRoles) ? rawRoles : [rawRoles]) as Role[]
         setState({ isAuthenticated: true, roles, isLoading: false })
       })
-      .catch(() => {
+      .catch((e: unknown) => {
+        if (isRateLimitError(e)) showRateLimitAlert()
         setState({ isAuthenticated: false, roles: [], isLoading: false })
       })
   }, [rawInitData])

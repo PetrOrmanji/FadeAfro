@@ -1,6 +1,7 @@
 import logo from '../../assets/logo.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { isRateLimitError } from '../../api/errors'
 import {
   getMasterSchedules,
   setMySchedule,
@@ -126,6 +127,7 @@ const MasterSchedulePage = () => {
           }
           return { dow, ok: true }
         } catch (e: unknown) {
+          if (isRateLimitError(e)) return { dow, ok: false, fatal: false, msg: 'Слишком много запросов. Попробуйте через минуту.' }
           const status = (e as { response?: { status?: number } })?.response?.status
           if (!status || status >= 500) return { dow, ok: false, fatal: true }
           const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
@@ -157,7 +159,7 @@ const MasterSchedulePage = () => {
       const profile = await getMyMasterProfile()
       const schedules = await getMasterSchedules(profile.id)
       setDayStates(prev => {
-        const next = Object.fromEntries(
+        const next: Record<number, DayState> = Object.fromEntries(
           DAYS.map(d => [d.dow, {
             enabled: false, startTime: DEFAULT_START, endTime: DEFAULT_END,
             savedId: null, dirty: false, error: prev[d.dow].error,

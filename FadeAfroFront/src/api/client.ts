@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { RateLimitError } from './errors'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -12,5 +13,14 @@ apiClient.interceptors.request.use((config) => {
   }
   return config
 })
+
+// Throw RateLimitError on 429 so every catch block can handle it uniformly
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error?.response?.status === 429) throw new RateLimitError()
+    throw error
+  }
+)
 
 export default apiClient

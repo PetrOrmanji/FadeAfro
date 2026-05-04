@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import type { ClientAppointment } from '../../api/appointments'
 import { cancelMyAppointment, getMyAppointments } from '../../api/appointments'
+import { isRateLimitError, showRateLimitAlert } from '../../api/errors'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import useBackButton from '../../hooks/useBackButton'
@@ -59,8 +60,9 @@ const AppointmentCard = ({
 
     try {
       await cancelMyAppointment(appointment.id)
-    } catch {
+    } catch (e: unknown) {
       setCancelling(false)
+      if (isRateLimitError(e)) { showRateLimitAlert(); return }
       navigate('/error', { replace: true })
       return
     }

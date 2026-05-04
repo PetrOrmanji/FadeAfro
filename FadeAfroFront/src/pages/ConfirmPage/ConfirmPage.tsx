@@ -5,6 +5,7 @@ import type { MasterProfile } from '../../api/masters'
 import { getMasterPhotoUrl } from '../../api/masters'
 import type { MasterService } from '../../api/services'
 import { bookAppointment } from '../../api/appointments'
+import { isRateLimitError } from '../../api/errors'
 import { durationToMinutes, minutesToFormatted } from '../../utils/duration'
 import useBackButton from '../../hooks/useBackButton'
 import styles from './ConfirmPage.module.css'
@@ -79,6 +80,11 @@ const ConfirmPage = () => {
         })
       }, 800)
     } catch (e: unknown) {
+      if (isRateLimitError(e)) {
+        setError('Слишком много запросов. Попробуйте через минуту.')
+        setSubmitting(false)
+        return
+      }
       const status = (e as { response?: { status?: number } })?.response?.status
       if (!status || status >= 500) {
         navigate('/error', { replace: true })

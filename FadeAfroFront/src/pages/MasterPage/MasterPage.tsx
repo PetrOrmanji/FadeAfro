@@ -28,8 +28,6 @@ const DAYS = [
   { dow: 0, short: 'Вс' },
 ]
 
-const trimSeconds = (t: string) => t.slice(0, 5)
-
 // ── Карточка графика ───────────────────────────────────────────────────────
 
 const ScheduleCard = ({

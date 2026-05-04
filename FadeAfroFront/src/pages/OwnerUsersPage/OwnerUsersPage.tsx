@@ -1,6 +1,7 @@
 import logo from '../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { isRateLimitError, showRateLimitAlert } from '../../api/errors'
 import {
   getAllUsers, getMasters, getOwners, assignMaster, dismissMaster, getMe,
   type UserItem,
@@ -70,12 +71,14 @@ const UserActionPanel = ({
   onAssign,
   onDismiss,
   onClose,
+  onError,
 }: {
   user: UserItem
   isMe: boolean
   onAssign: (id: string) => Promise<void>
   onDismiss: (id: string) => Promise<void>
   onClose: () => void
+  onError: () => void
 }) => {
   const [pending,      setPending]      = useState(false)
   const [confirmMode,  setConfirmMode]  = useState(false)
@@ -87,6 +90,9 @@ const UserActionPanel = ({
     try {
       await onAssign(user.id)
       onClose()
+    } catch (e: unknown) {
+      if (isRateLimitError(e)) showRateLimitAlert()
+      else onError()
     } finally {
       setPending(false)
     }
@@ -97,6 +103,9 @@ const UserActionPanel = ({
     try {
       await onDismiss(user.id)
       onClose()
+    } catch (e: unknown) {
+      if (isRateLimitError(e)) showRateLimitAlert()
+      else onError()
     } finally {
       setPending(false)
     }
@@ -372,6 +381,7 @@ const OwnerUsersPage = () => {
           onAssign={handleAssign}
           onDismiss={handleDismiss}
           onClose={() => setSelectedUser(null)}
+          onError={() => navigate('/error', { replace: true })}
         />
       )}
 

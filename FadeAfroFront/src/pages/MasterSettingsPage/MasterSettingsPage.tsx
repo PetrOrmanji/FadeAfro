@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLaunchParams } from '@tma.js/sdk-react'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyMasterProfile, getMasterPhotoUrl, uploadMasterPhoto, type MasterProfile } from '../../api/masters'
+import { isRateLimitError, showRateLimitAlert } from '../../api/errors'
 import { useAuth, type Role } from '../../context/AuthContext'
 import useBackButton from '../../hooks/useBackButton'
 import styles from './MasterSettingsPage.module.css'
@@ -67,7 +68,8 @@ const MasterSettingsPage = () => {
       await uploadMasterPhoto(file)
       setMasterProfile(prev => prev ? { ...prev, photoUrl: 'uploaded' } : prev)
       setCacheBust(Date.now())
-    } catch {
+    } catch (e: unknown) {
+      if (isRateLimitError(e)) { showRateLimitAlert(); return }
       navigate('/error', { replace: true })
     } finally {
       setUploading(false)
