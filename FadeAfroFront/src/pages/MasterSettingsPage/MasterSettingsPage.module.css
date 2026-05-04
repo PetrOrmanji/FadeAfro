@@ -19,7 +19,7 @@
 .logoWrap {
   display: flex;
   justify-content: center;
-  padding: 8px 0 48px;
+  padding: 48px 0 48px;
 }
 
 .logo {
