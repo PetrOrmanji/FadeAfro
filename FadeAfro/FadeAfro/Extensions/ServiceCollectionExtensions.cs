@@ -21,6 +21,26 @@ public static class ServiceCollectionExtensions
                         Window = TimeSpan.FromMinutes(1),
                         QueueLimit = 0,
                     }));
+
+            options.AddPolicy(RateLimitingPolicies.MasterPhoto, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 30,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                    }));
+
+            options.AddPolicy(RateLimitingPolicies.MasterAvailability, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 20,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                    }));
         });
 
         return services;

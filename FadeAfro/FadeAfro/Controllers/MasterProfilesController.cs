@@ -11,6 +11,7 @@ using FadeAfro.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace FadeAfro.Controllers;
@@ -62,6 +63,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpGet("get/{masterProfileId:guid}/photo")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitingPolicies.MasterPhoto)]
     [SwaggerOperation(Summary = "Get master profile photo")]
     public async Task<IActionResult> GetMasterPhoto(Guid masterProfileId)
     {
@@ -73,6 +75,7 @@ public class MasterProfilesController : ControllerBase
     
     [HttpGet("get/{masterProfileId:guid}/day-availability")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitingPolicies.MasterAvailability)]
     [SwaggerOperation(Summary = "Get master profile day availability")]
     public async Task<IActionResult> GetMasterProfileDayAvailability(
         Guid masterProfileId, 
