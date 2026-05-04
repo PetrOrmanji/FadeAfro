@@ -17,6 +17,14 @@ RUN dotnet publish FadeAfro/FadeAfro.csproj -c Release -o /app/publish --no-rest
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
+RUN adduser --disabled-password --no-create-home appuser
+
 COPY --from=build /app/publish .
+
+RUN mkdir -p logs && chown appuser logs
+
+USER appuser
+
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "FadeAfro.dll"]
