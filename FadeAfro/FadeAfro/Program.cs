@@ -2,7 +2,6 @@ using System.Reflection;
 using FadeAfro.Application.Extensions;
 using FadeAfro.Extensions;
 using FadeAfro.Infrastructure.Extensions;
-using ServiceCollectionExtensions = FadeAfro.Infrastructure.Extensions.ServiceCollectionExtensions;
 
 SetCurrentDirectory();
 
@@ -26,6 +25,7 @@ builder.Services.AddHealthCheckServices();
 
 var app = builder.Build();
 
+app.ApplyMigrations();
 app.UseRequestLogging();
 app.UseExceptionHandling();
 app.UseSwaggerWithUi();
