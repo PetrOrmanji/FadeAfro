@@ -156,9 +156,11 @@ const ServicesCard = ({
     {services.length === 0 ? (
       <span className={styles.scheduleHint}>Услуги не добавлены</span>
     ) : (
-      <span className={styles.scheduleHint}>
-        {services.length} {servicesWord(services.length)}
-      </span>
+      <div className={styles.serviceChips}>
+        <span className={styles.serviceChip}>
+          {services.length} {servicesWord(services.length)}
+        </span>
+      </div>
     )}
   </div>
 )
