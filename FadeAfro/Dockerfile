@@ -6,7 +6,6 @@ COPY FadeAfro/FadeAfro.csproj FadeAfro/
 COPY FadeAfro.Application/FadeAfro.Application.csproj FadeAfro.Application/
 COPY FadeAfro.Domain/FadeAfro.Domain.csproj FadeAfro.Domain/
 COPY FadeAfro.Infrastructure/FadeAfro.Infrastructure.csproj FadeAfro.Infrastructure/
-COPY FadeAfro.Tests/FadeAfro.Tests.csproj FadeAfro.Tests/
 
 RUN dotnet restore
 
