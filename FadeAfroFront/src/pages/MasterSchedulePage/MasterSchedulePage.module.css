@@ -151,6 +151,9 @@
   min-width: 0;
   font-family: inherit;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
 }
 
 .errorText {

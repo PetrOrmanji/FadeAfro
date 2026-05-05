@@ -14,6 +14,14 @@ import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import useBackButton from '../../hooks/useBackButton'
 import styles from './MasterSchedulePage.module.css'
 
+// ── Опции времени (каждые 30 минут) ───────────────────────────────────────
+
+const TIME_OPTIONS: string[] = []
+for (let h = 0; h < 24; h++) {
+  TIME_OPTIONS.push(`${String(h).padStart(2, '0')}:00`)
+  TIME_OPTIONS.push(`${String(h).padStart(2, '0')}:30`)
+}
+
 // ── Константы ──────────────────────────────────────────────────────────────
 
 const DAYS = [
@@ -225,22 +233,28 @@ const MasterSchedulePage = () => {
                   <div className={styles.timeRow}>
                     <div className={styles.timeGroup}>
                       <span className={styles.timeLabel}>Начало</span>
-                      <input
-                        type="time"
+                      <select
                         className={styles.timeInput}
                         value={d.startTime}
                         onChange={e => update(dow, { startTime: e.target.value })}
-                      />
+                      >
+                        {TIME_OPTIONS.map(t => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
                     </div>
                     <span className={styles.timeSep}>—</span>
                     <div className={styles.timeGroup}>
                       <span className={styles.timeLabel}>Конец</span>
-                      <input
-                        type="time"
+                      <select
                         className={styles.timeInput}
                         value={d.endTime}
                         onChange={e => update(dow, { endTime: e.target.value })}
-                      />
+                      >
+                        {TIME_OPTIONS.map(t => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 )}
