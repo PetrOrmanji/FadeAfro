@@ -18,7 +18,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --disabled-password --no-create-home appuser
+RUN useradd --no-create-home --shell /bin/false appuser
 
 COPY --from=build /app/publish .
 
