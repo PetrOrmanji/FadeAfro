@@ -3,6 +3,7 @@ using FadeAfro.Application.Services;
 using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Repositories;
 using FadeAfro.Domain.Services;
+using FadeAfro.Infrastructure.HealthChecks;
 using FadeAfro.Infrastructure.Options;
 using FadeAfro.Infrastructure.Persistence;
 using FadeAfro.Infrastructure.Repositories;
@@ -113,6 +114,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFileStorage(this IServiceCollection services)
     {
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddHealthCheckServices(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("database");
 
         return services;
     }
