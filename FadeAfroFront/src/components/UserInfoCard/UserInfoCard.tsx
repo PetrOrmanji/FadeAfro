@@ -26,7 +26,7 @@ const UserInfoCard = ({ user, unreadCount, onSettingsClick, onNotificationsClick
     : user.firstName
 
   const username = tgUser?.username ? `@${tgUser.username}` : null
-  const tgPhotoUrl = typeof tgUser?.photoUrl === 'string' ? tgUser.photoUrl : null
+  const tgPhotoUrl = typeof tgUser?.photo_url === 'string' ? tgUser.photo_url : null
   const photoUrl = overridePhotoUrl !== undefined ? overridePhotoUrl : tgPhotoUrl
   const initials = getInitials(user.firstName, user.lastName)
 

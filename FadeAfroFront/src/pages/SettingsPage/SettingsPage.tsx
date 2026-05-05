@@ -40,7 +40,7 @@ const SettingsPage = () => {
 
   const username = tgUser?.username ? `@${tgUser.username}` : null
   const telegramId = tgUser?.id ?? null
-  const photoUrl = typeof tgUser?.photoUrl === 'string' ? tgUser.photoUrl : null
+  const photoUrl = typeof tgUser?.photo_url === 'string' ? tgUser.photo_url : null
   const initials = user ? getInitials(user.firstName, user.lastName) : '?'
 
   return (

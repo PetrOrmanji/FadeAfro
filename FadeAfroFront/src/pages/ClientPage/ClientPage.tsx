@@ -118,7 +118,7 @@ const ClientPage = () => {
 
       {/* Список мастеров */}
       <section className={styles.mastersSection}>
-        <h2 className={styles.sectionTitle}>Выберите мастера:</h2>
+        {masters.length > 0 && <h2 className={styles.sectionTitle}>Выберите мастера:</h2>}
         <div className={styles.mastersGrid}>
           {masters.map(master => (
             <MasterCard

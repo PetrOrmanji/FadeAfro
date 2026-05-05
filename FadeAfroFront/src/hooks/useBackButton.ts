@@ -13,7 +13,7 @@ const useBackButton = () => {
     }
 
     try {
-      if (!backButton.isMounted) backButton.mount()
+      if (!backButton.isMounted()) backButton.mount()
       backButton.show()
       const unsub = backButton.onClick(() => navigate(-1))
 
