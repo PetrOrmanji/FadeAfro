@@ -44,7 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login(initData)
       .then((token) => {
         localStorage.setItem('token', token)
-        const payload = JSON.parse(atob(token.split('.')[1]))
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+        const payload = JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join('')))
         const rawRoles = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? []
         const roles: Role[] = (Array.isArray(rawRoles) ? rawRoles : [rawRoles]) as Role[]
         setState({ isAuthenticated: true, roles, isLoading: false })
