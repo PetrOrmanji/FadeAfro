@@ -6,7 +6,11 @@ services:
     environment:
       ConnectionStrings__Postgres: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Jwt__SecretKey: ${JWT_SECRET_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      Jwt__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES}
       Telegram__BotToken: ${TELEGRAM_BOT_TOKEN}
+      Time__TimeZone: ${TIME_ZONE}
     volumes:
       - fadeafro-backend-logs:/app/logs
       - fadeafro-backend-uploads:/app/uploads
