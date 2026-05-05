@@ -1,0 +1,33 @@
+services:
+  fade-afro-back:
+    build:
+      context: ./FadeAfro
+    container_name: fadeafro-backend
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Jwt__SecretKey: ${JWT_SECRET_KEY}
+      Telegram__BotToken: ${TELEGRAM_BOT_TOKEN}
+    networks:
+      - infra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  fade-afro-front:
+    build:
+      context: ./FadeAfroFront
+    container_name: fadeafro-frontend
+    networks:
+      - infra-network
+    restart: unless-stopped
+    depends_on:
+      fade-afro-back:
+        condition: service_healthy
+
+networks:
+  infra-network:
+    external: true
