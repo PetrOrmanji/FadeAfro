@@ -22,13 +22,13 @@ const formatDate = (iso: string) => {
   return `${d} ${MONTHS_RU[m - 1]} ${y}`
 }
 
-// Бэк отдаёт UTC ISO datetime → отображаем в локальном времени устройства
-const formatTime = (isoUtc: string) => {
-  const d = new Date(isoUtc)
+// Бэк отдаёт корректный UTC — конвертируем в локальное время через Date
+const formatTime = (iso: string) => {
+  const d = new Date(iso)
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-const getHour = (isoUtc: string) => new Date(isoUtc).getHours()
+const getHour = (iso: string) => new Date(iso).getHours()
 
 const minutesToDuration = (minutes: number): string => {
   const h = Math.floor(minutes / 60)
