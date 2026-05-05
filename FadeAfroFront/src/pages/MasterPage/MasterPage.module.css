@@ -46,7 +46,7 @@
 .contentLoader {
   display: flex;
   justify-content: center;
-  padding: 48px 0;
+  padding: 72px 0;
 }
 
 .spinner {
@@ -61,7 +61,7 @@
 .logoWrap {
   display: flex;
   justify-content: center;
-  padding: 48px 0 48px;
+  padding: 72px 0 48px;
 }
 
 .logo {
