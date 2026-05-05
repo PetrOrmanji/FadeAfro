@@ -1,6 +1,13 @@
 @keyframes bounce {
-  0%, 100% { transform: translateY(0);     }
-  50%       { transform: translateY(-24px); }
+  0%, 100% { transform: translateY(0);     animation-timing-function: ease-in;  }
+  50%       { transform: translateY(-32px); animation-timing-function: ease-out; }
+}
+
+@keyframes shimmer {
+  0%   { background-color: #c8c8c8; }
+  33%  { background-color: #a0a0a0; }
+  66%  { background-color: #d8d8d8; }
+  100% { background-color: #c8c8c8; }
 }
 
 .page {
@@ -12,9 +19,10 @@
 }
 
 .circle {
-  width: 20px;
-  height: 20px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background-color: var(--tg-hint);
-  animation: bounce 0.8s ease-in-out infinite;
+  animation:
+    bounce  0.7s ease-in-out infinite,
+    shimmer 1.4s ease-in-out infinite;
 }

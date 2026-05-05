@@ -5,6 +5,7 @@ import { useLaunchParams } from '@tma.js/sdk-react'
 import { getMe, type UserResponse } from '../../api/user'
 import { useAuth, type Role } from '../../context/AuthContext'
 import useBackButton from '../../hooks/useBackButton'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import styles from './SettingsPage.module.css'
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -27,16 +28,20 @@ const SettingsPage = () => {
   const tgUser = launchParams.tgWebAppData?.user
 
   const [user, setUser] = useState<UserResponse | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getMe()
       .then(setUser)
       .catch(() => navigate('/error', { replace: true }))
+      .finally(() => setLoading(false))
   }, [navigate])
+
+  if (loading) return <LoadingScreen />
 
   const fullName = user
     ? [user.firstName, user.lastName].filter(Boolean).join(' ')
-    : '...'
+    : ''
 
   const username = tgUser?.username ? `@${tgUser.username}` : null
   const telegramId = tgUser?.id ?? null
