@@ -17,6 +17,7 @@ import MasterSettingsPage from '../pages/MasterSettingsPage/MasterSettingsPage'
 import MasterSchedulePage from '../pages/MasterSchedulePage/MasterSchedulePage'
 import MasterUnavailabilityPage from '../pages/MasterUnavailabilityPage/MasterUnavailabilityPage'
 import MasterAppointmentsPage from '../pages/MasterAppointmentsPage/MasterAppointmentsPage'
+import MasterServicesPage from '../pages/MasterServicesPage/MasterServicesPage'
 import OwnerPage from '../pages/OwnerPage/OwnerPage'
 import OwnerUsersPage from '../pages/OwnerUsersPage/OwnerUsersPage'
 
@@ -74,6 +75,7 @@ const AppRouter = () => {
         <Route path="/master/schedule"      element={<RequireRole role="Master"><MasterSchedulePage /></RequireRole>} />
         <Route path="/master/unavailability" element={<RequireRole role="Master"><MasterUnavailabilityPage /></RequireRole>} />
         <Route path="/master/appointments"  element={<RequireRole role="Master"><MasterAppointmentsPage /></RequireRole>} />
+        <Route path="/master/services"       element={<RequireRole role="Master"><MasterServicesPage /></RequireRole>} />
 
         {/* ── Владелец ── */}
         <Route path="/owner" element={<RequireRole role="Owner"><OwnerPage /></RequireRole>} />

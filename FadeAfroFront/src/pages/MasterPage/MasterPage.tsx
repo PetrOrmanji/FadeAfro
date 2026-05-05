@@ -12,6 +12,7 @@ import {
   type MasterUnavailabilityItem,
 } from '../../api/schedule'
 import { getMasterAppointments, type MasterAppointment } from '../../api/appointments'
+import { getMasterServices, type MasterService } from '../../api/services'
 import UserInfoCard from '../../components/UserInfoCard/UserInfoCard'
 import styles from './MasterPage.module.css'
 
@@ -127,6 +128,38 @@ const UnavailabilityCard = ({
   )
 }
 
+// ── Карточка услуг ────────────────────────────────────────────────────────
+
+const ServicesCard = ({
+  services,
+  onClick,
+}: {
+  services: MasterService[]
+  onClick: () => void
+}) => (
+  <div className={styles.scheduleCard} onClick={onClick}>
+    <div className={styles.scheduleHeader}>
+      <div className={styles.scheduleTitleRow}>
+        <ServicesIcon />
+        <span className={styles.scheduleTitle}>Услуги</span>
+      </div>
+      <ChevronRightIcon />
+    </div>
+    {services.length === 0 ? (
+      <span className={styles.scheduleHint}>Услуги не добавлены</span>
+    ) : (
+      <div className={styles.serviceChips}>
+        {services.slice(0, 3).map(s => (
+          <span key={s.id} className={styles.serviceChip}>{s.name}</span>
+        ))}
+        {services.length > 3 && (
+          <span className={styles.serviceChipMore}>+{services.length - 3}</span>
+        )}
+      </div>
+    )}
+  </div>
+)
+
 // ── Карточка записей ───────────────────────────────────────────────────────
 
 const MONTHS_RU = [
@@ -188,6 +221,7 @@ const MasterPage = () => {
   const [schedules,       setSchedules]       = useState<MasterScheduleItem[]>([])
   const [unavailabilities,  setUnavailabilities]  = useState<MasterUnavailabilityItem[]>([])
   const [appointments,      setAppointments]      = useState<MasterAppointment[]>([])
+  const [services,          setServices]          = useState<MasterService[]>([])
   const [unreadCount,       setUnreadCount]       = useState(0)
   const [loading,           setLoading]           = useState(true)
 
@@ -200,14 +234,16 @@ const MasterPage = () => {
         setUser(userData)
         setMasterProfile(profileData)
         setUnreadCount(unreadCountData)
-        const [schedulesData, unavailData, appointmentsData] = await Promise.all([
+        const [schedulesData, unavailData, appointmentsData, servicesData] = await Promise.all([
           getMasterSchedules(profileData.id),
           getMasterUnavailabilities(profileData.id),
           getMasterAppointments(),
+          getMasterServices(profileData.id),
         ])
         setSchedules(schedulesData)
         setUnavailabilities(unavailData)
         setAppointments(appointmentsData)
+        setServices(servicesData)
       } catch {
         navigate('/error')
       } finally {
@@ -266,6 +302,12 @@ const MasterPage = () => {
         </div>
       ) : (
         <>
+          {/* Услуги */}
+          <ServicesCard
+            services={services}
+            onClick={() => navigate('/master/services')}
+          />
+
           {/* График */}
           <ScheduleCard
             schedules={schedules}
@@ -314,6 +356,13 @@ const AppointmentsIcon = () => (
     <circle cx="9" cy="7" r="4" />
     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+)
+
+const ServicesIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
   </svg>
 )
 

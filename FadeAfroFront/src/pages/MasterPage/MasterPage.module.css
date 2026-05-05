@@ -193,6 +193,36 @@
   color: var(--tg-hint);
 }
 
+/* ── Чипы услуг ───────────────────────────────────────────────────────────── */
+
+.serviceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.serviceChip {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: color-mix(in srgb, var(--tg-button) 12%, transparent);
+  color: var(--tg-button);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.serviceChipMore {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--tg-secondary-bg);
+  color: var(--tg-hint);
+}
+
 /* ── Подпись ──────────────────────────────────────────────────────────────── */
 .scheduleFooter {
   display: flex;
