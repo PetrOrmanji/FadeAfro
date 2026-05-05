@@ -9,11 +9,14 @@ import styles from './MasterServiceFormPage.module.css'
 // ── Пресеты длительности ───────────────────────────────────────────────────
 
 const DURATION_PRESETS: { label: string; value: string }[] = [
-  { label: '15 мин', value: '00:15:00' },
-  { label: '30 мин', value: '00:30:00' },
-  { label: '45 мин', value: '00:45:00' },
-  { label: '1 час',   value: '01:00:00' },
-  { label: '2 часа',  value: '02:00:00' },
+  { label: '15 мин',     value: '00:15:00' },
+  { label: '30 мин',     value: '00:30:00' },
+  { label: '45 мин',     value: '00:45:00' },
+  { label: '1 час',      value: '01:00:00' },
+  { label: '1 ч 15 мин', value: '01:15:00' },
+  { label: '1 ч 30 мин', value: '01:30:00' },
+  { label: '1 ч 45 мин', value: '01:45:00' },
+  { label: '2 часа',     value: '02:00:00' },
 ]
 
 const toHHMMSS = (h: number, m: number) =>
