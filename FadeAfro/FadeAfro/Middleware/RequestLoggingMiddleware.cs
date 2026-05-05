@@ -78,7 +78,7 @@ public class RequestLoggingMiddleware
 
     private static async Task<string> GetResponseBodyLogStringAsync(HttpContext context)
     {
-        if (IsBinaryResponse(context.Response))
+        if (!IsJsonResponse(context.Response))
             return string.Empty;
 
         var responseBody = await ReadResponseBodyAsync(context.Response);
@@ -88,15 +88,8 @@ public class RequestLoggingMiddleware
             : $"ResponseBody: {responseBody}";
     }
 
-    private static bool IsBinaryResponse(HttpResponse response)
-    {
-        var contentType = response.ContentType;
-        if (string.IsNullOrEmpty(contentType)) return false;
-
-        return contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
-               contentType.StartsWith("multipart/", StringComparison.OrdinalIgnoreCase) ||
-               contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase);
-    }
+    private static bool IsJsonResponse(HttpResponse response) =>
+        response.ContentType?.StartsWith("application/json", StringComparison.OrdinalIgnoreCase) == true;
 
     private static async Task<string> ReadRequestBodyAsync(HttpRequest request)
     {
