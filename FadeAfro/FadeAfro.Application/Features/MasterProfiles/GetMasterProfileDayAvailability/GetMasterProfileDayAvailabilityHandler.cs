@@ -1,4 +1,5 @@
 using FadeAfro.Application.Features.MasterProfiles.Common;
+using FadeAfro.Application.Settings;
 using FadeAfro.Domain.Entities;
 using FadeAfro.Domain.Exceptions.MasterProfile;
 using FadeAfro.Domain.Exceptions.MasterSchedule;
@@ -9,17 +10,20 @@ namespace FadeAfro.Application.Features.MasterProfiles.GetMasterProfileDayAvaila
 
 public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterProfileDayAvailabilityQuery, GetMasterProfileDayAvailabilityResponse>
 {
+    private readonly TimeZoneInfo _timeZone;
     private readonly IMasterProfileRepository _masterProfileRepository;
     private readonly IMasterScheduleRepository _masterScheduleRepository;
     private readonly IMasterUnavailabilityRepository _masterUnavailabilityRepository;
     private readonly IAppointmentRepository _appointmentRepository;
 
     public GetMasterProfileDayAvailabilityHandler(
+        ITimeSettings timeSettings,
         IMasterProfileRepository masterProfileRepository,
         IMasterScheduleRepository masterScheduleRepository,
         IMasterUnavailabilityRepository masterUnavailabilityRepository,
         IAppointmentRepository appointmentRepository)
     {
+        _timeZone = timeSettings.TimeZone;
         _masterProfileRepository = masterProfileRepository;
         _masterScheduleRepository = masterScheduleRepository;
         _masterUnavailabilityRepository = masterUnavailabilityRepository;
@@ -72,7 +76,7 @@ public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterP
         while (current + duration <= end)
         {
             var slotStartLocal = date.ToDateTime(TimeOnly.FromTimeSpan(current));
-            var slotStartUtc = TimeZoneInfo.ConvertTimeToUtc(slotStartLocal, TimeZoneInfo.Local);
+            var slotStartUtc = TimeZoneInfo.ConvertTimeToUtc(slotStartLocal, _timeZone);
             var slotEndUtc = slotStartUtc + duration;
 
             var isActive = !appointments.Any(a =>
