@@ -64,6 +64,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
 }
 
 .cardRow {
@@ -128,6 +129,7 @@
   flex-direction: column;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 
 .timeLabel {
@@ -146,6 +148,7 @@
   font-weight: 500;
   color: var(--tg-text);
   width: 100%;
+  min-width: 0;
   font-family: inherit;
   cursor: pointer;
 }
