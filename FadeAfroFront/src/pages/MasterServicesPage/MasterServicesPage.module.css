@@ -108,13 +108,13 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
   margin-top: 2px;
 }
 
 .cardDuration {
   font-size: 13px;
-  color: var(--tg-hint);
+  color: var(--tg-text);
 }
 
 /* ── Пусто ────────────────────────────────────────────────────────────────── */
@@ -299,6 +299,17 @@
   font-size: 14px;
   color: var(--tg-text);
   font-weight: 500;
+  line-height: 1.4;
+}
+
+.deleteError {
+  background-color: rgba(255, 59, 48, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ff3b30;
+  text-align: center;
   line-height: 1.4;
 }
 

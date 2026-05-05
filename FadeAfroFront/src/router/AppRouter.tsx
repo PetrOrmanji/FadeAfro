@@ -18,6 +18,7 @@ import MasterSchedulePage from '../pages/MasterSchedulePage/MasterSchedulePage'
 import MasterUnavailabilityPage from '../pages/MasterUnavailabilityPage/MasterUnavailabilityPage'
 import MasterAppointmentsPage from '../pages/MasterAppointmentsPage/MasterAppointmentsPage'
 import MasterServicesPage from '../pages/MasterServicesPage/MasterServicesPage'
+import MasterServiceFormPage from '../pages/MasterServiceFormPage/MasterServiceFormPage'
 import OwnerPage from '../pages/OwnerPage/OwnerPage'
 import OwnerUsersPage from '../pages/OwnerUsersPage/OwnerUsersPage'
 
@@ -75,7 +76,9 @@ const AppRouter = () => {
         <Route path="/master/schedule"      element={<RequireRole role="Master"><MasterSchedulePage /></RequireRole>} />
         <Route path="/master/unavailability" element={<RequireRole role="Master"><MasterUnavailabilityPage /></RequireRole>} />
         <Route path="/master/appointments"  element={<RequireRole role="Master"><MasterAppointmentsPage /></RequireRole>} />
-        <Route path="/master/services"       element={<RequireRole role="Master"><MasterServicesPage /></RequireRole>} />
+        <Route path="/master/services"          element={<RequireRole role="Master"><MasterServicesPage /></RequireRole>} />
+        <Route path="/master/services/add"     element={<RequireRole role="Master"><MasterServiceFormPage /></RequireRole>} />
+        <Route path="/master/services/:id/edit" element={<RequireRole role="Master"><MasterServiceFormPage /></RequireRole>} />
 
         {/* ── Владелец ── */}
         <Route path="/owner" element={<RequireRole role="Owner"><OwnerPage /></RequireRole>} />

@@ -14,13 +14,19 @@ import styles from './MasterServicesPage.module.css'
 
 // ── Утилиты ────────────────────────────────────────────────────────────────
 
+const hoursWord = (h: number) => {
+  if (h === 1) return 'час'
+  if (h >= 2 && h <= 4) return 'часа'
+  return 'часов'
+}
+
 const formatDuration = (duration: string): string => {
   const parts = duration.split(':')
   const h = parseInt(parts[0], 10)
   const m = parseInt(parts[1], 10)
   if (h === 0) return `${m} мин`
-  if (m === 0) return `${h} ч`
-  return `${h} ч ${m} мин`
+  if (m === 0) return `${h} ${hoursWord(h)}`
+  return `${h} ${hoursWord(h)} ${m} мин`
 }
 
 const formatPrice = (price: number): string =>
@@ -65,15 +71,21 @@ const ServiceActionPanel = ({
 }) => {
   const [confirmMode, setConfirmMode] = useState(false)
   const [pending,     setPending]     = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const handleDelete = async () => {
     setPending(true)
+    setDeleteError(null)
     try {
       await deleteMyService(service.id)
       onDelete()
     } catch (e: unknown) {
-      if (isRateLimitError(e)) showRateLimitAlert()
-      else onClose()
+      if (isRateLimitError(e)) {
+        showRateLimitAlert()
+      } else {
+        const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error
+        setDeleteError(msg ?? 'Не удалось удалить услугу')
+      }
     } finally {
       setPending(false)
     }
@@ -98,9 +110,12 @@ const ServiceActionPanel = ({
               </div>
               <div className={styles.panelWarningItem}>
                 <span className={styles.panelWarningDot} />
-                Уже созданные записи с этой услугой не изменятся
+                Услуга не удалится, если на неё есть активные записи
               </div>
             </div>
+            {deleteError && (
+              <div className={styles.deleteError}>{deleteError}</div>
+            )}
             <button
               className={`${styles.panelBtn} ${styles.panelBtnDelete}`}
               onClick={handleDelete}
@@ -108,7 +123,7 @@ const ServiceActionPanel = ({
             >
               {pending ? 'Удаление...' : 'Удалить'}
             </button>
-            <button className={styles.panelBtnCancel} onClick={() => setConfirmMode(false)}>
+            <button className={styles.panelBtnCancel} onClick={() => { setConfirmMode(false); setDeleteError(null) }}>
               Назад
             </button>
           </>

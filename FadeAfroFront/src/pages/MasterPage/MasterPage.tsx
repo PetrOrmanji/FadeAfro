@@ -128,6 +128,14 @@ const UnavailabilityCard = ({
   )
 }
 
+const servicesWord = (n: number) => {
+  const mod10 = n % 10, mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 19) return 'услуг'
+  if (mod10 === 1) return 'услуга'
+  if (mod10 >= 2 && mod10 <= 4) return 'услуги'
+  return 'услуг'
+}
+
 // ── Карточка услуг ────────────────────────────────────────────────────────
 
 const ServicesCard = ({
@@ -148,14 +156,9 @@ const ServicesCard = ({
     {services.length === 0 ? (
       <span className={styles.scheduleHint}>Услуги не добавлены</span>
     ) : (
-      <div className={styles.serviceChips}>
-        {services.slice(0, 3).map(s => (
-          <span key={s.id} className={styles.serviceChip}>{s.name}</span>
-        ))}
-        {services.length > 3 && (
-          <span className={styles.serviceChipMore}>+{services.length - 3}</span>
-        )}
-      </div>
+      <span className={styles.scheduleHint}>
+        {services.length} {servicesWord(services.length)}
+      </span>
     )}
   </div>
 )
