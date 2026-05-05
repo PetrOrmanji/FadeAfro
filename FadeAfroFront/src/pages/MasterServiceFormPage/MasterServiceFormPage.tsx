@@ -194,13 +194,12 @@ const MasterServiceFormPage = () => {
             <div className={styles.customField}>
               <input
                 className={styles.customInput}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                value={customH === 0 ? '' : customH}
+                pattern="[0-9]*"
+                value={customH === 0 ? '' : String(customH)}
                 placeholder="0"
-                onChange={e => handleCustomH(e.target.value)}
-                min={0}
-                max={23}
+                onChange={e => handleCustomH(e.target.value.replace(/\D/g, ''))}
               />
               <span className={styles.customUnit}>ч</span>
             </div>
@@ -208,13 +207,12 @@ const MasterServiceFormPage = () => {
             <div className={styles.customField}>
               <input
                 className={styles.customInput}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                value={customM === 0 ? '' : customM}
+                pattern="[0-9]*"
+                value={customM === 0 ? '' : String(customM)}
                 placeholder="0"
-                onChange={e => handleCustomM(e.target.value)}
-                min={0}
-                max={59}
+                onChange={e => handleCustomM(e.target.value.replace(/\D/g, ''))}
               />
               <span className={styles.customUnit}>мин</span>
             </div>

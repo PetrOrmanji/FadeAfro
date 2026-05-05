@@ -206,9 +206,8 @@
   min-width: 0;
 }
 
-.customInput[type='number']::-webkit-inner-spin-button,
-.customInput[type='number']::-webkit-outer-spin-button {
-  -webkit-appearance: none;
+.customInput {
+  caret-color: var(--tg-button);
 }
 
 .customInput::placeholder {
