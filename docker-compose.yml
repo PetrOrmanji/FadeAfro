@@ -7,6 +7,9 @@ services:
       ConnectionStrings__Postgres: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Jwt__SecretKey: ${JWT_SECRET_KEY}
       Telegram__BotToken: ${TELEGRAM_BOT_TOKEN}
+    volumes:
+      - fadeafro-backend-logs:/app/logs
+      - fadeafro-backend-uploads:/app/uploads
     networks:
       - infra-network
     restart: unless-stopped
@@ -27,6 +30,10 @@ services:
     depends_on:
       fade-afro-back:
         condition: service_healthy
+
+volumes:
+  fadeafro-backend-logs:
+  fadeafro-backend-uploads:
 
 networks:
   infra-network:

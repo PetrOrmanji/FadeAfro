@@ -22,7 +22,7 @@ RUN useradd --no-create-home --shell /bin/false appuser
 
 COPY --from=build /app/publish .
 
-RUN mkdir -p logs && chown appuser logs
+RUN mkdir -p logs uploads/masters && chown -R appuser logs uploads
 
 USER appuser
 
