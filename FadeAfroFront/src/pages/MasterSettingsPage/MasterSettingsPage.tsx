@@ -3,12 +3,27 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLaunchParams } from '@tma.js/sdk-react'
 import axios from 'axios'
+import heic2any from 'heic2any'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyMasterProfile, getMasterPhotoUrl, uploadMasterPhoto, type MasterProfile } from '../../api/masters'
 import { isRateLimitError, showRateLimitAlert } from '../../api/errors'
 import { useAuth, type Role } from '../../context/AuthContext'
 import useBackButton from '../../hooks/useBackButton'
 import styles from './MasterSettingsPage.module.css'
+
+const isHeif = (file: File) => {
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  return ext === 'heic' || ext === 'heif'
+    || file.type === 'image/heic' || file.type === 'image/heif'
+}
+
+const convertToJpegIfNeeded = async (file: File): Promise<File> => {
+  if (!isHeif(file)) return file
+  const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 })
+  const result = Array.isArray(blob) ? blob[0] : blob
+  const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg')
+  return new File([result], newName, { type: 'image/jpeg' })
+}
 
 const ROLE_LABELS: Record<Role, string> = {
   Client: 'Клиент',
@@ -68,7 +83,8 @@ const MasterSettingsPage = () => {
     setUploading(true)
     setUploadError(null)
     try {
-      await uploadMasterPhoto(file)
+      const fileToUpload = await convertToJpegIfNeeded(file)
+      await uploadMasterPhoto(fileToUpload)
       setMasterProfile(prev => prev ? { ...prev, photoUrl: 'uploaded' } : prev)
       setCacheBust(Date.now())
     } catch (e: unknown) {

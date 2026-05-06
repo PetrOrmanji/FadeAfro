@@ -12,6 +12,7 @@
   "dependencies": {
     "@tma.js/sdk-react": "^3.0.19",
     "axios": "^1.15.2",
+    "heic2any": "^0.0.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2"
