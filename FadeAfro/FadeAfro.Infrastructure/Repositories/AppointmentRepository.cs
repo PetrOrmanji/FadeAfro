@@ -66,7 +66,7 @@ public class AppointmentRepository : IAppointmentRepository
             a.EndTime > DateTime.UtcNow);
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
+    public async Task<List<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,
         bool includeMasterInfo = false)
@@ -82,7 +82,7 @@ public class AppointmentRepository : IAppointmentRepository
         return await query.Where(a => a.ClientId == clientId).ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Appointment>> GetActiveByMasterProfileIdAsync(
+    public async Task<List<Appointment>> GetActiveByMasterProfileIdAsync(
         Guid masterProfileId,
         bool includeServices = false,
         bool includeClientInfo = false)
@@ -107,6 +107,12 @@ public class AppointmentRepository : IAppointmentRepository
     public async Task DeleteAsync(Appointment appointment)
     {
         _context.Appointments.Remove(appointment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteRangeAsync(List<Appointment> appointments)
+    {
+        _context.Appointments.RemoveRange(appointments);
         await _context.SaveChangesAsync();
     }
 

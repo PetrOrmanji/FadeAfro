@@ -19,16 +19,17 @@ public interface IAppointmentRepository
     
     Task<int> GetActiveAppointmentsCountByClientIdAsync(Guid masterProfileId);
 
-    Task<IReadOnlyList<Appointment>> GetActiveByClientIdAsync(
+    Task<List<Appointment>> GetActiveByClientIdAsync(
         Guid clientId,
         bool includeServices = false,
         bool includeMasterInfo = false);
 
-    Task<IReadOnlyList<Appointment>> GetActiveByMasterProfileIdAsync(
+    Task<List<Appointment>> GetActiveByMasterProfileIdAsync(
         Guid masterProfileId,
         bool includeServices = false,
         bool includeClientInfo = false);
             
     Task AddAsync(Appointment appointment);
     Task DeleteAsync(Appointment appointment);
+    Task DeleteRangeAsync(List<Appointment> appointments);
 }

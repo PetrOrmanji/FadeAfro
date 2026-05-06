@@ -9,11 +9,16 @@ namespace FadeAfro.Application.Features.MasterProfiles.SetAsMaster;
 public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
 {
     private readonly IMasterProfileRepository _masterProfileRepository;
+    private readonly IAppointmentRepository _appointmentRepository;
     private readonly IUserRepository _userRepository;
 
-    public SetAsMasterHandler(IMasterProfileRepository masterProfileRepository, IUserRepository userRepository)
+    public SetAsMasterHandler(
+        IMasterProfileRepository masterProfileRepository,
+        IAppointmentRepository appointmentRepository,
+        IUserRepository userRepository)
     {
         _masterProfileRepository = masterProfileRepository;
+        _appointmentRepository = appointmentRepository;
         _userRepository = userRepository;
     }
 
@@ -28,6 +33,12 @@ public class SetAsMasterHandler : IRequestHandler<SetAsMasterCommand>
 
         if (existingProfile is not null)
             throw new MasterProfileAlreadyExistsException();
+
+        var clientAppointments = 
+            await _appointmentRepository.GetActiveByClientIdAsync(user.Id);
+        
+        if (clientAppointments.Count != 0)
+            await _appointmentRepository.DeleteRangeAsync(clientAppointments);
 
         user.AssignMasterRole();
         await _userRepository.UpdateAsync(user);
