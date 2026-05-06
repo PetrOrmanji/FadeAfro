@@ -21,7 +21,10 @@ public class NotificationRepository : INotificationRepository
     
     public async Task<List<Notification>> GetUnreadNotificationsByUserId(Guid userId)
     {
-        return await _context.Notifications.Where(x => x.UserId == userId && x.IsRead == false).ToListAsync();
+        return await _context.Notifications
+            .Where(x => x.UserId == userId && x.IsRead == false)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
     }
     
     public async Task<Notification?> GetNotificationByIdAndUserId(Guid id, Guid userId)
