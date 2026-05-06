@@ -5,10 +5,12 @@ using FadeAfro.Domain.Repositories;
 using FadeAfro.Domain.Services;
 using FadeAfro.Infrastructure.HealthChecks;
 using FadeAfro.Infrastructure.Options;
+using FadeAfro.Infrastructure.Options.Workers;
 using FadeAfro.Infrastructure.Persistence;
 using FadeAfro.Infrastructure.Repositories;
 using FadeAfro.Infrastructure.Services;
 using FadeAfro.Infrastructure.Settings;
+using FadeAfro.Infrastructure.Workers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -106,7 +108,19 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddScoped<ITimeSettings, TimeSettings>();
+        services.AddSingleton<ITimeSettings, TimeSettings>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
+    {
+        services.AddOptions<AppointmentReminderWorkerOptions>()
+            .BindConfiguration("Workers:AppointmentReminderWorker")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddHostedService<AppointmentReminderWorker>();
 
         return services;
     }

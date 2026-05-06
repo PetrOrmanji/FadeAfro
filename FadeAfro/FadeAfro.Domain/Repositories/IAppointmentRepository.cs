@@ -9,6 +9,11 @@ public interface IAppointmentRepository
         bool includeMasterInfo = false,
         bool includeClientInfo = false);
 
+    Task<List<Appointment>> GetByDateAsync(
+        DateOnly date, 
+        bool includeMasterInfo = false, 
+        bool includeClientInfo = false);
+
     Task<bool> HasActiveAppointmentsOnDateAsync(Guid masterProfileId, DateOnly date);
     
     Task<bool> HasActiveAppointmentsOnDatesAsync(Guid masterProfileId, List<DateOnly> dates);

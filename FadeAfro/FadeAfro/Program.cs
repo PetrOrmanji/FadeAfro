@@ -22,6 +22,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddRateLimiting();
 builder.Services.AddSwagger();
 builder.Services.AddHealthCheckServices();
+builder.Services.AddBackgroundWorkers();
 
 var app = builder.Build();
 

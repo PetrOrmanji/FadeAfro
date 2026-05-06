@@ -29,6 +29,19 @@ public class AppointmentRepository : IAppointmentRepository
         
         return await query.FirstOrDefaultAsync(a => a.Id == id);
     }
+    
+    public async Task<List<Appointment>> GetByDateAsync(DateOnly date, bool includeMasterInfo = false, bool includeClientInfo = false)
+    {
+        var query = _context.Appointments.AsQueryable();
+        
+        if (includeMasterInfo)
+            query = query.Include(a => a.MasterProfile).ThenInclude(mp => mp.Master);
+        
+        if (includeClientInfo)
+            query = query.Include(a => a.Client);
+
+        return await query.Where(x => DateOnly.FromDateTime(x.StartTime) == date).ToListAsync();
+    }
 
     public async Task<bool> HasActiveAppointmentsOnDateAsync(Guid masterProfileId, DateOnly date)
     {
