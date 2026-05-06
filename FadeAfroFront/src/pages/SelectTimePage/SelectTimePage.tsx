@@ -148,18 +148,14 @@ const SelectTimePage = () => {
     <>
       <div className={`${styles.page} ${selectedTime ? styles.pageWithPanel : ''}`}>
 
-        {/* Лого + дата — единый верхний блок */}
-        <div className={styles.pageTop}>
-          <div className={styles.logoWrap}>
-            <img src={logo} className={styles.logo} alt="FadeAfro" />
-          </div>
+        <div className={styles.logoWrap}>
+          <img src={logo} className={styles.logo} alt="FadeAfro" />
           <div className={styles.dateRow}>
             <CalendarIcon />
             <span className={styles.dateText}>{formatDate(selectedDate)}</span>
           </div>
         </div>
 
-        {/* Заголовок — на той же позиции, что «Выберите дату» */}
         <h1 className={styles.title}>Выберите время</h1>
 
         {/* Слоты */}

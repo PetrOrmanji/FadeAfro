@@ -10,7 +10,7 @@
  * 100000003 — Vasya Clientov  (Client)
  */
 
-export const MOCK_USER_ID = 100000001
+export const MOCK_USER_ID = 100000003
 
 // ─────────────────────────────────────────────────────────────────────────────
 
