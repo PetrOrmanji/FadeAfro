@@ -2,7 +2,7 @@ using FadeAfro.Application.Features.Notifications.Common;
 using FadeAfro.Domain.Repositories;
 using MediatR;
 
-namespace FadeAfro.Application.Features.Notifications.GetMyNotifications;
+namespace FadeAfro.Application.Features.Notifications.GetMyUnreadNotifications;
 
 public class GetMyNotificationsHandler : IRequestHandler<GetMyUnreadNotificationsQuery, GetMyUnreadNotificationsResponse>
 {

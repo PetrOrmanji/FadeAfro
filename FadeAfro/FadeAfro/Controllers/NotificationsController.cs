@@ -1,4 +1,4 @@
-using FadeAfro.Application.Features.Notifications.GetMyNotifications;
+using FadeAfro.Application.Features.Notifications.GetMyUnreadNotifications;
 using FadeAfro.Application.Features.Notifications.GetMyUnreadNotificationsCount;
 using FadeAfro.Application.Features.Notifications.MarkMyNotificationAsRead;
 using FadeAfro.Application.Features.Notifications.MarkMyNotificationsAsRead;
