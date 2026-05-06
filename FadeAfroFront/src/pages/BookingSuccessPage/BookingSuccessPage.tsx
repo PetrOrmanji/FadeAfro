@@ -36,7 +36,7 @@ interface LocationState {
 
 const BookingSuccessPage = () => {
   const navigate = useNavigate()
-  useBackButton()
+  useBackButton('/client')
   const state = (history.state?.usr as LocationState) ?? {}
   const { master, selectedServices, selectedDate, selectedTime, totalPrice } = state
 
