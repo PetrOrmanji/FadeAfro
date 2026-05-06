@@ -2,6 +2,7 @@ import logo from '../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLaunchParams } from '@tma.js/sdk-react'
+import axios from 'axios'
 import { getMe, type UserResponse } from '../../api/user'
 import { getMyMasterProfile, getMasterPhotoUrl, uploadMasterPhoto, type MasterProfile } from '../../api/masters'
 import { isRateLimitError, showRateLimitAlert } from '../../api/errors'
@@ -32,6 +33,7 @@ const MasterSettingsPage = () => {
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null)
   const [uploading,     setUploading]     = useState(false)
   const [cacheBust,     setCacheBust]     = useState<number>(Date.now())
+  const [uploadError,   setUploadError]   = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -64,12 +66,17 @@ const MasterSettingsPage = () => {
     e.target.value = ''
 
     setUploading(true)
+    setUploadError(null)
     try {
       await uploadMasterPhoto(file)
       setMasterProfile(prev => prev ? { ...prev, photoUrl: 'uploaded' } : prev)
       setCacheBust(Date.now())
     } catch (e: unknown) {
       if (isRateLimitError(e)) { showRateLimitAlert(); return }
+      if (axios.isAxiosError(e) && e.response && e.response.status < 500) {
+        setUploadError(e.response.data?.error ?? 'Не удалось загрузить фото')
+        return
+      }
       navigate('/error', { replace: true })
     } finally {
       setUploading(false)
@@ -125,6 +132,11 @@ const MasterSettingsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Ошибка загрузки фото */}
+      {uploadError && (
+        <div className={styles.uploadError}>{uploadError}</div>
+      )}
 
       {/* Роли */}
       <section className={styles.section}>
