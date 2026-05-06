@@ -70,6 +70,7 @@ public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterP
         var slotStep = TimeSpan.FromMinutes(30);
         var current = masterSchedule.StartTime.ToTimeSpan();
         var end = masterSchedule.EndTime.ToTimeSpan();
+        var nowUtc = DateTime.UtcNow;
 
         var slots = new List<MasterProfileDateSlotDto>();
 
@@ -77,14 +78,21 @@ public class GetMasterProfileDayAvailabilityHandler : IRequestHandler<GetMasterP
         {
             var slotStartLocal = date.ToDateTime(TimeOnly.FromTimeSpan(current));
             var slotStartUtc = TimeZoneInfo.ConvertTimeToUtc(slotStartLocal, _timeZone);
+
+            if (slotStartUtc <= nowUtc)
+            {
+                current += slotStep;
+                continue;
+            }
+
             var slotEndUtc = slotStartUtc + duration;
 
             var isActive = !appointments.Any(a =>
                 a.StartTime < slotEndUtc &&
                 a.EndTime > slotStartUtc);
-            
+
             var masterProfileDateSlotDto = new MasterProfileDateSlotDto(
-                slotStartUtc, 
+                slotStartUtc,
                 isActive);
 
             slots.Add(masterProfileDateSlotDto);
