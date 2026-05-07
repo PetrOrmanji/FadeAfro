@@ -74,7 +74,7 @@ const AppointmentCard = ({
       el.style.height = `${el.offsetHeight}px`
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          el.style.transition = 'height 0.35s ease, margin 0.35s ease, opacity 0.25s ease, transform 0.25s ease'
+          el.style.transition = 'height 0.5s ease, margin 0.5s ease, opacity 0.4s ease, transform 0.4s ease'
           el.style.height = '0'
           el.style.marginBottom = '0'
           el.style.opacity = '0'
@@ -82,7 +82,7 @@ const AppointmentCard = ({
           el.style.overflow = 'hidden'
         })
       })
-      setTimeout(() => onCancel(appointment.id), 400)
+      setTimeout(() => onCancel(appointment.id), 550)
     }, 1000)
   }
 
