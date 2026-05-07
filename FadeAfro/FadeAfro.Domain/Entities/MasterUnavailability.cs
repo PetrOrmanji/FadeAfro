@@ -7,6 +7,8 @@ public class MasterUnavailability : Entity
 
     public MasterProfile MasterProfile { get; private set; } = null!;
     
+    private MasterUnavailability() { }
+
     public MasterUnavailability(Guid masterProfileId, DateOnly date)
     {
         MasterProfileId = masterProfileId;

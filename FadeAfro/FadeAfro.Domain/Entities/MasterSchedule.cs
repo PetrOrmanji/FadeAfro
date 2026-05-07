@@ -11,6 +11,8 @@ public class MasterSchedule : Entity
 
     public MasterProfile MasterProfile { get; private set; } = null!;
 
+    private MasterSchedule() { }
+
     public MasterSchedule(Guid masterProfileId, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime)
     {
         if (endTime <= startTime)

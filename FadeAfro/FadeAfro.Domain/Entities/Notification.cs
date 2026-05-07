@@ -10,6 +10,8 @@ public class Notification : Entity
 
     public User User { get; private set; } = null!;
 
+    private Notification() { Text = null!; }
+
     public Notification(Guid userId, string text)
     {
         if (string.IsNullOrWhiteSpace(text))

@@ -17,6 +17,8 @@ public class Appointment : Entity
     public User Client { get; private set; } = null!;
     public MasterProfile MasterProfile { get; private set; } = null!;
 
+    private Appointment() { }
+
     public Appointment(
         Guid clientId,
         Guid masterProfileId,

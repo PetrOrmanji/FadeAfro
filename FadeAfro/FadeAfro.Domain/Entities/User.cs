@@ -14,6 +14,8 @@ public class User : Entity
     public ICollection<Appointment> Appointments { get; private set; } = [];
     public ICollection<Notification> Notifications { get; private set; } = [];
 
+    private User() { FirstName = null!; Roles = null!; }
+
     public User(long telegramId, string firstName, string? lastName, string? username, List<Role> roles)
     {
         if (telegramId <= 0)

@@ -13,6 +13,8 @@ public class Service : Entity
     public MasterProfile MasterProfile { get; private set; } = null!;
     public ICollection<AppointmentService> AppointmentServices { get; private set; } = [];
 
+    private Service() { Name = null!; }
+
     public Service(Guid masterProfileId, string name, string? description, int price, TimeSpan duration)
     {
         if (string.IsNullOrWhiteSpace(name))

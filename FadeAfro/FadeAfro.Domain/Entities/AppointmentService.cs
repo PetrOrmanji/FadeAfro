@@ -11,6 +11,8 @@ public class AppointmentService : Entity
     public Appointment Appointment { get; private set; } = null!;
     public Service Service { get; private set; } = null!;
 
+    private AppointmentService() { ServiceName = null!; }
+
     public AppointmentService(Guid appointmentId, Guid? serviceId, string serviceName, int price, TimeSpan duration)
     {
         AppointmentId = appointmentId;

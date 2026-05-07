@@ -11,6 +11,8 @@ public class MasterProfile : Entity
     public ICollection<Appointment> Appointments { get; private set; } = [];
     public ICollection<MasterUnavailability> Unavailabilities { get; private set; } = [];
 
+    private MasterProfile() { }
+
     public MasterProfile(Guid masterId, string? photoUrl = null)
     {
         MasterId = masterId;
