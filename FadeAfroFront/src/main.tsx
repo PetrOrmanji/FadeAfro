@@ -9,6 +9,9 @@ if (import.meta.env.DEV) {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(window as any).Telegram?.WebApp?.lockOrientation?.()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
