@@ -192,6 +192,42 @@
 .cancelBtn:active   { opacity: 0.6; }
 .cancelBtn:disabled { opacity: 0.4; }
 
+@keyframes confirmBtnIn {
+  from { transform: scale(0.94); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes checkDraw {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0;  }
+}
+
+.cancelBtnConfirm {
+  background-color: #34c759;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px 16px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: confirmBtnIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, background-color 0.15s;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.cancelBtnConfirm:active   { opacity: 0.85; }
+.cancelBtnConfirm:disabled { opacity: 0.5; }
+
+.cancelBtnConfirm svg polyline {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkDraw 0.3s 0.15s ease forwards;
+}
+
 /* ── Пусто ────────────────────────────────────────────────────────────────── */
 .emptyCard {
   flex: 1;

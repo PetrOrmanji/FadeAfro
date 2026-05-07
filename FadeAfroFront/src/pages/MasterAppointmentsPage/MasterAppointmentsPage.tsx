@@ -37,7 +37,9 @@ const AppointmentCard = ({
   onCancel: (id: string) => void
   navigate: NavigateFunction
 }) => {
-  const [cancelling, setCancelling] = useState(false)
+  const [cancelling,  setCancelling]  = useState(false)
+  const [confirmStep, setConfirmStep] = useState(false)
+  const confirmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
   const clientName = appointment.client
@@ -53,20 +55,9 @@ const AppointmentCard = ({
   const totalMinutes  = appointment.services.reduce((s, svc) => s + durationToMinutes(svc.duration), 0)
   const totalDuration = minutesToFormatted(totalMinutes)
 
-  const handleCancel = async () => {
-    if (!ref.current || cancelling) return
-    setCancelling(true)
-
-    try {
-      await cancelMasterAppointment(appointment.id)
-    } catch (e: unknown) {
-      setCancelling(false)
-      if (isRateLimitError(e)) { showRateLimitAlert(); return }
-      navigate('/error', { replace: true })
-      return
-    }
-
+  const slideOut = () => {
     const el = ref.current
+    if (!el) return
     el.style.height = `${el.offsetHeight}px`
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -78,8 +69,31 @@ const AppointmentCard = ({
         el.style.overflow = 'hidden'
       })
     })
-
     setTimeout(() => onCancel(appointment.id), 350)
+  }
+
+  const handleCancelClick = () => {
+    if (cancelling) return
+    setConfirmStep(true)
+    confirmTimerRef.current = setTimeout(() => setConfirmStep(false), 3000)
+  }
+
+  const handleConfirm = async () => {
+    if (cancelling) return
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current)
+    setCancelling(true)
+
+    try {
+      await cancelMasterAppointment(appointment.id)
+    } catch (e: unknown) {
+      setCancelling(false)
+      setConfirmStep(false)
+      if (isRateLimitError(e)) { showRateLimitAlert(); return }
+      navigate('/error', { replace: true })
+      return
+    }
+
+    slideOut()
   }
 
   return (
@@ -149,13 +163,24 @@ const AppointmentCard = ({
       <div className={styles.divider} />
 
       {/* Отмена */}
-      <button
-        className={styles.cancelBtn}
-        onClick={handleCancel}
-        disabled={cancelling}
-      >
-        {cancelling ? 'Отмена...' : 'Отменить запись'}
-      </button>
+      {confirmStep ? (
+        <button
+          className={styles.cancelBtnConfirm}
+          onClick={handleConfirm}
+          disabled={cancelling}
+        >
+          <CheckIcon />
+          {cancelling ? 'Отменяем...' : 'Подтвердить отмену'}
+        </button>
+      ) : (
+        <button
+          className={styles.cancelBtn}
+          onClick={handleCancelClick}
+          disabled={cancelling}
+        >
+          Отменить запись
+        </button>
+      )}
 
     </div>
   )
@@ -216,6 +241,13 @@ const MasterAppointmentsPage = () => {
 }
 
 // ── Иконки ─────────────────────────────────────────────────────────────────
+
+const CheckIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+)
 
 const ScissorsIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
