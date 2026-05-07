@@ -8,6 +8,10 @@ if (import.meta.env.DEV) {
   setupTelegramMock()
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const tg = (window as any).Telegram?.WebApp
+tg?.lockOrientation?.('portrait')
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
