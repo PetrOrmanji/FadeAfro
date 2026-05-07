@@ -41,7 +41,7 @@ const RotateOverlay = () => (
       color: 'var(--tg-hint)', textAlign: 'center',
       padding: '0 32px',
     }}>
-      Переверните телефон вертикально
+      Переверните устройство вертикально
     </p>
   </div>
 )
