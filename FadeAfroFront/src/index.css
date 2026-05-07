@@ -106,7 +106,7 @@ img {
   }
 
   #root::after {
-    content: '';
+    content: 'Переверните телефон вертикально';
     position: fixed;
     inset: 0;
     background: var(--tg-secondary-bg, #efeff3);
@@ -114,5 +114,10 @@ img {
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--tg-hint, #999999);
+    text-align: center;
+    padding: 0 32px;
   }
 }
