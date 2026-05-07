@@ -41,7 +41,7 @@ const NotificationsPage = () => {
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id))
       setRemovingIds(prev => { const s = new Set(prev); s.delete(id); return s })
-    }, 350)
+    }, 550)
   }
 
   const handleMarkAll = async () => {
@@ -60,14 +60,14 @@ const NotificationsPage = () => {
     ids.forEach((id, i) => {
       setTimeout(() => {
         setRemovingIds(prev => new Set(prev).add(id))
-      }, i * 60)
+      }, i * 80)
     })
 
     setTimeout(() => {
       setNotifications([])
       setRemovingIds(new Set())
       setMarkingAll(false)
-    }, ids.length * 60 + 350)
+    }, ids.length * 80 + 550)
   }
 
   if (loading) return <LoadingScreen />
@@ -142,7 +142,7 @@ const NotificationCard = ({
     el.style.overflow = 'hidden'
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        el.style.transition = 'height 0.3s ease, padding 0.3s ease, margin 0.3s ease, opacity 0.2s ease, transform 0.2s ease'
+        el.style.transition = 'height 0.5s ease, padding 0.5s ease, margin 0.5s ease, opacity 0.4s ease, transform 0.4s ease'
         el.style.height = '0'
         el.style.paddingTop = '0'
         el.style.paddingBottom = '0'
